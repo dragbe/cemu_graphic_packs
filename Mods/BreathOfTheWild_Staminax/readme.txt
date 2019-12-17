@@ -1,0 +1,1 @@
+- Tested with Cemu 1.15.15 (possible compatibility break with Cemu 1.15.20)
