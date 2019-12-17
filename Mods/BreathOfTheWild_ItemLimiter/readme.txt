@@ -4,4 +4,4 @@ NOTES:
 - if this graphic pack is enabled before starting a game, there are {materials|foods} loss if the {materials|foods} total count in the game save is greater than the selected preset "{materials|foods} value"
 
 KNOWN ISSUES:
-- allow cooking even if the "foods limit" is reached (the food is not added to the inventory)
+- allow cooking even if the "food limit" is reached (the food is not added to the inventory)
