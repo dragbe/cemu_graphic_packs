@@ -1,1 +1,56 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Item Limiter
+path = "The Legend of Zelda: Breath of the Wild/Mods/Item Limiter"
+description = limits both materials and foods total count
+version = 4
 
+[Preset]
+name = 5 materials + 1 foods
+$MatMaxCount = 5
+$FoodMaxCount = 1
+
+[Preset]
+name = 10 materials + 3 foods
+$MatMaxCount = 10
+$FoodMaxCount = 3
+
+[Preset]
+name = 25 materials + 6 foods
+$MatMaxCount = 25
+$FoodMaxCount = 6
+
+[Preset]
+name = 50 materials + 13 foods
+$MatMaxCount = 50
+$FoodMaxCount = 13
+
+[Preset]
+name = 100 materials + 25 foods
+$MatMaxCount = 100
+$FoodMaxCount = 25
+
+[Preset]
+name = 300 materials + 75 foods
+$MatMaxCount = 300
+$FoodMaxCount = 75
+
+[Preset]
+name = 500 materials + 125 foods
+$MatMaxCount = 500
+$FoodMaxCount = 125
+
+[Preset]
+name = 1000 materials + 250 foods
+$MatMaxCount = 1000
+$FoodMaxCount = 250
+
+[Preset]
+name = 5000 materials + 1250 foods
+$MatMaxCount = 5000
+$FoodMaxCount = 1250
+
+[Preset]
+name = 10000 materials + 2500 foods
+$MatMaxCount = 10000
+$FoodMaxCount = 2500
