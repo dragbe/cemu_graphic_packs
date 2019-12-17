@@ -1,0 +1,43 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+codeCaveSize = 0x64
+
+0x0000000 = .float $StaMaxBonus
+_staMaxBonus = 0x0000000
+
+_staminaBonus = 0x0000004
+0x0000004 = lfs f1, +0x18(r1)
+0x0000008 = fadds f1, f1, f12
+0x000000C = lis r3, _staMaxBonus@ha
+0x0000010 = lfs f0, _staMaxBonus@l(r3)
+0x0000014 = fcmpu cr0, f1, f0
+0x0000018 = ble .+0x8
+0x000001C = fmr f1, f0
+0x0000020 = stfs f1, +0x18(r1)
+0x0000024 = blr
+
+_staminaBonusPreview = 0x0000028
+0x0000028 = lis r9, _staMaxBonus@ha
+0x000002C = lfs f0, _staMaxBonus@l(r9)
+0x0000030 = fcmpu cr0, f1, f0
+0x0000034 = bgt .+0x8
+0x0000038 = blr
+0x000003C = fmr f1, f0
+0x0000040 = blr
+
+_staminaBonusLimiter = 0x0000044
+0x0000044 = lis r3, _staMaxBonus@ha
+0x0000048 = lfs f1, _staMaxBonus@l(r3)
+0x000004C = lfs f13, +0x1a28(r31)
+0x0000050 = fcmpu cr0, f13, f1
+0x0000054 = ble .+0x8
+0x0000058 = stfs f1, +0x1a28(r31)
+0x000005C = lfs f13, +0x20(r30)
+0x0000060 = blr
+
+0x02ff15CC = lfs f12, +0x1d34(r31)
+0x02ff15D0 = bla _staminaBonus # Extra stamina bonus update
+0x02fe1778 = fadds f1, f1, f13 # Extra stamina bonus preview update
+0x02fe1784 = bla _staminaBonusPreview
+0x02d9d5BC = bla _staminaBonusLimiter

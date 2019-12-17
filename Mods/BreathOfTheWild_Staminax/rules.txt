@@ -1,1 +1,18 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Staminax
+path = "The Legend of Zelda: Breath of the Wild/Mods/Staminax"
+description = Cumulative extra stamina bonus
+version = 4
 
+[Preset]
+name = No limit
+$StaMaxBonus = 2147483647
+
+[Preset]
+name = Game limit (2000)
+$StaMaxBonus = 2000
+
+[Preset]
+name = Custom limit (1000)
+$StaMaxBonus = 1000
