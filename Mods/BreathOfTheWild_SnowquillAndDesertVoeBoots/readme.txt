@@ -1,2 +1,2 @@
-- Tested with Cemu 1.15.15 (possible compatibility break with Cemu 1.15.20)
+KNOWN ISSUES:
 - Bonus icon not visible in the inventory
