@@ -1,1 +1,46 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Material Limiter
+path = "The Legend of Zelda: Breath of the Wild/Mods/Material Limiter"
+description = Limits the materials total count
+version = 4
 
+[Preset]
+name = 5
+$MatMaxCount = 5
+
+[Preset]
+name = 10
+$MatMaxCount = 10
+
+[Preset]
+name = 25
+$MatMaxCount = 25
+
+[Preset]
+name = 50
+$MatMaxCount = 50
+
+[Preset]
+name = 100
+$MatMaxCount = 100
+
+[Preset]
+name = 300
+$MatMaxCount = 300
+
+[Preset]
+name = 500
+$MatMaxCount = 500
+
+[Preset]
+name = 1000
+$MatMaxCount = 1000
+
+[Preset]
+name = 5000
+$MatMaxCount = 5000
+
+[Preset]
+name = 10000
+$MatMaxCount = 10000
