@@ -1,0 +1,74 @@
+<!doctype html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<title>Weather Forecast rules calculator</title>
+<meta name="description" content="Rules generator in order to add custom weather rules for Weather Forecast graphic pack" />
+<script>
+function setFromWeathersRule(intFromWeatherIndex) {
+	arrWeathersRules[0].value=(parseInt(arrWeathersRules[0].value,10)+(arrInputWeathers[0][intFromWeatherIndex].checked*2-1)*(1<<intFromWeatherIndex)/2).toString();
+}
+function setToWeathersRule(intFromWeatherIndex) {
+var intShift=(intFromWeatherIndex-1)*4;
+var intPreviousToWeathersRule=parseInt(arrWeathersRules[1].value,10);
+var intMask=(4294967295 ^ (15 << intShift));
+	arrWeathersRules[1].value=((intPreviousToWeathersRule & intMask) | (((1-arrInputWeathers[1][intFromWeatherIndex].options[arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex].disabled)*arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex) << intShift)).toString();
+	return (intPreviousToWeathersRule & (~intMask)) >> intShift;
+}
+function updateToWeathersRule(intFromWeatherIndex) {
+var intPreviousToWeatherRule=setToWeathersRule(intFromWeatherIndex);
+	arrInputWeathers[0][arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex].disabled=true;
+	arrInputWeathers[0][intPreviousToWeatherRule].disabled=false;
+	for (var intToWeathersIndex in arrWeathers) {
+		if (intToWeathersIndex!=intPreviousToWeatherRule) {
+			arrInputWeathers[0][intPreviousToWeatherRule].disabled=arrInputWeathers[0][intPreviousToWeatherRule].disabled | (arrInputWeathers[1][intToWeathersIndex].options.selectedIndex==intPreviousToWeatherRule);
+		}
+	}
+	arrInputWeathers[0][0].disabled=true;
+}
+function updateFromWeathersRule(intFromWeatherIndex) {
+	setFromWeathersRule(intFromWeatherIndex);
+	if (arrInputWeathers[0][intFromWeatherIndex].checked) {
+		arrInputWeathers[1][intFromWeatherIndex].disabled=false;
+		arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex=0;
+	} else {
+		arrInputWeathers[1][intFromWeatherIndex].disabled=true;
+		arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex=intFromWeatherIndex;
+	}
+	updateToWeathersRule(intFromWeatherIndex);
+	arrInputWeathers[0][intFromWeatherIndex].disabled=false;
+	for (var intToWeathersIndex in arrWeathers) {
+		arrInputWeathers[1][intToWeathersIndex].options[intFromWeatherIndex].disabled=arrInputWeathers[0][intFromWeatherIndex].checked;
+	}
+}
+var arrWeathers=new Array("Blue sky","Cloudy","Rain","Heavy rain","Snow|rain","Heavy snow|rain","Dark weather","Thunder and rain","Blue sky and rain");
+</script>
+</head>
+<body>
+<form name="frmWeatherRules">
+<table align="center" border=2>
+<tr><td><label>$FromWeathers<input type="text" name="txtWeatherRules" value="0" disabled></label></td><td><label>$ToWeathers<input type="text" name="txtWeatherRules" value="0" disabled></label></td></tr>
+<script>
+	for (var intFromWeathersIndex in arrWeathers) {
+		document.write("<tr><td><label><input onclick=\"updateFromWeathersRule("+intFromWeathersIndex.toString()+");\" type=\"checkbox\" name=\"chkFromWeathers\" value=\""+intFromWeathersIndex.toString()+"\">"+arrWeathers[intFromWeathersIndex]+"</label></td><td><select disabled name=\"selToWeathers\" onchange=\"updateToWeathersRule("+intFromWeathersIndex.toString()+");\">");
+		for (var intToWeathersIndex in arrWeathers) {
+			document.write("<option value=\""+intToWeathersIndex.toString()+"\">"+arrWeathers[intToWeathersIndex]+"</option>");
+		}
+		document.write("<select></td></tr>");
+	}
+	var arrInputWeathers=new Array(document.frmWeatherRules.elements['chkFromWeathers'],document.frmWeatherRules.elements['selToWeathers']);
+	for (intToWeathersIndex in arrWeathers) {
+		arrInputWeathers[1][intToWeathersIndex].options.selectedIndex=intToWeathersIndex;
+		arrInputWeathers[1][intToWeathersIndex].options[intToWeathersIndex].disabled=true;
+	}
+	arrInputWeathers[0][0].disabled=true;
+	arrInputWeathers[1][0].disabled=true;
+	var arrWeathersRules=document.frmWeatherRules.elements['txtWeatherRules'];
+</script>
+</table>
+</form>
+</body>
+</html>

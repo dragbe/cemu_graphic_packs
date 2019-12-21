@@ -1,1 +1,21 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Weather Forecast
+path = "The Legend of Zelda: Breath of the Wild/Mods/Weather Forecast"
+description = Customizes the weather
+version = 4
 
+[Preset]
+name = Single rain ('rain' + 'heavy rain' + 'blue sky and rain' -> 'snow|rain')
+$FromWeathers = 134
+$ToWeathers = 1073742912
+
+[Preset]
+name = Harmless storm ('heavy snow|rain' + 'thunder and rain' -> 'heavy rain')
+$FromWeathers = 80
+$ToWeathers = 50528256
+
+[Preset]
+name = Single rain and no storm ('heavy snow|rain' + 'thunder and rain' -> 'dark weather')
+$FromWeathers = 214
+$ToWeathers = 1174799424
