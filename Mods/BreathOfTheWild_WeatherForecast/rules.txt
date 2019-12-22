@@ -16,6 +16,6 @@ $FromWeathers = 80
 $ToWeathers = 50528256
 
 [Preset]
-name = Single rain and no storm ('heavy snow|rain' + 'thunder and rain' -> 'dark weather')
+name = Single rain and no storm ('heavy snow|rain with thunderbolt' + 'thunder and rain' -> 'dark weather')
 $FromWeathers = 214
 $ToWeathers = 1174799424
