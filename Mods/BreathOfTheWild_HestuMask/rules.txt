@@ -1,1 +1,18 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Hestu Mask
+path = "The Legend of Zelda: Breath of the Wild/Mods/Hestu Mask"
+description = Korok mask with long-range detection
+version = 4
 
+[Preset]
+name = Max {search distance|forest weapons|mask defense} bonus {25|50|19}
+$MaxKorokSearchDistBonus = 25
+$MaxForestWeaponsBonus = 50
+$MaxKorokMaskDefenseBonus = 19
+
+[Preset]
+name = Max {search distance|forest weapons|mask defense} bonus {50|50|19}
+$MaxKorokSearchDistBonus = 50
+$MaxForestWeaponsBonus = 50
+$MaxKorokMaskDefenseBonus = 19
