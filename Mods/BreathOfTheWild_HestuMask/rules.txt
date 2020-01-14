@@ -2,7 +2,7 @@
 titleIds = 00050000101C9500
 name = Hestu Mask
 path = "The Legend of Zelda: Breath of the Wild/Mods/Hestu Mask"
-description = Korok mask with long-range detection
+description = The power of the Korok Mask (distance search, defense, bonus for looted forest weapons) increases with the Korok Seeds
 version = 4
 
 [Preset]
