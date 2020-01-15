@@ -1,1 +1,18 @@
+[Definition]
+titleIds = 00050000101C9500
+name = Hestu Mask
+path = "The Legend of Zelda: Breath of the Wild/Mods/Hestu Mask"
+description = The Korok Seeds in the inventory increase the power of the Korok Mask (distance search, defense, bonus for looted forest weapons)
+version = 4
 
+[Preset]
+name = Max {search distance|forest weapons|mask defense} bonuses {25|50|19}
+$MaxKorokSearchDistBonus = 25
+$MaxForestWeaponsBonus = 50
+$MaxKorokMaskDefenseBonus = 19
+
+[Preset]
+name = Max {search distance|forest weapons|mask defense} bonuses {50|50|19}
+$MaxKorokSearchDistBonus = 50
+$MaxForestWeaponsBonus = 50
+$MaxKorokMaskDefenseBonus = 19
