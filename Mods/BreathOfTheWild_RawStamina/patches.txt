@@ -1,0 +1,107 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+codeCaveSize = 0x11C
+
+_float1 = 0x10000670
+_floatneg1 = 0x100005F0
+_staminaGaugeAddress = 0x41C0F29C
+_uiStaminaGaugeAddress = 0x4499c96c
+0x0000000 = .float 1
+_currentStamina = 0x0000000
+
+_updateUiStaminaGauge = 0x0000004
+0x0000004 = lfs f12, +0x68(r3)
+0x0000008 = fcmpu cr0, f29, f12
+0x000000C = bge .+0x28
+0x0000010 = lis r3, _float1@ha
+0x0000014 = lfs f12, _float1@l(r3)
+0x0000018 = fcmpu cr0, f29, f12
+0x000001C = bge .+0x8
+0x0000020 = fmr f29, f12
+0x0000024 = fsubs f29, f29, f12
+0x0000028 = fmr f1, f29
+0x000002C = fadds f1, f1, f12
+0x0000030 = stfs f1, +0x1324(r12)
+0x0000034 = fcmpu cr0, f29, f1
+0x0000038 = lis r3, _currentStamina@ha
+0x000003C = stfs f1, _currentStamina@l(r3)
+0x0000040 = blr
+
+_recoverStamina = 0x0000044
+0x0000044 = fcmpu cr0, f29, f31
+0x0000048 = bne .+0xC
+0x000004C = fmr f9, f31
+0x0000050 = blr
+0x0000054 = lfs f9, +0x12C(r10)
+0x0000058 = blr
+
+_restoreUiGauge = 0x000005C
+0x000005C = lis r12, _staminaGaugeAddress@ha
+0x0000060 = lfs f31, _staminaGaugeAddress@l(r12)
+0x0000064 = lis r12, _uiStaminaGaugeAddress@ha
+0x0000068 = stfs f31, _uiStaminaGaugeAddress@l(r12)
+0x000006C = lis r12, _currentStamina@ha
+0x0000070 = stfs f1, _currentStamina@l(r12)
+0x0000074 = stfs f1, +0x1d2c(r31)
+0x0000078 = blr
+
+_resetUiStaminaGauge = 0x000007C
+0x000007C = lis r3, 0x101E
+0x0000080 = lfs f1, +0x5360(r3)
+0x0000084 = lis r4, _currentStamina@ha
+0x0000088 = lfs f30, _currentStamina@l(r4)
+0x000008C = fcmpu cr0, f30, f1
+0x0000090 = blt .+0x1C
+0x0000094 = bne .+0x14
+0x0000098 = lis r3, _float1@ha
+0x000009C = lfs f1, _float1@l(r3)
+0x00000A0 = fadds f30, f30, f1
+0x00000A4 = stfs f30, _currentStamina@l(r4)
+0x00000A8 = stfs f30, +0x1324(r12)
+0x00000AC = mr r3, r31
+0x00000B0 = blr
+
+_updateInventoryStamina = 0x00000B4
+0x00000B4 = lis r12, _currentStamina@ha
+0x00000B8 = stfs f12, _currentStamina@l(r12)
+0x00000BC = stfs f12, +0x1d2c(r30)
+0x00000C0 = blr
+
+_resetStamina = 0x00000C4
+0x00000C4 = lis r10, _floatneg1@ha
+0x00000C8 = lfs f31, _floatneg1@l(r10)
+0x00000CC = lis r10, _currentStamina@ha
+0x00000D0 = stfs f31, _currentStamina@l(r10)
+0x00000D4 = lwz r10, +0x10(r30)
+0x00000D8 = blr
+
+_initStamina = 0x00000DC
+0x00000DC = lis r3, _currentStamina@ha
+0x00000E0 = lfs f19, _currentStamina@l(r3)
+0x00000E4 = lis r0, _floatneg1@ha
+0x00000E8 = lfs f20, _floatneg1@l(r0)
+0x00000EC = fcmpu cr0, f19, f20
+0x00000F0 = bne .+0x8
+0x00000F4 = stfs f1, _currentStamina@l(r3)
+0x00000F8 = stfs f1, +0x68(r31)
+0x00000FC = blr
+
+_restoreFullStamina = 0x0000100
+0x0000100 = lis r3, _float1@ha
+0x0000104 = lfs f20, _float1@l(r3)
+0x0000108 = fcmpu cr0, f1, f20
+0x000010C = bne .+0x8
+0x0000110 = fsubs f1, f1, f20
+0x0000114 = mr r3, r31
+0x0000118 = blr
+
+0x02D90DC4 = bla _updateUiStaminaGauge # update UI stamina gauge area [fcmpu cr0, f29, f1]
+0x02D90D84 = bla _recoverStamina # stamina auto recover area [lfs f9, +0x12C(r10)]
+0x02D5935c = bla _resetUiStaminaGauge # reset UI stamina gauge area [mr r3, r31]
+0x02FE67F0 = bla _restoreUiGauge # inventory stamina initialization area [stfs f1, +0x1d2c(r31)]
+0x02FE43F8 = bla _updateInventoryStamina # update inventory stamina [stfs f12, +0x1d2c(r30)]
+0x0322CCF4 = bla _resetStamina # savedata structure initialization area [lwz r10, +0x10(r30)]
+0x02D49DE4 = bla _initStamina # restore full stamina or load saved stamina [stfs f1, +0x68(r31)]
+0x02D37C74 = bla _restoreFullStamina # restore full stamina area [mr r3, r31]
+0x02FE4394 = bla _updateInventoryStamina # update inventory stamina by eating foods with yellow stamina bonus [stfs f12, +0x1d2c(r30)]
