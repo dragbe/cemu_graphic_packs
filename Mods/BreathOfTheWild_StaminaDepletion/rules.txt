@@ -2,7 +2,7 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Stamina Depletion
 path = "The Legend of Zelda: Breath of the Wild/Mods/Stamina Depletion"
-description = Decreases the stamina slowly (FPS and Raw Stamina graphic packs enabled required)
+description = Decreases the stamina slowly ({FPS++ or static FPS} and Raw Stamina graphic packs required)
 version = 4
 
 [Preset]
