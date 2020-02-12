@@ -1,0 +1,71 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+codeCaveSize = 0xC8
+
+_float360 = 0x10004FF6
+_float120 = 0x10002B3A
+0x0000000 = .float ($StaminaRule/43200)
+_staminaRule = 0x0000000
+0x0000004 = .float ($StaminaRule/24)
+_staminaForcedDec = 0x0000004
+0x0000008 = .float 0
+_staminaDec = 0x0000008
+0x000000C = .float 0
+_gameSpeed = 0x000000C
+
+_updateRelativeStamina = 0x0000010
+0x0000010 = lis r28, _staminaRule@ha
+0x0000014 = lfs f13, _staminaRule@l(r28)
+0x0000018 = lis r28, _gameSpeed@ha
+0x000001C = lfs f12, _gameSpeed@l(r28)
+0x0000020 = fmuls f13, f13, f12
+0x0000024 = lis r29, _staminaDec@ha
+0x0000028 = lfs f12, _staminaDec@l(r29)
+0x000002C = fadds f12, f12, f13
+0x0000030 = fcmpu cr0, f30, f31
+0x0000034 = bgt .+0x28
+0x0000038 = bne .+0x14
+0x000003C = lis r28, _staminaForcedDec@ha
+0x0000040 = lfs f13, _staminaForcedDec@l(r28)
+0x0000044 = fcmpu cr0, f12, f13
+0x0000048 = ble .+0x10
+0x000004C = stfs f31, _staminaDec@l(r29)
+0x0000050 = fsubs f30, f30, f12
+0x0000054 = blr
+0x0000058 = fcmpu cr0, f30, f31
+0x000005C = stfs f12, _staminaDec@l(r29)
+0x0000060 = blr
+
+_passTime = 0x0000064
+0x0000064 = lfs f7, +0x98(r30)
+0x0000068 = fsubs f7, f13, f7
+0x000006C = lis r9, 0x101E
+0x0000070 = lfs f1, +0x5360(r9)
+0x0000074 = fcmpu cr0, f7, f1
+0x0000078 = bge .+0x10
+0x000007C = lis r9, _float360@ha
+0x0000080 = lfs f1, _float360@l(r9)
+0x0000084 = fadds f7, f7, f1
+0x0000088 = lis r9, _float120@ha
+0x000008C = lfs f1, _float120@l(r9)
+0x0000090 = fmuls f7, f7, f1
+0x0000094 = lis r9, _staminaRule@ha
+0x0000098 = lfs f1, _staminaRule@l(r9)
+0x000009C = fmuls f7, f7, f1
+0x00000A0 = lis r9, _staminaDec@ha
+0x00000A4 = lfs f1, _staminaDec@l(r9)
+0x00000A8 = fadds f7, f7, f1
+0x00000AC = stfs f7, _staminaDec@l(r9)
+0x00000B0 = lis r9, 0x1030
+0x00000B4 = blr
+
+_updateGameSpeed = 0x00000B8
+0x00000B8 = lis r31, _gameSpeed@ha
+0x00000BC = stfs f0, _gameSpeed@l(r31)
+0x00000C0 = lis r31, 0x1048
+0x00000C4 = blr
+
+0x02D90C08 = bla _updateRelativeStamina # Stamina update area [fcmpu cr0, f30, f31]
+0x03415C28 = bla _updateGameSpeed # Game speed update area [lis r31, 0x1048]
+#0x0365FA10 = bla _passTime # Time of day update after sleep (campfire included) [lis r9, 0x1030]
