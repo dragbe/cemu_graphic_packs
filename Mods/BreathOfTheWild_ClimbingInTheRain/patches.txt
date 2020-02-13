@@ -1,0 +1,33 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+codeCaveSize = 0x40
+
+0x0000000 = .int 0
+_armorSetBonus = 0x0000000
+
+_initArmorSetBonus = 0x0000004
+0x0000004 = lis r31, _armorSetBonus@ha
+0x0000008 = stw r0, _armorSetBonus@l(r31)
+0x000000C = mr r31, r3
+0x0000010 = blr
+
+_enableClimbingArmorSetBonus = 0x0000014
+0x0000014 = lis r26, _armorSetBonus@ha
+0x0000018 = stw r9, _armorSetBonus@l(r26)
+0x000001C = stw r9, +0x0(r29)
+0x0000020 = blr
+
+_climbAndSlip = 0x0000024
+0x0000024 = lis r3, _armorSetBonus@ha
+0x0000028 = lwz r3, _armorSetBonus@l(r3)
+0x000002C = rlwinm r3, r3, 0, 23, 23
+0x0000030 = cmpwi r3, 256
+0x0000034 = mr r3, r29
+0x0000038 = mr r4, r30
+0x000003C = blr
+
+0x0328EB9C = bla _initArmorSetBonus # Init armor set bonus [mr r31, r3]
+0x033A1E84 = bla _enableClimbingArmorSetBonus # Enable climbing armor set bonus [stw r9, +0x0(r29)]
+0x03343FEC = bla _climbAndSlip # Slip while climbing in the rain [mr r3, r29]
+0x03343FF0 = beq .+0x8 # Same area as above [mr r4, r30]
