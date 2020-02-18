@@ -1,1 +1,22 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Hunger Wheel
+path = "The Legend of Zelda: Breath of the Wild/Mods/Hunger Wheel"
+description = Hunger wheel for the yellow stamina
+version = 4
 
+[Preset]
+name = 1 wheel per day
+$StaminaRule = 1000
+
+[Preset]
+name = 1/2 wheel per day
+$StaminaRule = 500
+
+[Preset]
+name = 1/3 wheel per day
+$StaminaRule = 333
+
+[Preset]
+name = 1/5 wheel per day
+$StaminaRule = 200
