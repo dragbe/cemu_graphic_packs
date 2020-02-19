@@ -6,17 +6,41 @@ description = Hunger wheel for the yellow stamina
 version = 4
 
 [Preset]
-name = 1 wheel per day
+name = 1 wheel per day (hunger wheel not affected by actions)
 $StaminaRule = 1000
+$StaminaHungerFactor = 0
 
 [Preset]
-name = 1/2 wheel per day
+name = 1 wheel per day and 1% of action stamina
+$StaminaRule = 1000
+$StaminaHungerFactor = 0.01
+
+[Preset]
+name = 1/2 wheel per day (hunger wheel not affected by actions)
 $StaminaRule = 500
+$StaminaHungerFactor = 0
 
 [Preset]
-name = 1/3 wheel per day
+name = 1/2 wheel per day and 1% of action stamina
+$StaminaRule = 500
+$StaminaHungerFactor = 0.01
+
+[Preset]
+name = 1/3 wheel per day (hunger wheel not affected by actions)
 $StaminaRule = 333
+$StaminaHungerFactor = 0
 
 [Preset]
-name = 1/5 wheel per day
+name = 1/3 wheel per day and 1% of action stamina
+$StaminaRule = 333
+$StaminaHungerFactor = 0.01
+
+[Preset]
+name = 1/5 wheel per day (hunger wheel not affected by actions)
 $StaminaRule = 200
+$StaminaHungerFactor = 0
+
+[Preset]
+name = 1/5 wheel per day and 1% of action stamina
+$StaminaRule = 200
+$StaminaHungerFactor = 0.01
