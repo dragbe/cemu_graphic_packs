@@ -1,1 +1,22 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Life Extension
+path = "The Legend of Zelda: Breath of the Wild/Mods/Life Extension"
+description = Cumulative golden hearts
+version = 4
 
+[Preset]
+name = No extra golden hearts
+$MaxExtraGoldenHearts = 0
+
+[Preset]
+name = 50 extra golden hearts
+$MaxExtraGoldenHearts = 50
+
+[Preset]
+name = 100 extra golden hearts
+$MaxExtraGoldenHearts = 100
+
+[Preset]
+name = Unlimited extra golden hearts
+$MaxExtraGoldenHearts = 536870911
