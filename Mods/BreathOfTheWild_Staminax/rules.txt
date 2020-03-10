@@ -2,17 +2,13 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Staminax
 path = "The Legend of Zelda: Breath of the Wild/Mods/Staminax"
-description = Cumulative extra stamina bonus
+description = Cumulative yellow stamina
 version = 4
 
 [Preset]
-name = No limit
-$StaMaxBonus = 2147483647
+name = Custom yellow wheel capacity (5000)
+$MaxYellowStamina = 5000
 
 [Preset]
-name = Game limit (2000)
-$StaMaxBonus = 2000
-
-[Preset]
-name = Custom limit (1000)
-$StaMaxBonus = 1000
+name = Default yellow wheel capacity (2000)
+$MaxYellowStamina = 2000
