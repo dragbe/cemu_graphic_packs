@@ -4,3 +4,11 @@ name = Raw Stamina
 path = "The Legend of Zelda: Breath of the Wild/Mods/Raw Stamina"
 description = Stamina without auto recover
 version = 4
+
+[Preset]
+name = Custom yellow wheel capacity (5000)
+$MaxYellowStamina = 5000
+
+[Preset]
+name = Default yellow wheel capacity (2000)
+$MaxYellowStamina = 2000
