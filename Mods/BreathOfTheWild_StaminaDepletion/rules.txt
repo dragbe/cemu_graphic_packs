@@ -6,49 +6,49 @@ description = Customizes the stamina depletion ({FPS++ or static FPS} and Raw St
 version = 4
 
 [Preset]
-name = 1 wheel per day (25% depletion during sleep) + 1% of action stamina
+name = 1000 per day (25% depletion during sleep) + 1% of action stamina
 $StaminaRule = 1000
 $ActionStaminaScaleFactor = 0.01
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1 wheel per day (25% depletion during sleep) + 100% of action stamina
+name = 1000 per day (25% depletion during sleep) + 100% of action stamina
 $StaminaRule = 1000
 $ActionStaminaScaleFactor = 1
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1/2 wheel per day (25% depletion during sleep) + 1% of action stamina
+name = 500 per day (25% depletion during sleep) + 1% of action stamina
 $StaminaRule = 500
 $ActionStaminaScaleFactor = 0.01
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1/2 wheel per day (25% depletion during sleep) + 100% of action stamina
+name = 500 per day (25% depletion during sleep) + 100% of action stamina
 $StaminaRule = 500
 $ActionStaminaScaleFactor = 1
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1/3 wheel per day (25% depletion during sleep) + 1% of action stamina
+name = 333 per day (25% depletion during sleep) + 1% of action stamina
 $StaminaRule = 333
 $ActionStaminaScaleFactor = 0.01
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1/3 wheel per day (25% depletion during sleep) + 100% of action stamina
+name = 333 per day (25% depletion during sleep) + 100% of action stamina
 $StaminaRule = 333
 $ActionStaminaScaleFactor = 1
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1/5 wheel per day (25% depletion during sleep) + 1% of action stamina
+name = 200 per day (25% depletion during sleep) + 1% of action stamina
 $StaminaRule = 200
 $ActionStaminaScaleFactor = 0.01
 $SleepDepletionFactor = 0.25
 
 [Preset]
-name = 1/5 wheel per day (25% depletion during sleep) + 100% of action stamina
+name = 200 per day (25% depletion during sleep) + 100% of action stamina
 $StaminaRule = 200
 $ActionStaminaScaleFactor = 1
 $SleepDepletionFactor = 0.25

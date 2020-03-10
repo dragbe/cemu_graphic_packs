@@ -101,4 +101,4 @@ _initStaminaDepletionVars = 0x0000114
 0x03415C28 = bla _updateGameSpeed # Game speed update area [lis r31, 0x1048]
 0x02FE6800 = bla _initInventoryGoldenStamina # init inventory golden stamina [stfs f1, +0x1D34(r31)]
 0x0322CD58 = bla _initStaminaDepletionVars # savedata structure initialization area [li r31, 0]
-#0x0365FA10 = bla _passTime # Time of day update after sleep (campfire included) [lis r9, 0x1030]
+0x0365FA10 = bla _passTime # Time of day update after sleep (campfire included) [lis r9, 0x1030]
