@@ -1,1 +1,33 @@
+[Definition]
+titleIds = 00050000101C9500
+name = Hereditary Powers
+path = "The Legend of Zelda: Breath of the Wild/Mods/Hereditary Powers"
+description = Hereditary powers of armor
+version = 4
 
+[Preset]
+name = +5% durability per level for complementary weapons
+$DurabilityPerLevel = 5
+$ZoraWeaponsDamagePerLevel = 6 # +6 damage per level for Zora weapons [same level required for the 3 Zora armor pieces]
+$DefaultSwimEnergyMove = 30 # 30 (default)
+$SwimEnergyMoveMultiplier = 0.5 # Set to zero to enable stamina autorecover during normal swimming [enabled with Zora armor set bonus]
+$DefaultSwimSpeed = 0.052 # 0.052 (default)
+$SwimSpeedMultiplier = 1.75 # [enabled with Zora armor set bonus]
+
+[Preset]
+name = +10% durability per level for complementary weapons
+$DurabilityPerLevel = 10
+$ZoraWeaponsDamagePerLevel = 6
+$DefaultSwimEnergyMove = 30
+$SwimEnergyMoveMultiplier = 0.5
+$DefaultSwimSpeed = 0.052
+$SwimSpeedMultiplier = 1.75
+
+[Preset]
+name = Unbreakable complementary weapons at maximum level 
+$DurabilityPerLevel = 20
+$ZoraWeaponsDamagePerLevel = 6
+$DefaultSwimEnergyMove = 30
+$SwimEnergyMoveMultiplier = 0.5
+$DefaultSwimSpeed = 0.052
+$SwimSpeedMultiplier = 1.75
