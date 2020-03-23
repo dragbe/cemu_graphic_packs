@@ -6,16 +6,19 @@ description = Customizes the weather
 version = 4
 
 [Preset]
-name = Single rain ('rain' + 'heavy rain' + 'blue sky and rain' -> 'snow|rain')
-$FromWeathers = 134
-$ToWeathers = 1073742912
+name = Single rain [Rain HeavyRain BlueskyRain -> Snow|Rain]
+$WFData0 = 66564
+$WFData1 = 67438087
+$WFData2 = 67108864
 
 [Preset]
-name = Harmless storm ('heavy snow|rain' + 'thunder and rain' -> 'heavy rain')
-$FromWeathers = 80
-$ToWeathers = 50528256
+name = Harmless storm [HeavySnow ThunderRain -> HeavyRain]
+$WFData0 = 66051
+$WFData1 = 67307011
+$WFData2 = 134217728
 
 [Preset]
-name = Single rain and no storm ('heavy snow|rain with thunderbolt' + 'thunder and rain' -> 'dark weather')
-$FromWeathers = 214
-$ToWeathers = 1174799424
+name = Single rain and no storm [Rain HeavyRain BlueskyRain -> Snow|Rain] [HeavySnow ThunderRain -> DarkWeather]
+$WFData0 = 66564
+$WFData1 = 67503622
+$WFData2 = 67108864

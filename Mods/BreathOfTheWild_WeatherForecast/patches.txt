@@ -1,31 +1,19 @@
 [BotwV208]
 moduleMatches = 0x6267BFD0
 
-codeCaveSize = 0x4C
+codeCaveSize = 0x24
 
-0x0000000 = .int $ToWeathers
 _toWeathers = 0x0000000
-0x0000004 = .byte $FromWeathers
-_fromWeathers = 0x0000004
-_weatherAddress = 0x3FF7DB24
+0x0000000 = .int $WFData0
+0x0000004 = .int $WFData1
+0x0000008 = .int $WFData2
 
-_changeWeather = 0x00000008
-0x0000008 = cmpwi r26, 0
-0x000000C = beq .+0x34
-0x0000010 = subi r5, r26, 1
-0x0000014 = lis r6, _fromWeathers@ha
-0x0000018 = lbz r6, _fromWeathers@l(r6)
-0x000001C = srw r6, r6, r5
-0x0000020 = rlwinm r6, r6, 0, 31, 31
-0x0000024 = cmpwi r6, 0
-0x0000028 = beq .+0x18
-0x000002C = lis r6, _toWeathers@ha
-0x0000030 = lwz r26, _toWeathers@l(r6)
-0x0000034 = slwi r5, r5, 2
-0x0000038 = srw r26, r26, r5
-0x000003C = rlwinm r26, r26, 0, 28, 31
-0x0000040 = lis r6, _weatherAddress@ha
-0x0000044 = stb r26, _weatherAddress@l(r6)
-0x0000048 = blr
+_replaceWeather = 0x000000C
+0x000000C = lis r6, _toWeathers@ha
+0x0000010 = lwzu r3, _toWeathers@l(r6)
+0x0000014 = add r6, r6, r26
+0x0000018 = lbz r26, +0x0(r6)
+0x000001C = stb r26, +0x18(r30)
+0x0000020 = blr
 
-0x3668FEC = bla _changeWeather # Weather update
+0x03668FEC = bla _replaceWeather # Update weather area [stb r26, +0x18(r30)]

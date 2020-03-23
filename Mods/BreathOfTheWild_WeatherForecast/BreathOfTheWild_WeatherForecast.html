@@ -8,66 +8,73 @@
 <title>Weather Forecast rules calculator</title>
 <meta name="description" content="Rules generator in order to add custom weather rules for Weather Forecast graphic pack" />
 <script>
-function setFromWeathersRule(intFromWeatherIndex) {
-	arrWeathersRules[0].value=(parseInt(arrWeathersRules[0].value,10)+(arrInputWeathers[0][intFromWeatherIndex].checked*2-1)*(1<<intFromWeatherIndex)/2).toString();
+function setToWeathersRulePreset() {
+var i
+var j;
+var intMod;
+var intWeatherForecastData=[0,0,0];
+	document.frmWeatherRules.txtWeatherRulesPreset.value="[Preset]\nname =";
+	for (i=0;i<arrWeathers.length;i++) {
+		j=Math.floor(i/4);
+		intWeatherForecastData[j]=intWeatherForecastData[j]+(arrInputWeathers[i].options.selectedIndex << (8*(3-(i % 4))));
+		if (arrInputWeathers[i].disabled) {
+			document.frmWeatherRules.txtWeatherRulesPreset.value=document.frmWeatherRules.txtWeatherRulesPreset.value+" [";
+			for (j=0;j<arrWeathers.length;j++) {
+				if (i!=j) {
+					if (arrInputWeathers[j].options.selectedIndex==i) {
+						document.frmWeatherRules.txtWeatherRulesPreset.value=document.frmWeatherRules.txtWeatherRulesPreset.value+arrWeathers[j]+" ";
+					}	
+				}
+			}
+			document.frmWeatherRules.txtWeatherRulesPreset.value=document.frmWeatherRules.txtWeatherRulesPreset.value+"-> "+arrWeathers[i]+"]";
+		}
+	}
+	for (i=0;i<intWeatherForecastData.length;i++) {
+		document.frmWeatherRules.txtWeatherRulesPreset.value=document.frmWeatherRules.txtWeatherRulesPreset.value+"\n$WFData"+i.toString()+" = "+intWeatherForecastData[i].toString();
+	}
 }
 function setToWeathersRule(intFromWeatherIndex) {
-var intShift=(intFromWeatherIndex-1)*4;
-var intPreviousToWeathersRule=parseInt(arrWeathersRules[1].value,10);
-var intMask=(4294967295 ^ (15 << intShift));
-	arrWeathersRules[1].value=((intPreviousToWeathersRule & intMask) | (((1-arrInputWeathers[1][intFromWeatherIndex].options[arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex].disabled)*arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex) << intShift)).toString();
-	return (intPreviousToWeathersRule & (~intMask)) >> intShift;
+var intPreviousToWeathersRule=parseInt(document.frmWeatherRules.txtWeatherRules.value.charAt(intFromWeatherIndex),10);
+	document.frmWeatherRules.txtWeatherRules.value=document.frmWeatherRules.txtWeatherRules.value.substr(0,intFromWeatherIndex)+arrInputWeathers[intFromWeatherIndex].options.selectedIndex.toString()+document.frmWeatherRules.txtWeatherRules.value.substr(intFromWeatherIndex+1)
+	return intPreviousToWeathersRule;
 }
 function updateToWeathersRule(intFromWeatherIndex) {
 var intPreviousToWeatherRule=setToWeathersRule(intFromWeatherIndex);
-	arrInputWeathers[0][arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex].disabled=true;
-	arrInputWeathers[0][intPreviousToWeatherRule].disabled=false;
+	arrInputWeathers[arrInputWeathers[intFromWeatherIndex].options.selectedIndex].disabled=(intFromWeatherIndex!=arrInputWeathers[intFromWeatherIndex].options.selectedIndex);
+	arrInputWeathers[intPreviousToWeatherRule].disabled=false;
 	for (var intToWeathersIndex in arrWeathers) {
+		arrInputWeathers[intToWeathersIndex].options[intFromWeatherIndex].disabled=true;
+		arrInputWeathers[intToWeathersIndex].options[intFromWeatherIndex].disabled=arrInputWeathers[arrInputWeathers[intFromWeatherIndex].options.selectedIndex].disabled;
 		if (intToWeathersIndex!=intPreviousToWeatherRule) {
-			arrInputWeathers[0][intPreviousToWeatherRule].disabled=arrInputWeathers[0][intPreviousToWeatherRule].disabled | (arrInputWeathers[1][intToWeathersIndex].options.selectedIndex==intPreviousToWeatherRule);
+			arrInputWeathers[intPreviousToWeatherRule].disabled=arrInputWeathers[intPreviousToWeatherRule].disabled | (arrInputWeathers[intToWeathersIndex].options.selectedIndex==intPreviousToWeatherRule);
 		}
 	}
-	arrInputWeathers[0][0].disabled=true;
+	arrInputWeathers[intFromWeatherIndex].options[intFromWeatherIndex].disabled=false;
+	setToWeathersRulePreset();
 }
-function updateFromWeathersRule(intFromWeatherIndex) {
-	setFromWeathersRule(intFromWeatherIndex);
-	if (arrInputWeathers[0][intFromWeatherIndex].checked) {
-		arrInputWeathers[1][intFromWeatherIndex].disabled=false;
-		arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex=0;
-	} else {
-		arrInputWeathers[1][intFromWeatherIndex].disabled=true;
-		arrInputWeathers[1][intFromWeatherIndex].options.selectedIndex=intFromWeatherIndex;
-	}
-	updateToWeathersRule(intFromWeatherIndex);
-	arrInputWeathers[0][intFromWeatherIndex].disabled=false;
-	for (var intToWeathersIndex in arrWeathers) {
-		arrInputWeathers[1][intToWeathersIndex].options[intFromWeatherIndex].disabled=arrInputWeathers[0][intFromWeatherIndex].checked;
-	}
-}
-var arrWeathers=new Array("Blue sky","Cloudy","Rain","Heavy rain","Snow|rain","Heavy snow|rain with thunderbolt","Dark weather","Thunder and rain","Blue sky and rain");
+var arrWeathers=new Array("BlueSky","Cloudy","Rain","HeavyRain","Snow|Rain","HeavySnow|ThunderRain","DarkWeather","ThunderRain","BlueskyRain");
 </script>
 </head>
 <body>
 <form name="frmWeatherRules">
 <table align="center" border=2>
-<tr><td><label>$FromWeathers<input type="text" name="txtWeatherRules" value="0" disabled></label></td><td><label>$ToWeathers<input type="text" name="txtWeatherRules" value="0" disabled></label></td></tr>
+<tr align="center"><td>From Weathers</td><td>To Weathers</td></tr>
 <script>
 	for (var intFromWeathersIndex in arrWeathers) {
-		document.write("<tr><td><label><input onclick=\"updateFromWeathersRule("+intFromWeathersIndex.toString()+");\" type=\"checkbox\" name=\"chkFromWeathers\" value=\""+intFromWeathersIndex.toString()+"\">"+arrWeathers[intFromWeathersIndex]+"</label></td><td><select disabled name=\"selToWeathers\" onchange=\"updateToWeathersRule("+intFromWeathersIndex.toString()+");\">");
+		document.write("<tr><td>["+intFromWeathersIndex.toString()+"]&nbsp;"+arrWeathers[intFromWeathersIndex]+"</td><td align='center'><select name=\"selToWeathers\" onchange=\"updateToWeathersRule("+intFromWeathersIndex.toString()+");\">");
 		for (var intToWeathersIndex in arrWeathers) {
 			document.write("<option value=\""+intToWeathersIndex.toString()+"\">"+arrWeathers[intToWeathersIndex]+"</option>");
 		}
 		document.write("<select></td></tr>");
 	}
-	var arrInputWeathers=new Array(document.frmWeatherRules.elements['chkFromWeathers'],document.frmWeatherRules.elements['selToWeathers']);
+	var arrInputWeathers=document.frmWeatherRules.elements['selToWeathers'];
 	for (intToWeathersIndex in arrWeathers) {
-		arrInputWeathers[1][intToWeathersIndex].options.selectedIndex=intToWeathersIndex;
-		arrInputWeathers[1][intToWeathersIndex].options[intToWeathersIndex].disabled=true;
+		arrInputWeathers[intToWeathersIndex].options.selectedIndex=intToWeathersIndex;
 	}
-	arrInputWeathers[0][0].disabled=true;
-	arrInputWeathers[1][0].disabled=true;
-	var arrWeathersRules=document.frmWeatherRules.elements['txtWeatherRules'];
 </script>
+<tr><td align="center" colspan=2>Weather rules (data sequence)&nbsp;<input type="text" name="txtWeatherRules" value="012345678" disabled><br><textarea id="txtWeatherRulesPreset" name="txtWeatherRulesPreset" rows="5" cols="100" wrap="off">
+Copy and paste your custom preset into the Weather Forecast rules.txt file 
+</textarea></tr>
 </table>
 </form>
 </body>
