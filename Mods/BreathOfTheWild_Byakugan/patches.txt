@@ -1,11 +1,5 @@
 [BotwV208]
 moduleMatches = 0x6267BFD0
 
-codeCaveSize = 0xC
-
-_showEnemyLifeGauge = 0x0000000
-0x0000000 = li r28, 1
-0x0000004 = stb r28, +0x1E(r4)
-0x0000008 = blr
-
-0x02FB0204 = bla _showEnemyLifeGauge # enemy life gauge data update area
+0x02FAFE28 = li r28, 1 # enemy life gauge hidden status update area [li r28, 0]
+0x02FAFE44 = li r28, 1 # same area as above [li r28, 0]
