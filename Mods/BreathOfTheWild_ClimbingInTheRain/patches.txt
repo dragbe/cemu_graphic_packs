@@ -15,7 +15,7 @@ _initArmorSetBonus = 0x0000004
 _enableClimbingArmorSetBonus = 0x0000014
 0x0000014 = lis r26, _armorSetBonus@ha
 0x0000018 = stw r9, _armorSetBonus@l(r26)
-0x000001C = stw r9, +0x0(r29)
+0x000001C = stw r9, 0x0(r29)
 0x0000020 = blr
 
 _climbWithoutSlip = 0x0000024
@@ -34,7 +34,7 @@ _updateLateralClimbingBonus = 0x0000040
 0x000004C = lis r3, _armorSetBonus@ha
 0x0000050 = lwz r3, _armorSetBonus@l(r3)
 0x0000054 = rlwinm r3, r3, 24, 31, 31
-0x0000058 = stb r3, +0x1AA3(r29)
+0x0000058 = stb r3, 0x1AA3(r29)
 0x000005C = addi r3, r29, 0x1D94
 0x0000060 = blr
 
