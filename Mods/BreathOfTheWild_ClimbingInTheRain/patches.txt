@@ -20,7 +20,7 @@ _enableClimbingArmorSetBonus = 0x0000014
 
 _climbWithoutSlip = 0x0000024
 0x0000024 = cmpwi r3, 0
-0x0000028 = beq .+0x14
+0x0000028 = beqlr
 0x000002C = lis r3, _armorSetBonus@ha
 0x0000030 = lwz r3, _armorSetBonus@l(r3)
 0x0000034 = rlwinm r3, r3, 0, 23, 23
