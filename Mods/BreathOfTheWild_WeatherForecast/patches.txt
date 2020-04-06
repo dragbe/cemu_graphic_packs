@@ -12,8 +12,8 @@ _replaceWeather = 0x000000C
 0x000000C = lis r6, _toWeathers@ha
 0x0000010 = lwzu r3, _toWeathers@l(r6)
 0x0000014 = add r6, r6, r26
-0x0000018 = lbz r26, +0x0(r6)
-0x000001C = stb r26, +0x18(r30)
+0x0000018 = lbz r26, 0x0(r6)
+0x000001C = stb r26, 0x18(r30)
 0x0000020 = blr
 
 0x03668FEC = bla _replaceWeather # Update weather area [stb r26, +0x18(r30)]

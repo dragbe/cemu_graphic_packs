@@ -7,9 +7,9 @@ version = 4
 
 [Preset]
 name = Single rain [Rain HeavyRain BlueskyRain -> Snow|Rain]
-$WFData0 = 66564
-$WFData1 = 67438087
-$WFData2 = 67108864
+$WFData0 = 66564 # 4 byte data sequence for weather 0-3
+$WFData1 = 67438087 # 4 byte data sequence for weather 4-7
+$WFData2 = 67108864 # 4 byte data sequence for weather 8
 
 [Preset]
 name = Harmless storm [HeavySnow ThunderRain -> HeavyRain]
