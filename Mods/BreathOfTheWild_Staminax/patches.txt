@@ -1,60 +1,59 @@
 [BotwV208]
 moduleMatches = 0x6267BFD0
 
-codeCaveSize = 0x98
+codeCaveSize = 0x94
 
 _float2000 = 0x10013490
-0x0000000 = .float (2000/$MaxYellowStamina)
-_staminaScaleFactor = 0x0000000
+_staminaScaleFactor = 0x00000000
+0x00000000 = .float (2000/$MaxYellowStamina)
 
-_updateInventoryYellowStamina = 0x0000004
-0x0000004 = lfs f1, +0x18(r1)
-0x0000008 = lis r3, _staminaScaleFactor@ha
-0x000000C = lfs f0, _staminaScaleFactor@l(r3)
-0x0000010 = fmuls f1, f1, f0
-0x0000014 = fadds f1, f1, f12
-0x0000018 = lis r3, _float2000@ha
-0x000001C = lfs f0, _float2000@l(r3)
-0x0000020 = fcmpu cr0, f1, f0
-0x0000024 = ble .+0x8
-0x0000028 = fmr f1, f0
-0x000002C = stfs f1, +0x18(r1)
-0x0000030 = blr
+_updateInventoryYellowStamina = 0x00000004
+0x00000004 = lfs f1, 0x18(r1)
+0x00000008 = lis r3, _staminaScaleFactor@ha
+0x0000000C = lfs f0, _staminaScaleFactor@l(r3)
+0x00000010 = fmuls f1, f1, f0
+0x00000014 = fadds f1, f1, f12
+0x00000018 = lis r3, _float2000@ha
+0x0000001C = lfs f0, _float2000@l(r3)
+0x00000020 = fcmpu cr0, f1, f0
+0x00000024 = ble .+0x8
+0x00000028 = fmr f1, f0
+0x0000002C = stfs f1, 0x18(r1)
+0x00000030 = blr
 
-_updateInventoryYellowStaminaPreview = 0x0000034
-0x0000034 = lis r9, _staminaScaleFactor@ha
-0x0000038 = lfs f0, _staminaScaleFactor@l(r9)
-0x000003C = fmuls f1, f1, f0
-0x0000040 = fadds f1, f1, f13
-0x0000044 = blr
+_updateInventoryYellowStaminaPreview = 0x00000034
+0x00000034 = lis r9, _staminaScaleFactor@ha
+0x00000038 = lfs f0, _staminaScaleFactor@l(r9)
+0x0000003C = fmuls f1, f1, f0
+0x00000040 = fadds f1, f1, f13
+0x00000044 = blr
 
-_limitInventoryYellowStaminaPreview = 0x0000048
-0x0000048 = lis r9, _float2000@ha
-0x000004C = lfs f0, _float2000@l(r9)
-0x0000050 = fcmpu cr0, f1, f0
-0x0000054 = bgt .+0x8
-0x0000058 = blr
-0x000005C = fmr f1, f0
-0x0000060 = blr
+_limitInventoryYellowStaminaPreview = 0x00000048
+0x00000048 = lis r9, _float2000@ha
+0x0000004C = lfs f0, _float2000@l(r9)
+0x00000050 = fcmpu cr0, f1, f0
+0x00000054 = blelr
+0x00000058 = fmr f1, f0
+0x0000005C = blr
 
-_updateYellowStamina = 0x0000064
-0x0000064 = lis r3, _staminaScaleFactor@ha
-0x0000068 = lfs f13, _staminaScaleFactor@l(r3)
-0x000006C = fmuls f13, f13, f29
-0x0000070 = fadds f13, f13, f12
-0x0000074 = blr
+_updateYellowStamina = 0x00000060
+0x00000060 = lis r3, _staminaScaleFactor@ha
+0x00000064 = lfs f13, _staminaScaleFactor@l(r3)
+0x00000068 = fmuls f13, f13, f29
+0x0000006C = fadds f13, f13, f12
+0x00000070 = blr
 
-_limitYellowStamina = 0x0000078
-0x0000078 = lis r3, _float2000@ha
-0x000007C = lfs f1, _float2000@l(r3)
-0x0000080 = lfs f13, +0x1a28(r31)
-0x0000084 = fcmpu cr0, f13, f1
-0x0000088 = ble .+0x8
-0x000008C = stfs f1, +0x1a28(r31)
-0x0000090 = lfs f13, +0x20(r30)
-0x0000094 = blr
+_limitYellowStamina = 0x00000074
+0x00000074 = lis r3, _float2000@ha
+0x00000078 = lfs f1, _float2000@l(r3)
+0x0000007C = lfs f13, 0x1a28(r31)
+0x00000080 = fcmpu cr0, f13, f1
+0x00000084 = lfs f13, 0x20(r30)
+0x00000088 = blelr
+0x0000008C = stfs f1, 0x1a28(r31)
+0x00000090 = blr
 
-0x02ff15CC = lfs f12, +0x1d34(r31) # Inventory yellow stamina update by eating cooked foods [lfs f1, +0x18(r1)]
+0x02ff15CC = lfs f12, 0x1d34(r31) # Inventory yellow stamina update by eating cooked foods [lfs f1, +0x18(r1)]
 0x02ff15D0 = bla _updateInventoryYellowStamina # Same area as above [lfs f12, +0x1d34(r31)]
 0x02fe1778 = bla _updateInventoryYellowStaminaPreview # Inventory yellow stamina preview update area [fcmpu cr0, f13, f1]
 0x02fe1784 = bla _limitInventoryYellowStaminaPreview # Same area as above [bge 0x02fe17cc]
