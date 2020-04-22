@@ -6,56 +6,56 @@ description = Hunger wheel for the yellow stamina (Staminax included)
 version = 4
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 1000 per day (25% depletion during sleep)
+name = CAPACITY: 5000, DEPLETION: 1000 per day (0.25 x depletion during sleep)
 $StaminaRule = 1000
 $StaminaHungerFactor = 0 # non zero value must be greater than or equal to 0.01
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 1000 per day (25% depletion during sleep) + 1% of action stamina
+name = CAPACITY: 5000, DEPLETION: 1000 per day (0.25 x depletion during sleep) + 0.01 x action stamina
 $StaminaRule = 1000
 $StaminaHungerFactor = 0.01
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 500 per day (25% depletion during sleep)
+name = CAPACITY: 5000, DEPLETION: 500 per day (0.25 x depletion during sleep)
 $StaminaRule = 500
 $StaminaHungerFactor = 0
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 500 per day (25% depletion during sleep) + 1% of action stamina
+name = CAPACITY: 5000, DEPLETION: 500 per day (0.25 x depletion during sleep) + 0.01 x action stamina
 $StaminaRule = 500
 $StaminaHungerFactor = 0.01
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 333 per day (25% depletion during sleep)
+name = CAPACITY: 5000, DEPLETION: 333 per day (0.25 x depletion during sleep)
 $StaminaRule = 333
 $StaminaHungerFactor = 0
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 333 per day (25% depletion during sleep) + 1% of action stamina
+name = CAPACITY: 5000, DEPLETION: 333 per day (0.25 x depletion during sleep) + 0.01 x action stamina
 $StaminaRule = 333
 $StaminaHungerFactor = 0.01
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 200 per day (25% depletion during sleep)
+name = CAPACITY: 5000, DEPLETION: 200 per day (0.25 x depletion during sleep)
 $StaminaRule = 200
 $StaminaHungerFactor = 0
 $SleepHungerFactor = 0.25
 $MaxYellowStamina = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 200 per day (25% depletion during sleep) + 1% of action stamina
+name = CAPACITY: 5000, DEPLETION: 200 per day (0.25 x depletion during sleep) + 0.01 x action stamina
 $StaminaRule = 200
 $StaminaHungerFactor = 0.01
 $SleepHungerFactor = 0.25
