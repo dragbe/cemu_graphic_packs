@@ -2,7 +2,7 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Raw Stamina
 path = "The Legend of Zelda: Breath of the Wild/Mods/Raw Stamina"
-description = Stamina without auto recover
+description = Stamina without auto recover (Staminax included)
 version = 4
 
 [Preset]
