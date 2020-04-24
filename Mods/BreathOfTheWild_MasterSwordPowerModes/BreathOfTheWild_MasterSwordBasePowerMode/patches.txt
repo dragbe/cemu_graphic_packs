@@ -1,0 +1,4 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+0x02A2A88C = fcmpu cr0, f0, f0 # Master sword power update area [fcmpu cr0, f1, f0]
