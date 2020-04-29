@@ -1,1 +1,6 @@
-
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Weapon Limiter
+path = "The Legend of Zelda: Breath of the Wild/Mods/Weapon Limiter"
+description = Limits weapon, bow and shield slots number in the inventory
+version = 4

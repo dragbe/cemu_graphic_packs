@@ -1,0 +1,6 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+0x02EB0020 = li r28, 20 # Weapon inventory slots number (non-zero value less than or equal to 20) [mr r28, r3]
+0x02EB00E8 = li r28, 13 # Bow inventory slots number (non-zero value less than or equal to 13) [mr r28, r3]
+0x02EB0084 = li r28, 20 # Shield inventory slots number (non-zero value less than or equal to 20) [mr r28, r3]
