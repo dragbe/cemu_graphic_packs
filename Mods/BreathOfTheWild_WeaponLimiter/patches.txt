@@ -1,6 +1,17 @@
 [BotwV208]
 moduleMatches = 0x6267BFD0
 
-0x02EB0020 = li r28, 20 # Weapon inventory slots number (non-zero value less than or equal to 20) [mr r28, r3]
-0x02EB00E8 = li r28, 13 # Bow inventory slots number (non-zero value less than or equal to 13) [mr r28, r3]
-0x02EB0084 = li r28, 20 # Shield inventory slots number (non-zero value less than or equal to 20) [mr r28, r3]
+codeCaveSize = 0x14
+
+_wLData = 0x00000000
+0x00000000 = .int (16777216*$WeaponMaxCount+65536*$BowMaxCount+256*6+$ShieldMaxCount)
+
+_lookNewWeapon = 0x00000004
+0x00000004 = lis r28, _wLData@ha
+0x00000008 = addi r28, r28, _wLData@l
+0x0000000C = lbzx r28, r28, r26
+0x00000010 = blr
+
+0x02EB0020 = bla _lookNewWeapon # Is focus weapon lootable [mr r28, r3]
+0x02EB00E8 = bla _lookNewWeapon # Is focus bow lootable [mr r28, r3]
+0x02EB0084 = bla _lookNewWeapon # Is focus shield lootable [mr r28, r3]

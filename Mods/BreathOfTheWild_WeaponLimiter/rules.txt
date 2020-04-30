@@ -2,5 +2,22 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Weapon Limiter
 path = "The Legend of Zelda: Breath of the Wild/Mods/Weapon Limiter"
-description = Limits weapon, bow and shield slots number in the inventory
+description = Limits weapons, bows and shields count in the inventory
 version = 4
+
+[Default]
+$WeaponMaxCount = 20
+$BowMaxCount = 13
+$ShieldMaxCount = 20
+
+[Preset]
+name = 5 weapons, 3 bows, 5 shields
+$WeaponMaxCount = 5
+$BowMaxCount = 3
+$ShieldMaxCount = 5
+
+[Preset]
+name = 4 weapons, 2 bows, 3 shields
+$WeaponMaxCount = 4
+$BowMaxCount = 2
+$ShieldMaxCount = 3
