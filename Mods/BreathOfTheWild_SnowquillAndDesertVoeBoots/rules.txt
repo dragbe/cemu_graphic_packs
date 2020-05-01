@@ -1,6 +1,0 @@
-[Definition]
-titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
-name = Snowquill And Desert Voe Boots
-path = "The Legend of Zelda: Breath of the Wild/Mods/Snowquill And Desert Voe Boots"
-description = Adds '{snow|sand} move speed up bonus' to the snowquill and desert voe trousers
-version = 4
