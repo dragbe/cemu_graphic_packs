@@ -1,2 +1,1 @@
-NOTES:
-- don't enable the Climbing In The Rain and Hestu Mask graphic packs
+- don't enable the Climbing In The Rain, Snowquill And Desert Voe Boots and Hestu Mask graphic packs
