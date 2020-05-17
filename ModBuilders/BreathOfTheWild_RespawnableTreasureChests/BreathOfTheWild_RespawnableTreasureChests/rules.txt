@@ -1,1 +1,6 @@
-
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Respawnable Treasure Chests
+path = "The Legend of Zelda: Breath of the Wild/Mods/Respawnable Treasure Chests"
+description = Some treasure chests respawn after a blood moon
+version = 4
