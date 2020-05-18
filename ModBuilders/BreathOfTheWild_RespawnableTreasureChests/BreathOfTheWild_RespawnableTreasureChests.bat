@@ -38,7 +38,7 @@ IF EXIST "%~1.sbactorpack" (
 ) ELSE (
 	ECHO %~1.sbactorpack not found (if all the treasure chests %~1 respawn after the blood moon, it makes sense to replace 'RevivalNone' with 'RevivalBloodyMoon' in the file %~1.sbactorpack\\Actor\ActorLink\TBox_Field_Enemy.bxml)
 )
-DEL %TMPFILENAME%>NUL 2>&1
+SET /P=""<NUL >%TMPFILENAME%
 FOR /F "usebackq tokens=1,3 delims=;" %%I IN ("%~1.csv") DO FOR /F "tokens=1 delims=_" %%A IN ("%%I") DO ECHO : %%A_%~1_%%J,>>%TMPFILENAME%
 SETLOCAL EnableDelayedExpansion
 FOR /L %%Z IN (0,1,7) DO (
