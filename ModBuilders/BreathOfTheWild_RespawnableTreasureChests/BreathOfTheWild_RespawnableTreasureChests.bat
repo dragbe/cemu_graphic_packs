@@ -36,7 +36,7 @@ IF EXIST "%~1.sbactorpack" (
 	SARC create "%~1" "%~n0\content\Actor\Pack\%~1.sbactorpack" -b>NUL 2>&1
 	RMDIR /S /Q "%~1">NUL 2>&1
 ) ELSE (
-	ECHO %~1.sbactorpack not found (if all the treasure chests %~1 respawn after the blood moon, it makes sense to replace 'RevivalNone' with 'RevivalBloodyMoon' in the file %~1.sbactorpack\\Actor\ActorLink\TBox_Field_Enemy.bxml)
+	ECHO Optional %~1.sbactorpack file not found (if all the treasure chests %~1 respawn after the blood moon, it makes sense to replace 'RevivalNone' with 'RevivalBloodyMoon' in the file %~1.sbactorpack\\Actor\ActorLink\TBox_Field_Enemy.bxml)
 )
 SET /P=""<NUL >%TMPFILENAME%
 FOR /F "usebackq tokens=1,3 delims=;" %%I IN ("%~1.csv") DO FOR /F "tokens=1 delims=_" %%A IN ("%%I") DO ECHO : %%A_%~1_%%J,>>%TMPFILENAME%
