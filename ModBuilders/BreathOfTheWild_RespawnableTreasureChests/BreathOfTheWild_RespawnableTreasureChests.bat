@@ -38,23 +38,31 @@ IF EXIST "%~1.sbactorpack" (
 ) ELSE (
 	ECHO %~1.sbactorpack not found (if all the treasure chests %~1 respawn after the blood moon, it makes sense to replace 'RevivalNone' with 'RevivalBloodyMoon' in the file %~1.sbactorpack\\Actor\ActorLink\TBox_Field_Enemy.bxml)
 )
-SET /P=""<NUL >%TMPFILENAME%
-FOR /F "usebackq tokens=3 delims=;" %%I IN ("%~1.csv") DO ECHO %~1_%%I,>>%TMPFILENAME%
+DEL %TMPFILENAME%>NUL 2>&1
+FOR /F "usebackq tokens=1,3 delims=;" %%I IN ("%~1.csv") DO FOR /F "tokens=1 delims=_" %%A IN ("%%I") DO ECHO : %%A_%~1_%%J,>>%TMPFILENAME%
 SETLOCAL EnableDelayedExpansion
 FOR /L %%Z IN (0,1,7) DO (
 	Set /P="Update Bootup\GameData\gamedata\revival_bool_data_%%Z: "<NUL
 	SET /A MATCHESCOUNT=0
-	FOR /F "tokens=1 delims=:" %%I IN ('FINDSTR /N /G:%TMPFILENAME% "Bootup\GameData\gamedata\revival_bool_data_%%Z.yml"') DO (
-		SET /A MATCHES[!MATCHESCOUNT!]=%%I+2
-		SET /A MATCHESCOUNT+=1
+	DEL "Bootup\GameData\gamedata\revival_bool_data_%%Z.bgdata">NUL 2>&1
+	FOR /F "delims=" %%I IN (%TMPFILENAME%) DO IF %%~zI NEQ 0 (
+		FOR /F "tokens=1,3 delims=:," %%I IN ('FINDSTR /N /G:%TMPFILENAME% "Bootup\GameData\gamedata\revival_bool_data_%%Z.yml"') DO (
+			SET /A MATCHES[!MATCHESCOUNT!]=%%I+2
+			SET /A MATCHESCOUNT+=1
+			ECHO :%%J,>>"Bootup\GameData\gamedata\revival_bool_data_%%Z.bgdata"
+		)
+		IF EXIST "Bootup\GameData\gamedata\revival_bool_data_%%Z.bgdata" (
+			FINDSTR /V /G:"Bootup\GameData\gamedata\revival_bool_data_%%Z.bgdata" %TMPFILENAME%>%TEMPFILENAME%
+			MOVE /Y %TEMPFILENAME% %TMPFILENAME%>NUL 2>&1
+		)
+		SET /A MATCHES[!MATCHESCOUNT!]=2147483647
 	)
-	SET /A MATCHES[!MATCHESCOUNT!]=2147483647
 	ECHO !MATCHESCOUNT! match(es^) found
 	IF !MATCHESCOUNT! NEQ 0 (
 		SET /A MATCHESCOUNT=0
 		CALL :GetMatchLineNumber 0
 		SET /A LINECOUNT=0
-		SET /P=""<NUL >%TEMPFILENAME%
+		DEL %TEMPFILENAME%>NUL 2>&1
 		FOR /F "usebackq delims=" %%I IN ("Bootup\GameData\gamedata\revival_bool_data_%%Z.yml") DO (
 			SET /A LINECOUNT+=1
 			IF !LINECOUNT! EQU !GetMatchLineNumber! (
@@ -97,6 +105,6 @@ ECHO "%~nx0" ^<treasure chest IDs list (space as delimiter)^>
 ECHO.
 ECHO - Treasure chest IDs (=search filters for https://objmap.zeldamods.org^):
 FOR %%A IN (%TREASURECHESTSLIST%) DO ECHO %%A
-ECHO - Treasure chests CSV files data structure (only the third field is used^)
+ECHO - Treasure chests CSV files data structure
 ECHO ^<Map^>;^<Id (hexadecimal format^)^>;^<Id (unsigned integer format^)^>
 EXIT /B
