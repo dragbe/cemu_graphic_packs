@@ -1,12 +1,16 @@
 @ECHO OFF
 IF NOT EXIST "Bootup.pack" ECHO Bootup.pack not found & EXIT /B
 SET "TREASURECHESTSLIST=TBox_Field_Enemy TBox_Field_Iron TBox_Field_Iron_NoReaction TBox_Field_Iron_NoReaction_Aoc TBox_Field_Iron_NoReaction_Aoc_long TBox_Field_Iron_NoReaction_Collabo TBox_Field_Stone TBox_Field_Stone_NoReaction TBox_Field_Wood"
+SET "LINKTAGS=And Or NAnd NOr XOr Count Pulse None"
 IF "%~1" EQU "" GOTO :EXITSCRIPT
 SETLOCAL EnableDelayedExpansion
 FOR %%I IN (%*) DO (
 	SET /A ISVALIDTCID=0
-	FOR %%A IN (%TREASURECHESTSLIST%) DO IF %%~I EQU %%A SET /A ISVALIDTCID=1
-	IF !ISVALIDTCID! EQU 0 GOTO :EXITSCRIPT
+	FOR %%A IN (%LINKTAGS%) DO IF %%~I EQU LinkTag%%A SET /A ISVALIDTCID=1
+	IF !ISVALIDTCID! EQU 0 (
+		FOR %%A IN (%TREASURECHESTSLIST%) DO IF %%~I EQU %%A SET /A ISVALIDTCID=1
+		IF !ISVALIDTCID! EQU 0 GOTO :EXITSCRIPT
+	)
 )
 ENDLOCAL
 SET "TMPFILENAME=%TMP%\tmp%RANDOM%."
@@ -39,7 +43,19 @@ IF EXIST "%~1.sbactorpack" (
 	ECHO Optional %~1.sbactorpack file not found (if all the treasure chests %~1 respawn after the blood moon, it makes sense to replace 'RevivalNone' with 'RevivalBloodyMoon' in the file %~1.sbactorpack\\Actor\ActorLink\TBox_Field_Enemy.bxml)
 )
 SET /P=""<NUL >%TMPFILENAME%
-FOR /F "usebackq tokens=1,3 delims=;" %%I IN ("%~1.csv") DO FOR /F "tokens=1 delims=_" %%A IN ("%%I") DO ECHO : %%A_%~1_%%J,>>%TMPFILENAME%
+DEL %TEMPFILENAME%>NUL 2>&1
+ECHO Read %~1.csv file data
+FINDSTR /M /R /C:"^..*;..*;..*$" "%~1.csv">NUL 2>&1
+IF ERRORLEVEL 1 (
+	ECHO Rebuild %~1.csv file with an additional field (treasure chests uint Id^)
+	FOR /F "usebackq tokens=1,2 delims=;" %%I IN ("%~1.csv") DO FOR /F %%A IN ('POWERSHELL -Command "[uint32]""0x%%J"""') DO (
+		ECHO %%I;%%J;%%A>>%TEMPFILENAME%
+		FOR /F "tokens=1 delims=_" %%Z IN ("%%I") DO ECHO : %%Z_%~1_%%A,>>%TMPFILENAME%
+	)
+	MOVE /Y %TEMPFILENAME% "%~1.csv">NUL 2>&1
+) ELSE (
+	FOR /F "usebackq tokens=1,3 delims=;" %%I IN ("%~1.csv") DO FOR /F "tokens=1 delims=_" %%A IN ("%%I") DO ECHO : %%A_%~1_%%J,>>%TMPFILENAME%
+)
 SETLOCAL EnableDelayedExpansion
 FOR /L %%Z IN (0,1,7) DO (
 	Set /P="Update Bootup\GameData\gamedata\revival_bool_data_%%Z: "<NUL
@@ -106,5 +122,5 @@ ECHO.
 ECHO - Treasure chest IDs (=search filters for https://objmap.zeldamods.org^):
 FOR %%A IN (%TREASURECHESTSLIST%) DO ECHO %%A
 ECHO - Treasure chests CSV files data structure
-ECHO ^<Map^>;^<Id (hexadecimal format^)^>;^<Id (unsigned integer format^)^>
+ECHO ^<Map^>;^<Id (hexadecimal format without 0x prefix^)^>
 EXIT /B
