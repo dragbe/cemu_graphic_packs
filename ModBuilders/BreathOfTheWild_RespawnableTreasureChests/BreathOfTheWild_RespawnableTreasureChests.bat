@@ -122,5 +122,5 @@ ECHO.
 ECHO - Treasure chest IDs (=search filters for https://objmap.zeldamods.org^):
 FOR %%A IN (%TREASURECHESTSLIST%) DO ECHO %%A
 ECHO - Treasure chests CSV files data structure
-ECHO ^<Map^>;^<Id (hexadecimal format without 0x prefix^)^>
+ECHO ^<Map^>;^<Id (hexadecimal format without the 0x prefix^)^>
 EXIT /B
