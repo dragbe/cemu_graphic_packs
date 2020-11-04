@@ -1,8 +1,8 @@
 Shows weapons durability stats
 
 NOTES:
-- Edit the default low durability warning values (300) in the patch_patches.asm file
-- To disable all low durability warnings, use the following lines in the patch_patches.asm file
+- Edit the default low durability warning values (300) in the patch_patches.asm|patches.txt file
+- To disable all low durability warnings, use the following lines in the patch_patches.asm|patches.txt file
 0x024aca84 = li r3, 0
 0x024b138c = li r3, 0
 0x030879f8 = li r3, 0
