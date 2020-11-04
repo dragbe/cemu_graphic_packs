@@ -16,3 +16,5 @@ INSTALLATION INSTRUCTIONS
 - open the graphicPacks folder
 - store the BreathOfTheWild_HereditaryPowers folder in this directory
 - enable the Hereditary Powers graphic pack in Cemu
+
+https://gamebanana.com/gamefiles/11453
