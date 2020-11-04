@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Unexpected Treasures rules generator</title>
+<meta name="description" content="Customize loot table for unexpected treasures graphic pack" />
+<script>
+function collapseAll() {
+	for (var intTCId in arrLootTable) {
+		document.getElementById("TCRules"+intTCId.toString()).style.visibility="collapse";
+	}
+	return;
+}
+function resetLootTable() {
+var strTCName;
+var intTCContentId;
+var objOption;
+	for (var intTCId in arrLootTable) {
+		strTCId=intTCId.toString();
+		document.getElementById("TCColor"+intTCId.toString()).style.backgroundColor="palegreen";
+		for (strTCName in arrLootTable[intTCId]) {
+			for (intTCContentId in arrLootTable[intTCId][strTCName]) {
+				arrTCRules[intTCId][intTCContentId]=arrLootTable[intTCId][strTCName][intTCContentId][2]+1;
+				if (arrLootTableInputRules[intTCId][intTCContentId].options.length>arrTCRules[intTCId][intTCContentId]) {
+					do {
+						arrLootTableInputRules[intTCId][intTCContentId].remove(0); 
+					} while (arrLootTableInputRules[intTCId][intTCContentId].options.length>arrTCRules[intTCId][intTCContentId])
+				} else {
+					while (arrLootTableInputRules[intTCId][intTCContentId].options.length<arrTCRules[intTCId][intTCContentId]) {
+						objOption=document.createElement("option");
+						objOption.text=arrLootTableInputRules[intTCId][intTCContentId].options.length.toString();
+						objOption.value=objOption.text;
+						arrLootTableInputRules[intTCId][intTCContentId].add(objOption,0);
+					}
+				}
+				arrTCRules[intTCId][intTCContentId]=arrLootTable[intTCId][strTCName][intTCContentId][2];
+				arrLootTableInputRules[intTCId][intTCContentId].options.selectedIndex=0;
+			}
+		}
+	}
+	return;
+}
+function showTCRules(intTCId) {
+var strTCId="TCRules"+intTCId.toString();
+	if (document.getElementById(strTCId).style.visibility=="collapse") {
+		document.getElementById(strTCId).style.visibility="visible";
+	} else {
+		document.getElementById(strTCId).style.visibility="collapse";
+	}
+	return;
+}
+function getLootTableRules() {
+var strTCName;
+	document.frmLootTable.txtLootTableRules.value="[Preset]\nname = Custom Loot Table";
+	for (var intTCId in arrLootTableInputRules) {
+		if (document.getElementById("TCColor"+intTCId.toString()).style.backgroundColor=="lightsalmon") {
+			for (strTCName in arrLootTable[intTCId]) {
+				alert("Imperfect settings for the "+strTCName+" treasure chest");
+			}
+		}
+		for (var intTCRuleId in arrLootTableInputRules[intTCId]) {
+			document.frmLootTable.txtLootTableRules.value=document.frmLootTable.txtLootTableRules.value+"\n$"+arrLootTableInputRules[intTCId][intTCRuleId].id+"Prob:int = "+arrLootTableInputRules[intTCId][intTCRuleId].value;
+		}
+	}
+	return;
+}
+function updateTCRules(intTCId,intTCRuleId) {
+var i=parseInt(arrLootTableInputRules[intTCId][intTCRuleId].value,10);
+var intFreeChance=arrTCRules[intTCId][intTCRuleId]-i;
+	arrTCRules[intTCId][intTCRuleId]=i;
+	document.frmLootTable.txtLootTableRules.value="Copy and paste your custom preset into the Unexpected Treasures rules.txt file";
+	if (intFreeChance>0) {
+		var objOption;
+		do {
+			for (i=0;i<arrLootTableInputRules[intTCId].length;i++) {
+				if (i!=intTCRuleId) {
+					objOption=document.createElement("option");
+					objOption.text=arrLootTableInputRules[intTCId][i].options.length.toString();
+					objOption.value=objOption.text;
+					arrLootTableInputRules[intTCId][i].add(objOption,0);		
+				}
+			}
+			intFreeChance--;
+		} while (intFreeChance)
+	} else {
+		while (intFreeChance) {
+			for (i=0;i<arrLootTableInputRules[intTCId].length;i++) {
+				if (i!=intTCRuleId) {
+					arrLootTableInputRules[intTCId][i].remove(0);		
+				}
+			}
+			intFreeChance++;
+		}
+	}
+	document.getElementById("TCColor"+intTCId.toString()).style.backgroundColor=(arrLootTableInputRules[intTCId][intTCRuleId].options.selectedIndex==0)?"palegreen":"lightsalmon";
+	return;
+}
+var arrLootTable=[
+{"Traveler's":[["TravelerSword","Weapon_Sword_001",20],["TravelerSpear","Weapon_Spear_001",20],["TravelerClaymore","Weapon_Lsword_001",20],["TravelerBow","Weapon_Bow_001",20],["TravelerShield","Weapon_Shield_035",20]]},
+{"Arrow x5":[["NormalArrowX5","Obj_ArrowBundle_A_01",15],["FireArrowX5","Obj_FireArrow_A_03",20],["IceArrowX5","Obj_IceArrow_A_03",20],["ElectricArrowX5","Obj_ElectricArrow_A_03",20],["BombArrowX5","Obj_BombArrow_A_02",20],["AncientArrowX3","Obj_AncientArrow_C_01",5]]},
+{"Arrow x10":[["NormalArrowX10","Obj_ArrowBundle_A_02",18],["FireArrowX10","Obj_FireArrow_A_02",20],["IceArrowX10","Obj_IceArrow_A_02",20],["ElectricArrowX10","Obj_ElectricArrow_A_02",20],["BombArrowX10","Obj_BombArrow_A_03",20],["AncientArrowX5","Obj_AncientArrow_B_01",2]]},
+{"Gem":[["Amber","Item_Ore_F",0],["Opal","Item_Ore_E",57],["Topaz","Item_Ore_D",19],["Ruby","Item_Ore_B",14],["Sapphire","Item_Ore_C",10]]},
+{"Zora":[["ZoraSword","Weapon_Sword_027",13],["CeremonialTrident","Weapon_Spear_049",14],["SilverscaleSpear","Weapon_Spear_028",15],["ZoraSpear","Weapon_Spear_027",15],["SilverLongsword","Weapon_Lsword_027",15],["SilverBow","Weapon_Bow_014",14],["SilverShield","Weapon_Shield_025",14]]},
+{"Gerudo":[["MoonlightScimitar","Weapon_Sword_030",13],["GerudoScimitar","Weapon_Sword_029",15],["GerudoSpear","Weapon_Spear_029",14],["GoldenClaymore","Weapon_Lsword_029",15],["GoldenBow","Weapon_Bow_015",13],["RadiantShield","Weapon_Shield_036",15],["GerudoShield","Weapon_Shield_026",15]]},
+{"Rito":[["FeatheredEdge","Weapon_Sword_031",20],["FeatheredSpear","Weapon_Spear_032",15],["FalconBow","Weapon_Bow_017",25],["SwallowBow","Weapon_Bow_016",25],["KiteShield","Weapon_Shield_042",15]]},
+{"Goron":[["Drillshaft","Weapon_Spear_031",35],["StoneSmasher","Weapon_Lsword_037",35],["CobbleCrusher","Weapon_Lsword_036",30]]},
+{"Yiga":[["DemonCarver","Weapon_Sword_073",30],["ViciousSickle","Weapon_Sword_053",20],["Windcleaver","Weapon_Lsword_074",30],["DuplexBow","Weapon_Bow_040",20]]},
+{"Sheikah":[["EightfoldBlade","Weapon_Sword_041",15],["SerpentineSpear","Weapon_Spear_037",20],["EdgeOfDuality","Weapon_Lsword_055",15],["EightfoldLongblade","Weapon_Lsword_041",20],["PhrenicBow","Weapon_Bow_029",15],["ShieldOfTheMindEye","Weapon_Shield_041",15]]},
+{"Soldier's":[["SoldierBroadsword","Weapon_Sword_002",20],["SoldierSpear","Weapon_Spear_002",20],["SoldierClaymore","Weapon_Lsword_002",20],["SoldierBow","Weapon_Bow_002",20],["SoldierShield","Weapon_Shield_002",20]]},
+{"Knight's":[["KnightBroadsword","Weapon_Sword_003",20],["KnightHalberd","Weapon_Spear_003",20],["KnightClaymore","Weapon_Lsword_003",20],["KnightBow","Weapon_Bow_035",20],["KnightShield","Weapon_Shield_003",20]]},
+{"Royal":[["RoyalBroadsword","Weapon_Sword_024",20],["RoyalHalberd","Weapon_Spear_024",20],["RoyalClaymore","Weapon_Lsword_024",20],["RoyalBow","Weapon_Bow_036",20],["RoyalShield","Weapon_Shield_022",20]]},
+{"Royal Guard's":[["RoyalGuardSword","Weapon_Sword_047",20],["RoyalGuardSpear","Weapon_Spear_047",20],["RoyalGuardClaymore","Weapon_Lsword_047",20],["RoyalGuardBow","Weapon_Bow_033",20],["RoyalGuardShield","Weapon_Shield_033",20]]},
+{"Electric":[["LightningRod","Weapon_Sword_062",0],["ThunderstormRod","Weapon_Sword_050",10],["Thunderblade","Weapon_Sword_035",30],["Thunderspear","Weapon_Spear_035",30],["GreatThunderblade","Weapon_Lsword_035",30]]},
+{"Forest":[["ForestDwellerSword","Weapon_Sword_025",28],["ForestDwellerSpear","Weapon_Spear_025",19],["ForestDwellerBow","Weapon_Bow_013",28],["ForestDwellerShield","Weapon_Shield_023",25]]},
+{"Frost":[["IceRod","Weapon_Sword_061",0],["BlizzardRod","Weapon_Sword_049",10],["Frostblade","Weapon_Sword_034",30],["Frostspear","Weapon_Spear_034",30],["GreatFrostblade","Weapon_Lsword_034",30]]},
+{"Fire":[["FireRod","Weapon_Sword_060",0],["MeteorRod","Weapon_Sword_048",10],["Flameblade","Weapon_Sword_033",30],["Flamespear","Weapon_Spear_033",30],["GreatFlameblade","Weapon_Lsword_033",30]]},
+{"Boomerang":[["Boomerang","Weapon_Sword_051",35],["GiantBoomerang","Weapon_Lsword_051",65]]},
+{"Lynel":[["LynelSword","Weapon_Sword_016",21],["LynelSpear","Weapon_Spear_016",16],["LynelCrusher","Weapon_Lsword_016",21],["LynelBow","Weapon_Bow_009",21],["LynelShield","Weapon_Shield_016",21]]},
+{"Mighty Lynel":[["MightyLynelSword","Weapon_Sword_017",21],["MightyLynelSpear","Weapon_Spear_017",16],["MightyLynelCrusher","Weapon_Lsword_017",21],["MightyLynelBow","Weapon_Bow_026",21],["MightyLynelShield","Weapon_Shield_017",21]]},
+{"Savage Lynel":[["SavageLynelSword","Weapon_Sword_018",21],["SavageLynelSpear","Weapon_Spear_018",16],["SavageLynelCrusher","Weapon_Lsword_018",21],["SavageLynelBow","Weapon_Bow_032",21],["SavageLynelShield","Weapon_Shield_018",21]]},
+{"Ancient":[["AncientShortSword","Weapon_Sword_023",20],["AncientSpear","Weapon_Spear_023",20],["AncientBladesaw","Weapon_Lsword_023",20],["AncientBow","Weapon_Bow_023",20],["AncientShield","Weapon_Shield_038",20]]},
+{"Guardian++":[["GuardianSword2","Weapon_Sword_015",25],["GuardianSpear2","Weapon_Spear_015",25],["AncientBattleAxe2","Weapon_Lsword_015",25],["GuardianShield2","Weapon_Shield_015",25]]},
+{"Guardian+":[["GuardianSword1","Weapon_Sword_014",25],["GuardianSpear1","Weapon_Spear_014",25],["AncientBattleAxe1","Weapon_Lsword_014",25],["GuardianShield1","Weapon_Shield_014",25]]},
+{"Guardian":[["GuardianSword","Weapon_Sword_013",25],["GuardianSpear","Weapon_Spear_013",25],["AncientBattleAxe","Weapon_Lsword_013",25],["GuardianShield","Weapon_Shield_013",25]]},
+{"Best Boko":[["DragonboneBokoClub","Weapon_Sword_006",20],["DragonboneBokoSpear","Weapon_Spear_006",20],["DragonboneBokoBat","Weapon_Lsword_006",20],["DragonBoneBokoBow","Weapon_Bow_027",20],["DragonboneBokoShield","Weapon_Shield_006",20]]},
+{"Medium Boko":[["SpikedBokoClub","Weapon_Sword_005",20],["SpikedBokoSpear","Weapon_Spear_005",20],["SpikedBokoBat","Weapon_Lsword_005",20],["SpikedBokoBow","Weapon_Bow_003",20],["SpikedBokoShield","Weapon_Shield_005",20]]},
+{"Boko":[["BokoClub","Weapon_Sword_004",20],["BokoSpear","Weapon_Spear_004",20],["BokoBat","Weapon_Lsword_004",20],["BokoBow","Weapon_Bow_004",20],["BokoShield","Weapon_Shield_004",20]]},
+{"Best Lizal":[["LizalTriBoomerang","Weapon_Sword_009",25],["ForkedLizalSpear","Weapon_Spear_009",25],["SteelLizalBow","Weapon_Bow_030",25],["SteelLizalShield","Weapon_Shield_009",25]]},
+{"Medium Lizal":[["LizalForkedBoomerang","Weapon_Sword_008",25],["EnhancedLizalSpear","Weapon_Spear_008",25],["StrengthenedLizalBow","Weapon_Bow_011",25],["ReinforcedLizalShield","Weapon_Shield_008",25]]},
+{"Lizal":[["LizalBoomerang","Weapon_Sword_007",25],["LizalSpear","Weapon_Spear_007",25],["LizalBow","Weapon_Bow_006",25],["LizalShield","Weapon_Shield_007",25]]},
+{"Best Moblin":[["DragonboneMoblinSpear","Weapon_Spear_012",35],["DragonboneMoblinClub","Weapon_Lsword_012",65]]},
+{"Medium Moblin":[["SpikedMoblinSpear","Weapon_Spear_011",35],["SpikedMoblinClub","Weapon_Lsword_011",65]]},
+{"Moblin":[["MoblinSpear","Weapon_Spear_010",35],["MoblinClub","Weapon_Lsword_010",65]]},
+{"Rusty":[["RustyBroadsword","Weapon_Sword_021",25],["RustyHalberd","Weapon_Spear_021",25],["RustyClaymore","Weapon_Lsword_020",25],["RustyShield","Weapon_Shield_021",25]]},
+{"Survival":[["FishingHarpoon","Weapon_Spear_038",11],["ThrowingSpear","Weapon_Spear_030",11],["FarmerPitchfork","Weapon_Spear_022",9],["WoodcutterAxe","Weapon_Lsword_032",5],["IronSledgehammer","Weapon_Lsword_031",11],["DoubleAxe","Weapon_Lsword_030",9],["WoodenBow","Weapon_Bow_038",11],["FishermanShield","Weapon_Shield_032",11],["HunterShield","Weapon_Shield_031",11],["WoodenShield","Weapon_Shield_001",11]]},
+{"Legendary":[["HylianShield","Weapon_Shield_030",12],["SeaBreezeBoomerang","Weapon_Sword_059",11],["HeroShield","Weapon_Shield_057",11],["Sword","Weapon_Sword_058",11],["BiggoronSword","Weapon_Lsword_059",11],["SwordOfTheSixSages","Weapon_Lsword_057",11],["TwilightBow","Weapon_Bow_072",11],["GoddessSword","Weapon_Sword_057",11],["FierceDeitySword","Weapon_Lsword_060",11]]}
+];
+</script>
+</head>
+<body>
+<form name="frmLootTable">
+<table align="center" style="border:2px solid;">
+<tr align="center" style="background-color:YELLOW;"><td>Treasure Chests Contents</td><td>Loot Chances (%)</td></tr>
+<script>
+var arrLootTableInputRules=[];
+var strTCName;
+var intTCContentId;
+var arrTCRules=[];
+var strTCId;
+var strOptionText;
+for (var intTCId in arrLootTable) {
+	arrLootTableInputRules.push([]);
+	arrTCRules.push([]);
+	strTCId=intTCId.toString();
+	for (strTCName in arrLootTable[intTCId]) {
+		document.write("<tr><td align=\"left\" colspan=2 id=\"TCColor"+strTCId+"\" style=\"cursor:pointer;background-color:palegreen;\" onclick=\"showTCRules("+strTCId+");\">&nabla;&nbsp;"+strTCName+" Treasure Chest</td></tr><tbody id=\"TCRules"+strTCId+"\" style=\"visibility:collapse;background-color:BEIGE;\">");
+		for (intTCContentId in arrLootTable[intTCId][strTCName]) {
+			document.write("<tr align=\"center\"><td><img src=\"images\\"+arrLootTable[intTCId][strTCName][intTCContentId][1]+".png\" alt=\""+arrLootTable[intTCId][strTCName][intTCContentId][1]+"\"></td><td><pre>"+arrLootTable[intTCId][strTCName][intTCContentId][1]+"</pre><select id=\""+arrLootTable[intTCId][strTCName][intTCContentId][0]+"\" onchange=\"updateTCRules("+strTCId+","+intTCContentId.toString()+");\">");
+			arrTCRules[intTCId].push(arrLootTable[intTCId][strTCName][intTCContentId][2]);
+			do {
+				strOptionText=arrLootTable[intTCId][strTCName][intTCContentId][2].toString();
+				document.write("<option value=\""+strOptionText+"\">"+strOptionText+"</option>");
+				arrLootTable[intTCId][strTCName][intTCContentId][2]--;
+			} while (arrLootTable[intTCId][strTCName][intTCContentId][2]>-1)
+			arrLootTable[intTCId][strTCName][intTCContentId][2]=arrTCRules[intTCId][intTCContentId];
+			document.write("</select></tr>");
+			arrLootTableInputRules[intTCId][arrLootTableInputRules[intTCId].push(document.getElementById(arrLootTable[intTCId][strTCName][intTCContentId][0]))-1].options.selectedIndex=0;
+		}
+		document.write("</tbody>");
+	}
+}
+</script>
+<tr><td align="center" colspan=3><input type="button" value="Collapse All" onclick="collapseAll();">&nbsp;<input type="button" value="Get Loot Table Rules Preset" onclick="getLootTableRules();">&nbsp;<input type="button" value="Reset Loot Table" onclick="resetLootTable();"><br><textarea id="txtLootTableRules" name="txtLootTableRules" rows="5" cols="100" wrap="off">
+Copy and paste your custom preset into the Unexpected Treasures rules.txt file
+</textarea></tr>
+</table>
+</form>
+</body>
+</html>
