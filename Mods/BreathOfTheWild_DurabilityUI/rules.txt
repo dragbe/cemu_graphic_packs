@@ -1,1 +1,14 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Durability UI
+path = "The Legend of Zelda: Breath of the Wild/Mods/Durability UI"
+description = Shows weapons durability stats
+version = 4
 
+[Preset]
+name = Show durability only
+$UIDurFormat = 0
+
+[Preset]
+name = Show weapon name and durability
+$UIDurFormat = 1
