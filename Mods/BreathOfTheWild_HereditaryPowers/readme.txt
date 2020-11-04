@@ -1,7 +1,7 @@
 Hereditary powers of armor
 
 NOTES
-- Don't enable the Climbing In The Rain
+- Don't enable the Climbing In The Rain graphic pack
 - The armor sets increase the damage and durability of their complementary weapons
 - some head|upper armors increase the damage and durability of their complementary weapons (head armor has priority over upper armor)
 - Additional bonuses (swim speed, swimming consumes less stamina, lateral climb speed, climb in the rain without slipping, faster move on snow, faster move on sand, Korok Mask detection distance) added to some armor sets bonuses (other bonuses are planned)
