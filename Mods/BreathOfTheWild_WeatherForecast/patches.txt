@@ -1,19 +1,18 @@
 [BotwV208]
 moduleMatches = 0x6267BFD0
 
-codeCaveSize = 0x24
+codeCaveSize = 0x00000020
 
-_toWeathers = 0x0000000
-0x0000000 = .int $WFData0
-0x0000004 = .int $WFData1
-0x0000008 = .int $WFData2
+_BOTW_WeatherForecast_ToWeathers = 0x00000000
+0x00000000 = .int $WFData0
+0x00000004 = .int $WFData1
+0x00000008 = .int $WFData2
 
-_replaceWeather = 0x000000C
-0x000000C = lis r6, _toWeathers@ha
-0x0000010 = lwzu r3, _toWeathers@l(r6)
-0x0000014 = add r6, r6, r26
-0x0000018 = lbz r26, 0x0(r6)
-0x000001C = stb r26, 0x18(r30)
-0x0000020 = blr
+_BOTW_WeatherForecast_ReplaceWeather = 0x0000000C
+0x0000000C = lis r6, _BOTW_WeatherForecast_ToWeathers@ha
+0x00000010 = addi r6, r6, _BOTW_WeatherForecast_ToWeathers@l
+0x00000014 = lbzx r26, r6, r26
+0x00000018 = stb r26, 0x18(r30)
+0x0000001C = blr
 
-0x03668FEC = bla _replaceWeather # Update weather area [stb r26, +0x18(r30)]
+0x03668FEC = bla _BOTW_WeatherForecast_ReplaceWeather # Update weather area [stb r26, +0x18(r30)]
