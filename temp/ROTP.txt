@@ -1,4 +1,4 @@
-I only looked at the game save data the punitive death mod --> inconsistencies found (related to WiiU limitation ?)
+I only looked at the game save data for the punitive death mod --> inconsistencies found (related to WiiU limitation ?)
 Ideal settings (just my opinion and to optimize punitive death)
 Max weapon slots: 60
 Max bows slots: 54
