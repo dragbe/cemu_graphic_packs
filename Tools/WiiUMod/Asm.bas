@@ -51,7 +51,7 @@ Dim i As Long
         Debug.Print ("0x" + Hex(lngInstructionAddresses(Asm_SearchPPCBl)))
     Next i
     Erase lngInstructionAddresses
-    i = Asm_SearchPPCBl + Asm_SearchPPCBl4B(intFile, lngTargetBl, lngInstructionAddresses, lngDeltaOffset)
+    i = Asm_SearchPPCBl4B(intFile, lngTargetBl, lngInstructionAddresses, lngDeltaOffset)
     Asm_SearchPPCBl = Asm_SearchPPCBl + i
     Do Until i = 0
         Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
