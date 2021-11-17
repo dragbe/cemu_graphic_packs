@@ -48,7 +48,7 @@ Dim i As Long
     Open strExecutableDumpFile For Binary As intFile
     Asm_SearchPPCBl = Asm_SearchPPCBl48(intFile, lngTargetBl, lngInstructionAddresses, lngDeltaOffset)
     For i = Asm_SearchPPCBl To 1 Step -1
-        Debug.Print ("0x" + Hex(lngInstructionAddresses(Asm_SearchPPCBl)))
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
     Next i
     Erase lngInstructionAddresses
     i = Asm_SearchPPCBl4B(intFile, lngTargetBl, lngInstructionAddresses, lngDeltaOffset)
