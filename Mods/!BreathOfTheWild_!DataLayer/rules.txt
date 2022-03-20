@@ -1,1 +1,7 @@
-
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Data Layer
+path = "The Legend of Zelda: Breath of the Wild/Mods/Data Layer"
+description = Shares game data and features with other cemu patches|- Don't disable this graphic pack|- Must be enabled before launching the game in cemu|- Don't rename the graphic pack folder
+default=true
+version = 5
