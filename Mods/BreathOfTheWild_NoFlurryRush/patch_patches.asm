@@ -18,7 +18,7 @@ lis r6, 0x101E
 addi r6, r6, 0x5360
 blr
 
-0x02CD081C = lwz r5, 0x0(r29) # Start SideStep flurry rush area, also executed before shield surfing with f12=1.0 [lfs f12, +0x0(r6)]
+0x02CD081C = lwz r5, 0x0(r29) # Start SideStep flurry rush area, also executed when shield+jump (f12=1.0) [lfs f12, +0x0(r6)]
 0x02CD0820 = bla _BOTW_NoFlurryRush_StartFlurryRush # [lwz r5, +0x0(r29)]
 0x02CD0824 = lfs f12, 0x0(r6) # [stfs f12, +0x12FC(r5)]
 0x02CD082C = stfs f12, 0x12FC(r5) # [stfs f31, +0x1304(r5)]
