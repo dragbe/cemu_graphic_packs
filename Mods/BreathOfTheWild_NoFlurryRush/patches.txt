@@ -1,7 +1,0 @@
-[BotwV208]
-moduleMatches = 0x6267BFD0
-
-0x02CD0818 = lis r6, 0x101E # Read JustAvoidTime area for the SideStep flurry rush [lwz r6, +0x2C(r29)]
-0x02CD081C = lfs f12, 0x5360(r6) # Same area as above [lfs f12, +0x0(r6)]
-0x02C625A8 = lis r6, 0x101E # Read JustAvoidTime area for the BackJump flurry rush [lwz r6, +0x20(r30)]
-0x02C625B0 = lfs f0, 0x5360(r6) # Same area as above [lfs f0, +0x0(r6)]
