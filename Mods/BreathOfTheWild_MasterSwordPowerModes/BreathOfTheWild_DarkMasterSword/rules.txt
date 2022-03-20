@@ -1,1 +1,9 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Dark Master Sword
+path = "The Legend of Zelda: Breath of the Wild/Mods/Dark Master Sword"
+description = 'Non-fully upgraded master sword' true form at night
+version = 5
 
+[Default]
+$DataLayerMemoryBase:int = 0x180
