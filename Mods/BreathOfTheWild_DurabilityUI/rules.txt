@@ -2,13 +2,41 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Durability UI
 path = "The Legend of Zelda: Breath of the Wild/Mods/Durability UI"
-description = Shows weapons durability stats
-version = 4
+description = Shows weapons durability stats and more
+version = 5
+
+[Default]
+$UIDurFormat:int = 0
+$LowDurWarning:int = 300
+$MSPowerLossWarning:int = 300
+$DataLayerMemoryBase:int = 0x180
 
 [Preset]
 name = Show durability only
-$UIDurFormat = 0
+category = UI string format
+$UIDurFormat:int = 0
 
 [Preset]
 name = Show weapon name and durability
-$UIDurFormat = 1
+category = UI string format
+$UIDurFormat:int = 1
+
+[Preset]
+name = Enabled
+category = Low durability warning
+$LowDurWarning:int = 300
+
+[Preset]
+name = Disabled
+category = Low durability warning
+$LowDurWarning:int = 0
+
+[Preset]
+name = Enabled
+category = Master sword power loss warning
+$MSPowerLossWarning:int = 300
+
+[Preset]
+name = Disabled
+category = Master sword power loss warning
+$MSPowerLossWarning:int = 0
