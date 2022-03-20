@@ -3,4 +3,4 @@ titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Cherry++
 path = "The Legend of Zelda: Breath of the Wild/Mods/Cherry++"
 description = Expands Cherry's crafting system
-version = 4
+version = 5
