@@ -1,1 +1,65 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Don't Starve
+path = "The Legend of Zelda: Breath of the Wild/Mods/Don't Starve"
+description = Eat, drink and sleep to survive
+version = 5
 
+[Default]
+$HeartAutoRecoverNumPerDay:float = 12.0 # Amount of 1/4 hearts auto lost per day
+$StaminaHealthLoss:float = 100000.0 # Amount of stamina to consume to lose one 1/4 heart
+
+[Preset]
+name = 1
+category = Amount of hearts auto lost per day
+$HeartAutoRecoverNumPerDay:float = 4.0
+
+[Preset]
+name = 2
+category = Amount of hearts auto lost per day
+$HeartAutoRecoverNumPerDay:float = 8.0
+
+[Preset]
+name = 3
+category = Amount of hearts auto lost per day
+$HeartAutoRecoverNumPerDay:float = 12.0
+
+[Preset]
+name = 4
+category = Amount of hearts auto lost per day
+$HeartAutoRecoverNumPerDay:float = 16.0
+
+[Preset]
+name = 5
+category = Amount of hearts auto lost per day
+$HeartAutoRecoverNumPerDay:float = 20.0
+
+[Preset]
+name = No loss of 1/4 heart due to the stamina consumption
+category = Amount of stamina to consume to lose one 1/4 heart
+$StaminaHealthLoss:float = 9999999.0
+
+[Preset]
+name = 3000
+category = Amount of stamina to consume to lose one 1/4 heart
+$StaminaHealthLoss:float = 3000.0
+
+[Preset]
+name = 5000
+category = Amount of stamina to consume to lose one 1/4 heart
+$StaminaHealthLoss:float = 5000.0
+
+[Preset]
+name = 10000
+category = Amount of stamina to consume to lose one 1/4 heart
+$StaminaHealthLoss:float = 10000.0
+
+[Preset]
+name = 15000
+category = Amount of stamina to consume to lose one 1/4 heart
+$StaminaHealthLoss:float = 15000.0
+
+[Preset]
+name = 20000
+category = Amount of stamina to consume to lose one 1/4 heart
+$StaminaHealthLoss:float = 20000.0
