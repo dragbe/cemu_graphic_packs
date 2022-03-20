@@ -3,4 +3,4 @@ titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Climbing In The Rain
 path = "The Legend of Zelda: Breath of the Wild/Mods/Climbing In The Rain"
 description = Climb in the rain without slipping thanks to the climbing armor set bonus (lateral climbing speed bonus included)
-version = 4
+version = 5
