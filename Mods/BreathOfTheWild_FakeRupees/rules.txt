@@ -1,1 +1,12 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Fake Rupees
+path = "The Legend of Zelda: Breath of the Wild/Mods/Fake Rupees"
+description = Materials not stored in the inventory and used for modded game mechanics
+version = 5
 
+[Default]
+$DataLayerMemoryBase:int = 0x180
+$VanillaMaxRupeeValue:int = 300
+$AncientCrystalId:int = 16750 # {'A','n'} = *((int16 *) (pFakeRupeeActorName+3))
+$BombsNumGameDataPointerOffset:int = 0xB08
