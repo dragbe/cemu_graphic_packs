@@ -2,5 +2,5 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = No Flurry Rush
 path = "The Legend of Zelda: Breath of the Wild/Mods/No Flurry Rush"
-description = Disables the flurry rush
-version = 4
+description = Disables the flurry rush except in the Ta'loh Naeg Shrine
+version = 5
