@@ -1,0 +1,319 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Shrine Replacements rules generator</title>
+<meta name="description" content="Customize Shrine Replacements graphic pack presets" />
+</head>
+<body>
+<script src="BreathOfTheWild_ShrineReplacements.js"></script>
+<form name="frmShrineReplacements">
+<table align="center" style="border:2px solid;">
+<tr align="center" style="background-color:YELLOW;"><td>Shrine Name</td><td>1st Replacement Shrine</td><td>2nd Replacement Shrine</td></tr>
+<script>
+function getZeroBasedArrayItemsIndexes(varArray,varItems) {
+//varArray elements order can be modified in this function
+var j;
+var varLastArrayItem;
+var arrItemsIndexes=new Array(varItems.length);
+var intStartIndex=varArray.length-1;
+	for (var i=varItems.length-1;i!=-1;i--) {
+		arrItemsIndexes[i]=-1;
+		for (j=intStartIndex;j!=-1;j--) {
+			if (varArray[j]==varItems[i]) {
+				arrItemsIndexes[i]=j;
+				varLastArrayItem=varArray[intStartIndex];
+				varArray[intStartIndex]=varArray[j];
+				varArray[j]=varLastArrayItem;
+				intStartIndex--;
+				break;
+			}
+		}
+	}
+	return arrItemsIndexes;
+}
+function shuffleZeroBasedArray(arrItems,intShuffleItemsCount) {
+var intRandomIndex;
+var varTemp;
+var intCurrentIndex=arrItems.length;
+	while ((intCurrentIndex) && (intShuffleItemsCount)) {
+		intRandomIndex=Math.floor(Math.random()*intCurrentIndex);
+		intCurrentIndex--;
+		intShuffleItemsCount--;
+		varTemp=arrItems[intCurrentIndex];
+		arrItems[intCurrentIndex]=arrItems[intRandomIndex];
+		arrItems[intRandomIndex]=varTemp;
+	}
+	return arrItems;
+}
+function collapseAll() {
+	for (var i=0;i<arrNormalShrines.length;i++) {
+		document.getElementById("SGRules"+i.toString()).style.visibility="collapse";
+	}
+	return;
+}
+function setModeGreatPlateauShrines() {
+var intIndex=document.getElementById("selShrineGroupMode").selectedIndex;
+	if (arrModeGreatPlateauShrines[intIndex].length) {
+		shuffleZeroBasedArray(arrModeGreatPlateauShrines[intIndex],4);
+		arrNormalShrineInputs[0][0].value=arrModeGreatPlateauShrines[intIndex][arrModeGreatPlateauShrines[intIndex].length-1];
+		updateSGRules(0,0);
+		arrNormalShrineInputs[0][1].value=arrModeGreatPlateauShrines[intIndex][arrModeGreatPlateauShrines[intIndex].length-2];
+		updateSGRules(0,1);
+		arrNormalShrineInputs[0][2].value=arrModeGreatPlateauShrines[intIndex][arrModeGreatPlateauShrines[intIndex].length-3];
+		updateSGRules(0,2);
+		arrNormalShrineInputs[0][3].value=arrModeGreatPlateauShrines[intIndex][arrModeGreatPlateauShrines[intIndex].length-4];
+		updateSGRules(0,3);
+	}
+	return;
+}
+function resetSRForm() {
+var strSGName;
+var objNSOption;
+var objSSOption;
+var intShrineId;
+var j;
+var k;
+var l;
+var m;
+var strShrineGroupName;
+	document.frmShrineReplacements.txtPresetRules.value=document.frmShrineReplacements.txtPresetRules.defaultValue;
+	if (intSpecialShrineTranslations.length) {
+		for (m=0;m<intSpecialShrineTranslations.length;m++) {
+			intSpecialShrineTranslations[m][0]=-1;
+			intSpecialShrineTranslations[m][1]=-1;
+		}
+	} else {
+		while (arrSpecialShrines.length>=intSpecialShrineTranslations.length) {
+			intSpecialShrineTranslations.push([-1,-1]);
+		}
+	}
+	for (var i=0;i<intShrineGroupIds.length;i++) {
+		for (j=0;j<intShrineGroupIds[i].length;j++) {
+			for (intShrineId=0;intShrineId<arrNormalShrineInputs[intShrineGroupIds[i][j]].length;intShrineId++) {
+				while (arrNormalShrineInputs[intShrineGroupIds[i][j]][intShrineId].length) {
+					arrNormalShrineInputs[intShrineGroupIds[i][j]][intShrineId].remove(0);
+				}
+				while (arrSpecialShrineInputs[intShrineGroupIds[i][j]][intShrineId].length) {
+					arrSpecialShrineInputs[intShrineGroupIds[i][j]][intShrineId].remove(0);
+				}
+			}
+		}
+		for (k=0;k<intShrineGroupIds[i].length;k++) {
+			for (strSGName in arrNormalShrines[intShrineGroupIds[i][k]]) {
+				for (j=0;j<intShrineGroupIds[i].length;j++) {
+					for (strShrineGroupName in arrNormalShrines[intShrineGroupIds[i][j]]) {
+						for (intShrineId=0;intShrineId<arrNormalShrines[intShrineGroupIds[i][k]][strSGName].length;intShrineId++) {
+							for (l=0;l<arrNormalShrines[intShrineGroupIds[i][j]][strShrineGroupName].length;l++) {
+								objNSOption=document.createElement("option");
+								objNSOption.text=arrShrineNames[arrNormalShrines[intShrineGroupIds[i][j]][strShrineGroupName][l]];
+								objNSOption.value=arrNormalShrines[intShrineGroupIds[i][j]][strShrineGroupName][l].toString();
+								if ((l==intShrineId) && (k==j)) {
+									intNormalShrineTranslations[arrNormalShrines[intShrineGroupIds[i][j]][strShrineGroupName][l]]=[intShrineGroupIds[i][j],l];
+									objNSOption.defaultSelected=true;
+									arrNormalShrineInputs[intShrineGroupIds[i][k]][intShrineId].style.backgroundColor="Gainsboro";
+									objSSOption=document.createElement("option");
+									objSSOption.text=objNSOption.text
+									objSSOption.value=objNSOption.value;
+									objSSOption.selected=true;
+									arrSpecialShrineInputs[intShrineGroupIds[i][k]][intShrineId].add(objSSOption);
+									arrSpecialShrineInputs[intShrineGroupIds[i][k]][intShrineId].style.backgroundColor="Gainsboro";
+									for (m=0;m<arrSpecialShrines.length;m++) {
+										objSSOption=document.createElement("option");
+										objSSOption.text=arrShrineNames[arrSpecialShrines[m]];
+										objSSOption.value=arrSpecialShrines[m].toString();
+										arrSpecialShrineInputs[intShrineGroupIds[i][k]][intShrineId].add(objSSOption);
+									}
+								}
+								arrNormalShrineInputs[intShrineGroupIds[i][k]][intShrineId].add(objNSOption);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	setModeGreatPlateauShrines();
+	return;
+}
+function resetSRModeDefaultSettings() {
+var strShrineGroups=document.getElementById("selShrineGroupMode").value.split(',');
+var j;
+	intShrineGroupIds=[];
+	for (var i=0;i<strShrineGroups.length;i++) {
+		intShrineGroupIds[i]=[];
+		for (j=0;j<strShrineGroups[i].length;j++) {
+			intShrineGroupIds[i].push(parseInt(strShrineGroups[i].charAt(j),16));
+		}
+	}
+	resetSRForm();
+	return;
+}
+function showSGRules(intShrineGroupId) {
+var strShrineGroupId="SGRules"+intShrineGroupId.toString();
+	if (document.getElementById(strShrineGroupId).style.visibility=="collapse") {
+		document.getElementById(strShrineGroupId).style.visibility="visible";
+	} else {
+		document.getElementById(strShrineGroupId).style.visibility="collapse";
+	}
+	return;
+}
+function getPresetRules() {
+var varout;
+var intShrineId;
+var objSelect=document.frmShrineReplacements.selShrineGroupMode;
+var strRules=[arrNormalShrineInputs[0][0].value,arrNormalShrineInputs[0][1].value,arrNormalShrineInputs[0][2].value,arrNormalShrineInputs[0][3].value];
+	if (arrModeGreatPlateauShrines[objSelect.selectedIndex].length) {
+		var intArrayItemsIndexes=getZeroBasedArrayItemsIndexes(arrModeGreatPlateauShrines[objSelect.selectedIndex],strRules);
+		varout="";
+		for (intShrineId=intArrayItemsIndexes.length-1;intShrineId!=-1;intShrineId--) {
+			if (intArrayItemsIndexes[intShrineId]==-1) {
+				varout=varout+"Dungeon"+("00"+arrNormalShrineInputs[0][intShrineId].value).slice(-3)+" ";
+			}
+		}
+		if (varout!="") {
+			alert("Not recommended to use "+varout+"as Great Plateau shrine(s) for the selected mode");
+		}
+	}
+	for (var intShrineGroupId=0;intShrineGroupId<arrNormalShrineInputs.length;intShrineGroupId++) {
+		for (intShrineId=0;intShrineId<arrNormalShrineInputs[intShrineGroupId].length;intShrineId++) {
+			strRules[parseInt(arrNormalShrineInputs[intShrineGroupId][intShrineId].id.substr(7),10)]=("0"+parseInt(arrNormalShrineInputs[intShrineGroupId][intShrineId].value,10).toString(16)).slice(-2)+("0"+parseInt(arrSpecialShrineInputs[intShrineGroupId][intShrineId].value,10).toString(16)).slice(-2);
+		}
+	}
+	while (strRules.length!=arrShrineNames.length) {
+		varout=("0"+strRules.length.toString(16)).slice(-2);
+		strRules.push(varout+varout);
+	}
+	varout="";
+	do {
+		varout=strRules.pop()+"\n"+varout;
+		varout=("0"+strRules.length.toString(16)).slice(-2)+":int = 0x"+strRules.pop()+varout;
+		varout="$Shrines"+("0"+strRules.length.toString(16)).slice(-2)+varout;
+	} while (strRules.length);
+	return "[Preset]\nname = "+objSelect.options[objSelect.selectedIndex].text+"\n"+varout;
+}
+function updateSRuleColors(intShrineGroupId,intShrineId) {
+	if (arrNormalShrineInputs[intShrineGroupId][intShrineId].options[arrNormalShrineInputs[intShrineGroupId][intShrineId].selectedIndex].defaultSelected) {
+		arrNormalShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="Gainsboro";
+		if (arrNormalShrineInputs[intShrineGroupId][intShrineId].value==arrSpecialShrineInputs[intShrineGroupId][intShrineId].value) {
+			arrSpecialShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="Gainsboro";
+		} else {
+			arrSpecialShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="White";
+		}
+	} else {
+		arrNormalShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="White";
+		arrSpecialShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="White";
+	}
+	return;
+}
+function updateSGRules(intShrineGroupId,intShrineId) {
+var intNewValue=parseInt(arrNormalShrineInputs[intShrineGroupId][intShrineId].value,10);
+var intOldValue=parseInt(arrSpecialShrineInputs[intShrineGroupId][intShrineId].options[0].value,10);
+	arrNormalShrineInputs[intNormalShrineTranslations[intNewValue][0]][intNormalShrineTranslations[intNewValue][1]].value=arrSpecialShrineInputs[intShrineGroupId][intShrineId].options[0].value;
+	arrSpecialShrineInputs[intNormalShrineTranslations[intNewValue][0]][intNormalShrineTranslations[intNewValue][1]].options[0].value=arrSpecialShrineInputs[intShrineGroupId][intShrineId].options[0].value;
+	arrSpecialShrineInputs[intNormalShrineTranslations[intNewValue][0]][intNormalShrineTranslations[intNewValue][1]].options[0].text=arrSpecialShrineInputs[intShrineGroupId][intShrineId].options[0].text;
+	arrSpecialShrineInputs[intShrineGroupId][intShrineId].options[0].text=arrNormalShrineInputs[intShrineGroupId][intShrineId].options[arrNormalShrineInputs[intShrineGroupId][intShrineId].selectedIndex].text;
+	arrSpecialShrineInputs[intShrineGroupId][intShrineId].options[0].value=arrNormalShrineInputs[intShrineGroupId][intShrineId].options[arrNormalShrineInputs[intShrineGroupId][intShrineId].selectedIndex].value;
+	updateSRuleColors(intShrineGroupId,intShrineId);
+	intShrineGroupId=intNormalShrineTranslations[intNewValue][0];
+	intShrineId=intNormalShrineTranslations[intNewValue][1];
+	updateSRuleColors(intShrineGroupId,intShrineId);
+	intNormalShrineTranslations[intNewValue][0]=intNormalShrineTranslations[intOldValue][0];
+	intNormalShrineTranslations[intNewValue][1]=intNormalShrineTranslations[intOldValue][1];
+	intNormalShrineTranslations[intOldValue][0]=intShrineGroupId;
+	intNormalShrineTranslations[intOldValue][1]=intShrineId;
+	return;
+}
+function updateSSRuleColor(intShrineGroupId,intShrineId) {
+	if ((arrSpecialShrineInputs[intShrineGroupId][intShrineId].value==arrNormalShrineInputs[intShrineGroupId][intShrineId].value) && (arrNormalShrineInputs[intShrineGroupId][intShrineId].options[arrNormalShrineInputs[intShrineGroupId][intShrineId].selectedIndex].defaultSelected)) {
+		arrSpecialShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="Gainsboro";
+	}
+}
+function updateSSGRules(intShrineGroupId,intShrineId) {
+	if (arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex>0) {
+		arrSpecialShrineInputs[intShrineGroupId][intShrineId].style.backgroundColor="White";
+		if (intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][0]!=-1) {
+			arrSpecialShrineInputs[intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][0]][intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][1]].selectedIndex=0;
+			updateSSRuleColor(intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][0],intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][1]);
+		}
+		intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][0]=intShrineGroupId;
+		intSpecialShrineTranslations[arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex][1]=intShrineId;
+	} else {
+		updateSSRuleColor(intShrineGroupId,intShrineId);
+	}
+	intSpecialShrineTranslations[intSpecialShrineTranslations[0][1]][0]=-1;
+	intSpecialShrineTranslations[intSpecialShrineTranslations[0][1]][1]=-1;
+	arrSpecialShrineInputs[intShrineGroupId][intShrineId].blur();
+	return;
+}
+function saveInputControlValue(intShrineGroupId,intShrineId) {
+	intSpecialShrineTranslations[0][0]=parseInt(arrSpecialShrineInputs[intShrineGroupId][intShrineId].value,10);
+	intSpecialShrineTranslations[0][1]=arrSpecialShrineInputs[intShrineGroupId][intShrineId].selectedIndex;
+	return;
+}
+function randomizeSettings() {
+var j;
+var intRandomIndex;
+	document.frmShrineReplacements.txtPresetRules.value=document.frmShrineReplacements.txtPresetRules.defaultValue;
+	for (var i=0;i<arrNormalShrineInputs.length;i++) {
+		for (j=0;j<arrNormalShrineInputs[i].length;j++) {
+			intRandomIndex=Math.floor(Math.random()*arrNormalShrineInputs[i][j].options.length);
+			if (intRandomIndex!=arrNormalShrineInputs[i][j].selectedIndex) {
+				arrNormalShrineInputs[i][j].selectedIndex=intRandomIndex;
+				updateSGRules(i,j);
+			}
+		}
+	}
+	setModeGreatPlateauShrines();
+	for (i=1;i<=arrSpecialShrines.length;i++) {
+		intRandomIndex=Math.floor(Math.random()*intShrinesCount);
+		for (var j=0;j<arrNormalShrineInputs.length;j++) {
+			if (intRandomIndex<arrNormalShrineInputs[j].length) {
+				if (i!=arrSpecialShrineInputs[j][intRandomIndex].selectedIndex) {
+					saveInputControlValue(j,intRandomIndex);
+					arrSpecialShrineInputs[j][intRandomIndex].selectedIndex=i;
+					updateSSGRules(j,intRandomIndex);
+				}
+				break;
+			} else {
+				intRandomIndex=intRandomIndex-arrNormalShrineInputs[j].length;
+			}
+		}
+	}
+	return;
+}
+var intShrineGroupIds=[];
+var intNormalShrineTranslations=[];
+var intSpecialShrineTranslations=[];
+var strSGName;
+var intShrineId;
+var strShrineId;
+var strDungeonId;
+var strShrineGroupId;
+var arrNormalShrineInputs=[];
+var arrSpecialShrineInputs=[];
+var intShrinesCount=0;
+for (var intShrineGroupId=0;intShrineGroupId<arrNormalShrines.length;intShrineGroupId++) {
+	strShrineGroupId=intShrineGroupId.toString();
+	for (strSGName in arrNormalShrines[intShrineGroupId]) {
+		intShrinesCount=intShrinesCount+arrNormalShrines[intShrineGroupId][strSGName].length;
+		document.write("<tr><td align=\"left\" colspan=3 style=\"cursor:pointer;background-color:palegreen;\" onclick=\"showSGRules("+strShrineGroupId+");\">&nabla;&nbsp;"+strSGName+" ("+arrNormalShrines[intShrineGroupId][strSGName].length.toString()+" Shrines)</td></tr><tbody id=\"SGRules"+strShrineGroupId+"\" style=\"visibility:collapse;background-color:BEIGE;\">");
+		for (intShrineId=0;intShrineId<arrNormalShrines[intShrineGroupId][strSGName].length;intShrineId++) {
+			strDungeonId=arrNormalShrines[intShrineGroupId][strSGName][intShrineId].toString();
+			strShrineId=intShrineId.toString();
+			document.write("<tr align=\"center\"><td>"+arrShrineNames[arrNormalShrines[intShrineGroupId][strSGName][intShrineId]]+" (Dungeon"+("00"+strDungeonId).slice(-3)+")</td><td><select id=\"Dungeon"+strDungeonId+"\" name=\"selNormalShrine"+strShrineGroupId+"\" onchange=\"updateSGRules("+strShrineGroupId+","+strShrineId+");\"></select></td><td><select name=\"selSpecialShrine"+strShrineGroupId+"\" onfocus=\"saveInputControlValue("+strShrineGroupId+","+strShrineId+");\" onchange=\"updateSSGRules("+strShrineGroupId+","+strShrineId+");\"></select></td></tr>");
+		}
+		document.write("</tbody>");
+	}
+	arrNormalShrineInputs.push(document.frmShrineReplacements.elements["selNormalShrine"+strShrineGroupId]);
+	arrSpecialShrineInputs.push(document.frmShrineReplacements.elements["selSpecialShrine"+strShrineGroupId]);
+}
+</script>
+<tr><td align="center" colspan=3>Mode&nbsp;<select onchange="resetSRModeDefaultSettings();" id="selShrineGroupMode"><option value="0,1,2,3,4,5,6,7,8,9,A,B,C,D,E" selected>Regional replacement</option><option value="0,123456789ABCDE">The Great Plateau shrines and others</option><option value="0123456789ABCDE">Overworld replacement</option><option value="0123456789ABCDE">Free overworld replacement</option><option value="0123456789ABCDE">Overworld replacement compatible with unlocked paraglider</option></select><br><input type="button" value="Collapse All" onclick="collapseAll();">&nbsp;<input type="button" value="Get your custom preset" onclick="document.frmShrineReplacements.txtPresetRules.value=getPresetRules();">&nbsp;<input type="button" value="Randomize Settings" onclick="randomizeSettings();">&nbsp;<input type="button" value="Reset Settings" onclick="resetSRForm();"><br><textarea id="txtPresetRules" name="txtPresetRules" rows="5" cols="100" wrap="off">Copy and paste your custom preset into the Shrine Replacements rules.txt file</textarea></tr>
+</table>
+</form>
+<script>
+resetSRModeDefaultSettings();
+</script>
+</body>
+</html>
