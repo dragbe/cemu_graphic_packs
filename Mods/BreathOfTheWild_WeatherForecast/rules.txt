@@ -2,23 +2,28 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Weather Forecast
 path = "The Legend of Zelda: Breath of the Wild/Mods/Weather Forecast"
-description = Customizes the weather
-version = 4
+description = Customizes the weather|- Don't enable the Weather graphics pack|- BreathOfTheWild_WeatherForecast.html to create new weather rules|- If you (r)enable the Weather Forecast graphic pack in an area with a constant weather (such as thundra plateau), you must re-enter the area so that the rules related to this weather work
+version = 5
+
+[Default]
+$WFData0:int = 66051 # 4 byte data sequence for weather 0-3
+$WFData1:int = 67438087 # 4 byte data sequence for weather 4-7
+$WFData2:int = 134217728 # 4 byte data sequence for weather 8
 
 [Preset]
 name = Single rain [Rain HeavyRain BlueskyRain -> Snow|Rain]
-$WFData0 = 66564 # 4 byte data sequence for weather 0-3
-$WFData1 = 67438087 # 4 byte data sequence for weather 4-7
-$WFData2 = 67108864 # 4 byte data sequence for weather 8
+$WFData0:int = 66564
+$WFData1:int = 67438087
+$WFData2:int = 67108864
 
 [Preset]
 name = Harmless storm [HeavySnow ThunderRain -> HeavyRain]
-$WFData0 = 66051
-$WFData1 = 67307011
-$WFData2 = 134217728
+$WFData0:int = 66051
+$WFData1:int = 67307011
+$WFData2:int = 134217728
 
 [Preset]
 name = Single rain and no storm [Rain HeavyRain BlueskyRain -> Snow|Rain] [HeavySnow ThunderRain -> DarkWeather]
-$WFData0 = 66564
-$WFData1 = 67503622
-$WFData2 = 67108864
+$WFData0:int = 66564
+$WFData1:int = 67503622
+$WFData2:int = 67108864
