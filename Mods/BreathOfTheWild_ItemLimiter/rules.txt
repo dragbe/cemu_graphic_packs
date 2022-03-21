@@ -2,55 +2,229 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Item Limiter
 path = "The Legend of Zelda: Breath of the Wild/Mods/Item Limiter"
-description = limits both materials and foods total count
-version = 4
+description = Limits both materials and foods total count|- DataLayer mod required|- Active after (re)start/(re)load a new/existing game|- Depending on the selected presets, possible {materials/foods} loss|- Disable it in Cemu, save and (re)load the game save to deactivate this mod
+version = 5
+
+[Default]
+$MatMaxCount:int = 1000
+$MatMaxSlotsCount:int = 160
+$MatMaxItemsCount:int = 999
+$FoodMaxCount:int = 250
+$FoodMaxSlotsCount:int = 60
+$FoodMaxItemsCount:int = 999
+$DataLayerMemoryBase:int = 0x180
 
 [Preset]
-name = 5 materials + 1 foods
-$MatMaxCount = 5
-$FoodMaxCount = 1
+name = 1000
+category = Max materials count
+$MatMaxCount:int = 1000
 
 [Preset]
-name = 10 materials + 3 foods
-$MatMaxCount = 10
-$FoodMaxCount = 3
+name = No Limit
+category = Max materials count
+$MatMaxCount:int = 1073741824
 
 [Preset]
-name = 25 materials + 6 foods
-$MatMaxCount = 25
-$FoodMaxCount = 6
+name = 100000
+category = Max materials count
+$MatMaxCount:int = 100000
 
 [Preset]
-name = 50 materials + 13 foods
-$MatMaxCount = 50
-$FoodMaxCount = 13
+name = 50000
+category = Max materials count
+$MatMaxCount:int = 50000
 
 [Preset]
-name = 100 materials + 25 foods
-$MatMaxCount = 100
-$FoodMaxCount = 25
+name = 10000
+category = Max materials count
+$MatMaxCount:int = 10000
 
 [Preset]
-name = 300 materials + 75 foods
-$MatMaxCount = 300
-$FoodMaxCount = 75
+name = 5000
+category = Max materials count
+$MatMaxCount:int = 5000
 
 [Preset]
-name = 500 materials + 125 foods
-$MatMaxCount = 500
-$FoodMaxCount = 125
+name = 500
+category = Max materials count
+$MatMaxCount:int = 500
 
 [Preset]
-name = 1000 materials + 250 foods
-$MatMaxCount = 1000
-$FoodMaxCount = 250
+name = 300
+category = Max materials count
+$MatMaxCount:int = 300
 
 [Preset]
-name = 5000 materials + 1250 foods
-$MatMaxCount = 5000
-$FoodMaxCount = 1250
+name = 100
+category = Max materials count
+$MatMaxCount:int = 100
 
 [Preset]
-name = 10000 materials + 2500 foods
-$MatMaxCount = 10000
-$FoodMaxCount = 2500
+name = 50
+category = Max materials count
+$MatMaxCount:int = 50
+
+[Preset]
+name = 25
+category = Max materials count
+$MatMaxCount:int = 25
+
+[Preset]
+name = 10
+category = Max materials count
+$MatMaxCount:int = 10
+
+[Preset]
+name = 5
+category = Max materials count
+$MatMaxCount:int = 5
+
+[Preset]
+name = 160
+category = Max material slots count
+$MatMaxSlotsCount:int = 160
+
+[Preset]
+name = 140
+category = Max material slots count
+$MatMaxSlotsCount:int = 140
+
+[Preset]
+name = 120
+category = Max material slots count
+$MatMaxSlotsCount:int = 120
+
+[Preset]
+name = 100
+category = Max material slots count
+$MatMaxSlotsCount:int = 100
+
+[Preset]
+name = 80
+category = Max material slots count
+$MatMaxSlotsCount:int = 80
+
+[Preset]
+name = 999
+category = Max items count for material slots
+$MatMaxItemsCount:int = 999
+
+[Preset]
+name = 750
+category = Max items count for material slots
+$MatMaxItemsCount:int = 750
+
+[Preset]
+name = 500
+category = Max items count for material slots
+$MatMaxItemsCount:int = 500
+
+[Preset]
+name = 250
+category = Max items count for material slots
+$MatMaxItemsCount:int = 250
+
+[Preset]
+name = 100
+category = Max items count for material slots
+$MatMaxItemsCount:int = 100
+
+[Preset]
+name = 250
+category = Max foods count
+$FoodMaxCount:int = 250
+
+[Preset]
+name = No limit
+category = Max foods count
+$FoodMaxCount:int = 1073741824
+
+[Preset]
+name = 2500
+category = Max foods count
+$FoodMaxCount:int = 2500
+
+[Preset]
+name = 1000
+category = Max foods count
+$FoodMaxCount:int = 1000
+
+[Preset]
+name = 500
+category = Max foods count
+$FoodMaxCount:int = 500
+
+[Preset]
+name = 125
+category = Max foods count
+$FoodMaxCount:int = 125
+
+[Preset]
+name = 75
+category = Max foods count
+$FoodMaxCount:int = 75
+
+[Preset]
+name = 25
+category = Max foods count
+$FoodMaxCount:int = 25
+
+[Preset]
+name = 13
+category = Max foods count
+$FoodMaxCount:int = 13
+
+[Preset]
+name = 6
+category = Max foods count
+$FoodMaxCount:int = 6
+
+[Preset]
+name = 3
+category = Max foods count
+$FoodMaxCount:int = 3
+
+[Preset]
+name = 1
+category = Max foods count
+$FoodMaxCount:int = 1
+
+[Preset]
+name = 60
+category = Max food slots count
+$FoodMaxSlotsCount:int = 60
+
+[Preset]
+name = 40
+category = Max food slots count
+$FoodMaxSlotsCount:int = 40
+
+[Preset]
+name = 20
+category = Max food slots count
+$FoodMaxSlotsCount:int = 20
+
+[Preset]
+name = 999
+category = Max items count for food slots
+$FoodMaxItemsCount:int = 999
+
+[Preset]
+name = 750
+category = Max items count for food slots
+$FoodMaxItemsCount:int = 750
+
+[Preset]
+name = 500
+category = Max items count for food slots
+$FoodMaxItemsCount:int = 500
+
+[Preset]
+name = 250
+category = Max items count for food slots
+$FoodMaxItemsCount:int = 250
+
+[Preset]
+name = 100
+category = Max items count for food slots
+$FoodMaxItemsCount:int = 100
