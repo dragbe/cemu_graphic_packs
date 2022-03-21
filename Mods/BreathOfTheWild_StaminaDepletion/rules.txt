@@ -2,53 +2,58 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Stamina Depletion
 path = "The Legend of Zelda: Breath of the Wild/Mods/Stamina Depletion"
-description = Customizes the stamina depletion
-version = 4
+description = Customizes the stamina depletion|- Don't enable the Hunger Wheel graphic pack|- Raw Stamina graphic pack required
+version = 5
 
-[Preset]
-name = 1000 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 1000
-$ActionStaminaScaleFactor = 0.01 # non zero value greater than or equal to 0.01
-$SleepDepletionFactor = 0.25
-
-[Preset]
-name = 1000 per day (0.25 x depletion during sleep) + action stamina
-$StaminaRule = 1000
-$ActionStaminaScaleFactor = 1
-$SleepDepletionFactor = 0.25
+[Default]
+$StaminaRule:float = 500
+$ActionStaminaScaleFactor:float = 0.01 # non zero value greater than or equal to 0.01
+$SleepDepletionFactor:float = 0.25
 
 [Preset]
 name = 500 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 500
-$ActionStaminaScaleFactor = 0.01
-$SleepDepletionFactor = 0.25
+$StaminaRule:float = 500
+$ActionStaminaScaleFactor:float = 0.01
+$SleepDepletionFactor:float = 0.25
+
+[Preset]
+name = 1000 per day (0.25 x depletion during sleep) + 0.01 x action stamina
+$StaminaRule:float = 1000
+$ActionStaminaScaleFactor:float = 0.01
+$SleepDepletionFactor:float = 0.25
+
+[Preset]
+name = 1000 per day (0.25 x depletion during sleep) + action stamina
+$StaminaRule:float = 1000
+$ActionStaminaScaleFactor:float = 1
+$SleepDepletionFactor:float = 0.25
 
 [Preset]
 name = 500 per day (0.25 x depletion during sleep) + action stamina
-$StaminaRule = 500
-$ActionStaminaScaleFactor = 1
-$SleepDepletionFactor = 0.25
+$StaminaRule:float = 500
+$ActionStaminaScaleFactor:float = 1
+$SleepDepletionFactor:float = 0.25
 
 [Preset]
 name = 333 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 333
-$ActionStaminaScaleFactor = 0.01
-$SleepDepletionFactor = 0.25
+$StaminaRule:float = 333
+$ActionStaminaScaleFactor:float = 0.01
+$SleepDepletionFactor:float = 0.25
 
 [Preset]
 name = 333 per day (0.25 x depletion during sleep) + action stamina
-$StaminaRule = 333
-$ActionStaminaScaleFactor = 1
-$SleepDepletionFactor = 0.25
+$StaminaRule:float = 333
+$ActionStaminaScaleFactor:float = 1
+$SleepDepletionFactor:float = 0.25
 
 [Preset]
 name = 200 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 200
-$ActionStaminaScaleFactor = 0.01
-$SleepDepletionFactor = 0.25
+$StaminaRule:float = 200
+$ActionStaminaScaleFactor:float = 0.01
+$SleepDepletionFactor:float = 0.25
 
 [Preset]
 name = 200 per day (0.25 x depletion during sleep) + action stamina
-$StaminaRule = 200
-$ActionStaminaScaleFactor = 1
-$SleepDepletionFactor = 0.25
+$StaminaRule:float = 200
+$ActionStaminaScaleFactor:float = 1
+$SleepDepletionFactor:float = 0.25
