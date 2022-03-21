@@ -1,1 +1,34 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Punitive Death
+path = "The Legend of Zelda: Breath of the Wild/Mods/Punitive Death"
+description = Non-essential items loss after death|Survival: keep master sword + key items|Hard: keep master sword + armors + key items|Normal: keep master sword + armors + materials + food + key items|Easy: keep weapons + armors + key items|Custom: keep master sword + arrows + armors + materials + food + key items
+version = 5
 
+[Default]
+$EssentialItems:int = 8388609
+$DataLayerMemoryBase:int = 0x180
+
+[Preset]
+name = Survival
+$EssentialItems:int = 1 # Master Sword filter
+
+[Preset]
+name = Hard
+$EssentialItems:int = 8388609 # Master Sword filter + Armor filter
+
+[Preset]
+name = Normal
+$EssentialItems:int = 16777265 # Master Sword filter + Non-weapons items filter + Arrows exclusion filters
+
+[Preset]
+name = Easy
+$EssentialItems:int = 41943052 # Weapons filter + Arrows filters + Armor filter
+
+[Preset]
+name = Custom
+$EssentialItems:int = 16777217 # Master Sword filter + Non-weapons items filter
+
+[Preset]
+name = Test
+$EssentialItems:int = 8392705 # Master Sword filter + Armor filter + Ancient Materials filter
