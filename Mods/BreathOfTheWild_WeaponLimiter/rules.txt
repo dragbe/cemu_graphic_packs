@@ -2,17 +2,22 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Weapon Limiter
 path = "The Legend of Zelda: Breath of the Wild/Mods/Weapon Limiter"
-description = Limits weapons, bows and shields count in the inventory
-version = 4
+description = Limits weapons, bows and shields count in the inventory|- if this graphic pack is enabled before starting a game, there are {weapons!bows!shields} loss if the {weapons!bows!shields} count in the game save is greater than the selected preset '{weapons!bows!shields} value'
+version = 5
+
+[Default]
+$WeaponMaxCount:int = 20 # non-zero value less than or equal to 20
+$BowMaxCount:int = 13 # non-zero value less than or equal to 13
+$ShieldMaxCount:int = 20 # non-zero value less than or equal to 20
 
 [Preset]
 name = 5 weapons, 3 bows, 5 shields
-$WeaponMaxCount = 5 # non-zero value less than or equal to 20
-$BowMaxCount = 3 # non-zero value less than or equal to 13
-$ShieldMaxCount = 5 # non-zero value less than or equal to 20
+$WeaponMaxCount:int = 5
+$BowMaxCount:int = 3
+$ShieldMaxCount:int = 5
 
 [Preset]
 name = 4 weapons, 2 bows, 3 shields
-$WeaponMaxCount = 4
-$BowMaxCount = 2
-$ShieldMaxCount = 3
+$WeaponMaxCount:int = 4
+$BowMaxCount:int = 2
+$ShieldMaxCount:int = 3
