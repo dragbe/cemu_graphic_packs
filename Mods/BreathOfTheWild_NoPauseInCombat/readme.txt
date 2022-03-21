@@ -1,9 +1,9 @@
-Removes pausing in combat
+Disables pausing in combat
 
 NOTES
-- Use Wii U Gamepad as emulated controller
-- "Exclusion feature" available
-- Ingame weapons|runes selector not affected
+- Data Layer mod (last version) required for the "exclusion feature"
+- Use Wii U Gamepad|pro controller as emulated controller
+- Quick menu not affected
 
 INSTALLATION INSTRUCTIONS
 - browse to your Cemu folder
@@ -11,4 +11,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_NoPauseInCombat folder in this directory
 - enable the No Pause In Combat graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/12954
+https://gamebanana.com/mods/49878
