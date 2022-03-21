@@ -2,61 +2,71 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Hunger Wheel
 path = "The Legend of Zelda: Breath of the Wild/Mods/Hunger Wheel"
-description = Hunger wheel for the yellow stamina (Staminax included)
-version = 4
+description = Hunger wheel for the yellow stamina (Staminax included)|- Don't enable the Raw Stamina, Stamina Depletion and Staminax graphic packs|- Useful for mods with custom stamina settings (don't edit the EnergyAutoRecover parameter in the Player_Link.bgparamlist file)
+version = 5
+
+[Default]
+$StaminaRule:float = 1000
+$StaminaHungerFactor:float = 0
+$SleepHungerFactor:float = 0.25
+$MaxYellowStamina:float = 5000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 1000 per day (0.25 x depletion during sleep)
-$StaminaRule = 1000
-$StaminaHungerFactor = 0 # non zero value must be greater than or equal to 0.01
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 1000
+category = Stamina auto depletion per day
+$StaminaRule:float = 1000
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 1000 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 1000
-$StaminaHungerFactor = 0.01
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 500
+category = Stamina auto depletion per day
+$StaminaRule:float = 500
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 500 per day (0.25 x depletion during sleep)
-$StaminaRule = 500
-$StaminaHungerFactor = 0
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 333
+category = Stamina auto depletion per day
+$StaminaRule:float = 333
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 500 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 500
-$StaminaHungerFactor = 0.01
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 200
+category = Stamina auto depletion per day
+$StaminaRule:float = 200
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 333 per day (0.25 x depletion during sleep)
-$StaminaRule = 333
-$StaminaHungerFactor = 0
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = No stamina depletion due to actions
+category = Multiplier for actions stamina
+$StaminaHungerFactor:float = 0
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 333 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 333
-$StaminaHungerFactor = 0.01
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 0.01
+category = Multiplier for actions stamina
+$StaminaHungerFactor:float = 0.01
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 200 per day (0.25 x depletion during sleep)
-$StaminaRule = 200
-$StaminaHungerFactor = 0
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 0.02
+category = Multiplier for actions stamina
+$StaminaHungerFactor:float = 0.02
 
 [Preset]
-name = CAPACITY: 5000, DEPLETION: 200 per day (0.25 x depletion during sleep) + 0.01 x action stamina
-$StaminaRule = 200
-$StaminaHungerFactor = 0.01
-$SleepHungerFactor = 0.25
-$MaxYellowStamina = 5000
+name = 0.25
+category = Multiplier for stamina auto depletion for sleep and campfire
+$SleepHungerFactor:float = 0.25
+
+[Preset]
+name = No stamina depletion for sleep and campfire
+category = Multiplier for stamina auto depletion for sleep and campfire
+$SleepHungerFactor:float = 0
+
+[Preset]
+name = 0.125
+category = Multiplier for stamina auto depletion for sleep and campfire
+$SleepHungerFactor:float = 0.125
+
+[Preset]
+name = 5000
+category = Max yellow stamina
+$MaxYellowStamina:float = 5000
+
+[Preset]
+name = 10000
+category = Max yellow stamina
+$MaxYellowStamina:float = 10000
