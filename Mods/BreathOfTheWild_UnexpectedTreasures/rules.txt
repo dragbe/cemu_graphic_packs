@@ -3,190 +3,376 @@ titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Unexpected Treasures
 path = "The Legend of Zelda: Breath of the Wild/Mods/Unexpected Treasures"
 description = Randomizes the treasure chests with a group of the same category content
-version = 4
+version = 5
+
+[Default]
+$DataLayerMemoryBase:int = 0x180
+$TravelerSwordProb:int = 20 # Traveler's treasures probabilities (positive values less than or equal to 100)
+$TravelerSpearProb:int = 20
+$TravelerClaymoreProb:int = 20
+$TravelerBowProb:int = 20
+$TravelerShieldProb:int = 20 # Requirements: $TravelerSwordProb + $TravelerSpearProb + $TravelerClaymoreProb + $TravelerBowProb + $TravelerShieldProb = 100
+$NormalArrowX5Prob:int = 15 # Arrow x5 treasures probabilities (positive values less than or equal to 100)
+$FireArrowX5Prob:int = 20
+$IceArrowX5Prob:int = 20
+$ElectricArrowX5Prob:int = 20
+$BombArrowX5Prob:int = 20
+$AncientArrowX3Prob:int = 5 # Requirements: $NormalArrowX5Prob + $FireArrowX5Prob + $IceArrowX5Prob + $ElectricArrowX5Prob + $BombArrowX5Prob + $AncientArrowX3Prob = 100
+$NormalArrowX10Prob:int = 18 # Arrow x10 treasures probabilities (positive values less than or equal to 100)
+$FireArrowX10Prob:int = 20
+$IceArrowX10Prob:int = 20
+$ElectricArrowX10Prob:int = 20
+$BombArrowX10Prob:int = 20
+$AncientArrowX5Prob:int = 2 # Requirements: $NormalArrowX10Prob + $FireArrowX10Prob + $IceArrowX10Prob + $ElectricArrowX10Prob + $BombArrowX10Prob + $AncientArrowX5Prob = 100
+$AmberProb:int = 0 # Gem treasures probabilities (positive values less than or equal to 100)
+$OpalProb:int = 57
+$TopazProb:int = 19
+$RubyProb:int = 14
+$SapphireProb:int = 10 # Requirements: $AmberProb + $OpalProb + $TopazProb + $RubyProb + $SapphireProb = 100
+$ZoraSwordProb:int = 13 # Zora treasures probabilities (positive values less than or equal to 100)
+$CeremonialTridentProb:int = 14
+$SilverscaleSpearProb:int = 15
+$ZoraSpearProb:int = 15
+$SilverLongswordProb:int = 15
+$SilverBowProb:int = 14
+$SilverShieldProb:int = 14 # Requirements: $ZoraSwordProb + $CeremonialTridentProb + $SilverscaleSpearProb + $ZoraSpearProb + $SilverLongswordProb + $SilverBowProb + $SilverShieldProb = 100
+$MoonlightScimitarProb:int = 13 # Gerudo treasures probabilities (positive values less than or equal to 100)
+$GerudoScimitarProb:int = 15
+$GerudoSpearProb:int = 14
+$GoldenClaymoreProb:int = 15
+$GoldenBowProb:int = 13
+$RadiantShieldProb:int = 15
+$GerudoShieldProb:int = 15 # Requirements: $MoonlightScimitarProb + $GerudoScimitarProb + $GerudoSpearProb + $GoldenClaymoreProb + $GoldenBowProb + $RadiantShieldProb + $GerudoShieldProb = 100
+$FeatheredEdgeProb:int = 20 # Rito treasures probabilities (positive values less than or equal to 100)
+$FeatheredSpearProb:int = 15
+$FalconBowProb:int = 25
+$SwallowBowProb:int = 25
+$KiteShieldProb:int = 15 # Requirements: $FeatheredEdgeProb + $FeatheredSpearProb + $FalconBowProb + $SwallowBowProb + $KiteShieldProb = 100
+$DrillshaftProb:int = 35 # Goron treasures probabilities (positive values less than or equal to 100)
+$StoneSmasherProb:int = 35
+$CobbleCrusherProb:int = 30 # Requirements: $DrillshaftProb + $StoneSmasherProb + $CobbleCrusherProb = 100
+$DemonCarverProb:int = 30 # Yiga treasures probabilities (positive values less than or equal to 100)
+$ViciousSickleProb:int = 20
+$WindcleaverProb:int = 30
+$DuplexBowProb:int = 20 # Requirements: $DemonCarverProb + $ViciousSickleProb + $WindcleaverProb + $DuplexBowProb = 100
+$EightfoldBladeProb:int = 15 # Sheikah treasures probabilities (positive values less than or equal to 100)
+$SerpentineSpearProb:int = 20
+$EdgeOfDualityProb:int = 15
+$EightfoldLongbladeProb:int = 20
+$PhrenicBowProb:int = 15
+$ShieldOfTheMindEyeProb:int = 15 # Requirements: $EightfoldBladeProb + $SerpentineSpearProb + $EdgeOfDualityProb + $EightfoldLongbladeProb + $PhrenicBowProb + $ShieldOfTheMindEyeProb = 100
+$SoldierBroadswordProb:int = 20 # Soldier's treasures probabilities (positive values less than or equal to 100)
+$SoldierSpearProb:int = 20
+$SoldierClaymoreProb:int = 20
+$SoldierBowProb:int = 20
+$SoldierShieldProb:int = 20 # Requirements: $SoldierBroadswordProb + $SoldierSpearProb + $SoldierClaymoreProb + $SoldierBowProb + $SoldierShieldProb = 100
+$KnightBroadswordProb:int = 20 # Knight's treasures probabilities (positive values less than or equal to 100)
+$KnightHalberdProb:int = 20
+$KnightClaymoreProb:int = 20
+$KnightBowProb:int = 20
+$KnightShieldProb:int = 20 # Requirements: $KnightBroadswordProb + $KnightHalberdProb + $KnightClaymoreProb + $KnightBowProb + $KnightShieldProb = 100
+$RoyalBroadswordProb:int = 20 # Royal treasures probabilities (positive values less than or equal to 100)
+$RoyalHalberdProb:int = 20
+$RoyalClaymoreProb:int = 20
+$RoyalBowProb:int = 20
+$RoyalShieldProb:int = 20 # Requirements: $RoyalBroadswordProb + $RoyalHalberdProb + $RoyalClaymoreProb + $RoyalBowProb + $RoyalShieldProb = 100
+$RoyalGuardSwordProb:int = 20 # Royal Guard's treasures probabilities (positive values less than or equal to 100)
+$RoyalGuardSpearProb:int = 20
+$RoyalGuardClaymoreProb:int = 20
+$RoyalGuardBowProb:int = 20
+$RoyalGuardShieldProb:int = 20 # Requirements: $RoyalGuardSwordProb + $RoyalGuardSpearProb + $RoyalGuardClaymoreProb + $RoyalGuardBowProb + $RoyalGuardShieldProb = 100
+$LightningRodProb:int = 0 # Electric treasures probabilities (positive values less than or equal to 100)
+$ThunderstormRodProb:int = 10
+$ThunderbladeProb:int = 30
+$ThunderspearProb:int = 30
+$GreatThunderbladeProb:int = 30 # Requirements: $LightningRodProb + $ThunderstormRodProb + $ThunderbladeProb + $ThunderspearProb + $GreatThunderbladeProb = 100
+$ForestDwellerSwordProb:int = 28 # Forest treasures probabilities (positive values less than or equal to 100)
+$ForestDwellerSpearProb:int = 19
+$ForestDwellerBowProb:int = 28
+$ForestDwellerShieldProb:int = 25 # Requirements: $ForestDwellerSwordProb + $ForestDwellerSpearProb + $ForestDwellerBowProb + $ForestDwellerShieldProb = 100
+$IceRodProb:int = 0 # Frost treasures probabilities (positive values less than or equal to 100)
+$BlizzardRodProb:int = 10
+$FrostbladeProb:int = 30
+$FrostspearProb:int = 30
+$GreatFrostbladeProb:int = 30 # Requirements: $IceRodProb + $BlizzardRodProb + $FrostbladeProb + $FrostspearProb + $GreatFrostbladeProb = 100
+$FireRodProb:int = 0 # Fire treasures probabilities (positive values less than or equal to 100)
+$MeteorRodProb:int = 10
+$FlamebladeProb:int = 30
+$FlamespearProb:int = 30
+$GreatFlamebladeProb:int = 30 # Requirements: $FireRodProb + $MeteorRodProb + $FlamebladeProb + $FlamespearProb + $GreatFlamebladeProb = 100
+$BoomerangProb:int = 35 # Climber treasures probabilities (positive values less than or equal to 100)
+$GiantBoomerangProb:int = 55
+$WoodenShieldProb:int = 10 # Requirements: $BoomerangProb + $GiantBoomerangProb + $WoodenShieldProb = 100
+$LynelSwordProb:int = 21 # Lynel treasures probabilities (positive values less than or equal to 100)
+$LynelSpearProb:int = 16
+$LynelCrusherProb:int = 21
+$LynelBowProb:int = 21
+$LynelShieldProb:int = 21 # Requirements: $LynelSwordProb + $LynelSpearProb + $LynelCrusherProb + $LynelBowProb + $LynelShieldProb = 100
+$MightyLynelSwordProb:int = 21 # Mighty Lynel treasures probabilities (positive values less than or equal to 100)
+$MightyLynelSpearProb:int = 16
+$MightyLynelCrusherProb:int = 21
+$MightyLynelBowProb:int = 21
+$MightyLynelShieldProb:int = 21 # Requirements: $MightyLynelSwordProb + $MightyLynelSpearProb + $MightyLynelCrusherProb + $MightyLynelBowProb + $MightyLynelShieldProb = 100
+$SavageLynelSwordProb:int = 21 # Savage Lynel treasures probabilities (positive values less than or equal to 100)
+$SavageLynelSpearProb:int = 16
+$SavageLynelCrusherProb:int = 21
+$SavageLynelBowProb:int = 21
+$SavageLynelShieldProb:int = 21 # Requirements: $SavageLynelSwordProb + $SavageLynelSpearProb + $SavageLynelCrusherProb + $SavageLynelBowProb + $SavageLynelShieldProb = 100
+$AncientShortSwordProb:int = 20 # Ancient treasures probabilities (positive values less than or equal to 100)
+$AncientSpearProb:int = 20
+$AncientBladesawProb:int = 20
+$AncientBowProb:int = 20
+$AncientShieldProb:int = 20 # Requirements: $AncientShortSwordProb + $AncientSpearProb + $AncientBladesawProb + $AncientBowProb + $AncientShieldProb = 100
+$GuardianSword2Prob:int = 25 # Guardian++ treasures probabilities (positive values less than or equal to 100)
+$GuardianSpear2Prob:int = 25
+$AncientBattleAxe2Prob:int = 25
+$GuardianShield2Prob:int = 25 # Requirements: $GuardianSword2Prob + $GuardianSpear2Prob + $AncientBattleAxe2Prob + $GuardianShield2Prob = 100
+$GuardianSword1Prob:int = 25 # Guardian+ treasures probabilities (positive values less than or equal to 100)
+$GuardianSpear1Prob:int = 25
+$AncientBattleAxe1Prob:int = 25
+$GuardianShield1Prob:int = 25 # Requirements: $GuardianSword1Prob + $GuardianSpear1Prob + $AncientBattleAxe1Prob + $GuardianShield1Prob = 100
+$GuardianSwordProb:int = 25 # Guardian treasures probabilities (positive values less than or equal to 100)
+$GuardianSpearProb:int = 25
+$AncientBattleAxeProb:int = 25
+$GuardianShieldProb:int = 25 # Requirements: $GuardianSwordProb + $GuardianSpearProb + $AncientBattleAxeProb + $GuardianShieldProb = 100
+$DragonboneBokoClubProb:int = 20 # Best Boko treasures probabilities (positive values less than or equal to 100)
+$DragonboneBokoSpearProb:int = 20
+$DragonboneBokoBatProb:int = 20
+$DragonBoneBokoBowProb:int = 20
+$DragonboneBokoShieldProb:int = 20 # Requirements: $DragonboneBokoClubProb + $DragonboneBokoSpearProb + $DragonboneBokoBatProb + $DragonBoneBokoBowProb + $DragonboneBokoShieldProb = 100
+$SpikedBokoClubProb:int = 20 # Medium Boko treasures probabilities (positive values less than or equal to 100)
+$SpikedBokoSpearProb:int = 20
+$SpikedBokoBatProb:int = 20
+$SpikedBokoBowProb:int = 20
+$SpikedBokoShieldProb:int = 20 # Requirements: $SpikedBokoClubProb + $SpikedBokoSpearProb + $SpikedBokoBatProb + $SpikedBokoBowProb + $SpikedBokoShieldProb = 100
+$BokoClubProb:int = 20 # Boko treasures probabilities (positive values less than or equal to 100)
+$BokoSpearProb:int = 20
+$BokoBatProb:int = 20
+$BokoBowProb:int = 20
+$BokoShieldProb:int = 20 # Requirements: $BokoClubProb + $BokoSpearProb + $BokoBatProb + $BokoBowProb + $BokoShieldProb = 100
+$LizalTriBoomerangProb:int = 25 # Best Lizal treasures probabilities (positive values less than or equal to 100)
+$ForkedLizalSpearProb:int = 25
+$SteelLizalBowProb:int = 25
+$SteelLizalShieldProb:int = 25 # Requirements: $LizalTriBoomerangProb + $ForkedLizalSpearProb + $SteelLizalBowProb + $SteelLizalShieldProb = 100
+$LizalForkedBoomerangProb:int = 25 # Medium Lizal treasures probabilities (positive values less than or equal to 100)
+$EnhancedLizalSpearProb:int = 25
+$StrengthenedLizalBowProb:int = 25
+$ReinforcedLizalShieldProb:int = 25 # Requirements: $LizalForkedBoomerangProb + $EnhancedLizalSpearProb + $StrengthenedLizalBowProb + $ReinforcedLizalShieldProb = 100
+$LizalBoomerangProb:int = 25 # Lizal treasures probabilities (positive values less than or equal to 100)
+$LizalSpearProb:int = 25
+$LizalBowProb:int = 25
+$LizalShieldProb:int = 25 # Requirements: $LizalBoomerangProb + $LizalSpearProb + $LizalBowProb + $LizalShieldProb = 100
+$DragonboneMoblinSpearProb:int = 35 # Best Moblin treasures probabilities (positive values less than or equal to 100)
+$DragonboneMoblinClubProb:int = 65 # Requirements: $DragonboneMoblinSpearProb + $DragonboneMoblinClubProb = 100
+$SpikedMoblinSpearProb:int = 35 # Medium Moblin treasures probabilities (positive values less than or equal to 100)
+$SpikedMoblinClubProb:int = 65 # Requirements: $SpikedMoblinSpearProb + $SpikedMoblinClubProb = 100
+$MoblinSpearProb:int = 35 # Moblin treasures probabilities (positive values less than or equal to 100)
+$MoblinClubProb:int = 65 # Requirements: $MoblinSpearProb + $MoblinClubProb = 100
+$RustyBroadswordProb:int = 25 # Rusty treasures probabilities (positive values less than or equal to 100)
+$RustyHalberdProb:int = 25
+$RustyClaymoreProb:int = 25
+$RustyShieldProb:int = 25 # Requirements: $RustyBroadswordProb + $RustyHalberdProb + $RustyClaymoreProb + $RustyShieldProb = 100
+$FishingHarpoonProb:int = 12 # Survival treasures probabilities (positive values less than or equal to 100)
+$ThrowingSpearProb:int = 12
+$FarmerPitchforkProb:int = 10
+$WoodcutterAxeProb:int = 7
+$IronSledgehammerProb:int = 12
+$DoubleAxeProb:int = 11
+$WoodenBowProb:int = 12
+$FishermanShieldProb:int = 12
+$HunterShieldProb:int = 12 # Requirements: $FishingHarpoonProb + $ThrowingSpearProb + $FarmerPitchforkProb + $WoodcutterAxeProb + $IronSledgehammerProb + $DoubleAxeProb + $WoodenBowProb + $FishermanShieldProb + $HunterShieldProb = 100
+$HylianShieldProb:int = 12 # Legendary treasures probabilities (positive values less than or equal to 100)
+$SeaBreezeBoomerangProb:int = 11
+$HeroShieldProb:int = 11
+$SwordProb:int = 11
+$BiggoronSwordProb:int = 11
+$SwordOfTheSixSagesProb:int = 11
+$TwilightBowProb:int = 11
+$GoddessSwordProb:int = 11
+$FierceDeitySwordProb:int = 11 # Requirements: $HylianShieldProb + $SeaBreezeBoomerangProb + $HeroShieldProb + $SwordProb + $BiggoronSwordProb + $SwordOfTheSixSagesProb + $TwilightBowProb + $GoddessSwordProb + $FierceDeitySwordProb = 100
 
 [Preset]
 name = Default Loot Table
-$TravelerSwordProb = 20 # Traveler's treasures probabilities (positive values less than or equal to 100)
-$TravelerSpearProb = 20
-$TravelerClaymoreProb = 20
-$TravelerBowProb = 20
-$TravelerShieldProb = 20 # Requirements: $TravelerSwordProb + $TravelerSpearProb + $TravelerClaymoreProb + $TravelerBowProb + $TravelerShieldProb = 100
-$NormalArrowX5Prob = 15 # Arrow x5 treasures probabilities (positive values less than or equal to 100)
-$FireArrowX5Prob = 20
-$IceArrowX5Prob = 20
-$ElectricArrowX5Prob = 20
-$BombArrowX5Prob = 20
-$AncientArrowX3Prob = 5 # Requirements: $NormalArrowX5Prob + $FireArrowX5Prob + $IceArrowX5Prob + $ElectricArrowX5Prob + $BombArrowX5Prob + $AncientArrowX3Prob = 100
-$NormalArrowX10Prob = 18 # Arrow x10 treasures probabilities (positive values less than or equal to 100)
-$FireArrowX10Prob = 20
-$IceArrowX10Prob = 20
-$ElectricArrowX10Prob = 20
-$BombArrowX10Prob = 20
-$AncientArrowX5Prob = 2 # Requirements: $NormalArrowX10Prob + $FireArrowX10Prob + $IceArrowX10Prob + $ElectricArrowX10Prob + $BombArrowX10Prob + $AncientArrowX5Prob = 100
-$AmberProb = 0 # Gem treasures probabilities (positive values less than or equal to 100)
-$OpalProb = 57
-$TopazProb = 19
-$RubyProb = 14
-$SapphireProb = 10 # Requirements: $AmberProb + $OpalProb + $TopazProb + $RubyProb + $SapphireProb = 100
-$ZoraSwordProb = 13 # Zora treasures probabilities (positive values less than or equal to 100)
-$CeremonialTridentProb = 14
-$SilverscaleSpearProb = 15
-$ZoraSpearProb = 15
-$SilverLongswordProb = 15
-$SilverBowProb = 14
-$SilverShieldProb = 14 # Requirements: $ZoraSwordProb + $CeremonialTridentProb + $SilverscaleSpearProb + $ZoraSpearProb + $SilverLongswordProb + $SilverBowProb + $SilverShieldProb = 100
-$MoonlightScimitarProb = 13 # Gerudo treasures probabilities (positive values less than or equal to 100)
-$GerudoScimitarProb = 15
-$GerudoSpearProb = 14
-$GoldenClaymoreProb = 15
-$GoldenBowProb = 13
-$RadiantShieldProb = 15
-$GerudoShieldProb = 15 # Requirements: $MoonlightScimitarProb + $GerudoScimitarProb + $GerudoSpearProb + $GoldenClaymoreProb + $GoldenBowProb + $RadiantShieldProb + $GerudoShieldProb = 100
-$FeatheredEdgeProb = 20 # Rito treasures probabilities (positive values less than or equal to 100)
-$FeatheredSpearProb = 15
-$FalconBowProb = 25
-$SwallowBowProb = 25
-$KiteShieldProb = 15 # Requirements: $FeatheredEdgeProb + $FeatheredSpearProb + $FalconBowProb + $SwallowBowProb + $KiteShieldProb = 100
-$DrillshaftProb = 35 # Goron treasures probabilities (positive values less than or equal to 100)
-$StoneSmasherProb = 35
-$CobbleCrusherProb = 30 # Requirements: $DrillshaftProb + $StoneSmasherProb + $CobbleCrusherProb = 100
-$DemonCarverProb = 30 # Yiga treasures probabilities (positive values less than or equal to 100)
-$ViciousSickleProb = 20
-$WindcleaverProb = 30
-$DuplexBowProb = 20 # Requirements: $DemonCarverProb + $ViciousSickleProb + $WindcleaverProb + $DuplexBowProb = 100
-$EightfoldBladeProb = 15 # Sheikah treasures probabilities (positive values less than or equal to 100)
-$SerpentineSpearProb = 20
-$EdgeOfDualityProb = 15
-$EightfoldLongbladeProb = 20
-$PhrenicBowProb = 15
-$ShieldOfTheMindEyeProb = 15 # Requirements: $EightfoldBladeProb + $SerpentineSpearProb + $EdgeOfDualityProb + $EightfoldLongbladeProb + $PhrenicBowProb + $ShieldOfTheMindEyeProb = 100
-$SoldierBroadswordProb = 20 # Soldier's treasures probabilities (positive values less than or equal to 100)
-$SoldierSpearProb = 20
-$SoldierClaymoreProb = 20
-$SoldierBowProb = 20
-$SoldierShieldProb = 20 # Requirements: $SoldierBroadswordProb + $SoldierSpearProb + $SoldierClaymoreProb + $SoldierBowProb + $SoldierShieldProb = 100
-$KnightBroadswordProb = 20 # Knight's treasures probabilities (positive values less than or equal to 100)
-$KnightHalberdProb = 20
-$KnightClaymoreProb = 20
-$KnightBowProb = 20
-$KnightShieldProb = 20 # Requirements: $KnightBroadswordProb + $KnightHalberdProb + $KnightClaymoreProb + $KnightBowProb + $KnightShieldProb = 100
-$RoyalBroadswordProb = 20 # Royal treasures probabilities (positive values less than or equal to 100)
-$RoyalHalberdProb = 20
-$RoyalClaymoreProb = 20
-$RoyalBowProb = 20
-$RoyalShieldProb = 20 # Requirements: $RoyalBroadswordProb + $RoyalHalberdProb + $RoyalClaymoreProb + $RoyalBowProb + $RoyalShieldProb = 100
-$RoyalGuardSwordProb = 20 # Royal Guard's treasures probabilities (positive values less than or equal to 100)
-$RoyalGuardSpearProb = 20
-$RoyalGuardClaymoreProb = 20
-$RoyalGuardBowProb = 20
-$RoyalGuardShieldProb = 20 # Requirements: $RoyalGuardSwordProb + $RoyalGuardSpearProb + $RoyalGuardClaymoreProb + $RoyalGuardBowProb + $RoyalGuardShieldProb = 100
-$LightningRodProb = 0 # Electric treasures probabilities (positive values less than or equal to 100)
-$ThunderstormRodProb = 10
-$ThunderbladeProb = 30
-$ThunderspearProb = 30
-$GreatThunderbladeProb = 30 # Requirements: $LightningRodProb + $ThunderstormRodProb + $ThunderbladeProb + $ThunderspearProb + $GreatThunderbladeProb = 100
-$ForestDwellerSwordProb = 28 # Forest treasures probabilities (positive values less than or equal to 100)
-$ForestDwellerSpearProb = 19
-$ForestDwellerBowProb = 28
-$ForestDwellerShieldProb = 25 # Requirements: $ForestDwellerSwordProb + $ForestDwellerSpearProb + $ForestDwellerBowProb + $ForestDwellerShieldProb = 100
-$IceRodProb = 0 # Frost treasures probabilities (positive values less than or equal to 100)
-$BlizzardRodProb = 10
-$FrostbladeProb = 30
-$FrostspearProb = 30
-$GreatFrostbladeProb = 30 # Requirements: $IceRodProb + $BlizzardRodProb + $FrostbladeProb + $FrostspearProb + $GreatFrostbladeProb = 100
-$FireRodProb = 0 # Fire treasures probabilities (positive values less than or equal to 100)
-$MeteorRodProb = 10
-$FlamebladeProb = 30
-$FlamespearProb = 30
-$GreatFlamebladeProb = 30 # Requirements: $FireRodProb + $MeteorRodProb + $FlamebladeProb + $FlamespearProb + $GreatFlamebladeProb = 100
-$BoomerangProb = 35 # Boomerang treasures probabilities (positive values less than or equal to 100)
-$GiantBoomerangProb = 65 # Requirements: $BoomerangProb + $GiantBoomerangProb = 100
-$LynelSwordProb = 21 # Lynel treasures probabilities (positive values less than or equal to 100)
-$LynelSpearProb = 16
-$LynelCrusherProb = 21
-$LynelBowProb = 21
-$LynelShieldProb = 21 # Requirements: $LynelSwordProb + $LynelSpearProb + $LynelCrusherProb + $LynelBowProb + $LynelShieldProb = 100
-$MightyLynelSwordProb = 21 # Mighty Lynel treasures probabilities (positive values less than or equal to 100)
-$MightyLynelSpearProb = 16
-$MightyLynelCrusherProb = 21
-$MightyLynelBowProb = 21
-$MightyLynelShieldProb = 21 # Requirements: $MightyLynelSwordProb + $MightyLynelSpearProb + $MightyLynelCrusherProb + $MightyLynelBowProb + $MightyLynelShieldProb = 100
-$SavageLynelSwordProb = 21 # Savage Lynel treasures probabilities (positive values less than or equal to 100)
-$SavageLynelSpearProb = 16
-$SavageLynelCrusherProb = 21
-$SavageLynelBowProb = 21
-$SavageLynelShieldProb = 21 # Requirements: $SavageLynelSwordProb + $SavageLynelSpearProb + $SavageLynelCrusherProb + $SavageLynelBowProb + $SavageLynelShieldProb = 100
-$AncientShortSwordProb = 20 # Ancient treasures probabilities (positive values less than or equal to 100)
-$AncientSpearProb = 20
-$AncientBladesawProb = 20
-$AncientBowProb = 20
-$AncientShieldProb = 20 # Requirements: $AncientShortSwordProb + $AncientSpearProb + $AncientBladesawProb + $AncientBowProb + $AncientShieldProb = 100
-$GuardianSword2Prob = 25 # Guardian++ treasures probabilities (positive values less than or equal to 100)
-$GuardianSpear2Prob = 25
-$AncientBattleAxe2Prob = 25
-$GuardianShield2Prob = 25 # Requirements: $GuardianSword2Prob + $GuardianSpear2Prob + $AncientBattleAxe2Prob + $GuardianShield2Prob = 100
-$GuardianSword1Prob = 25 # Guardian+ treasures probabilities (positive values less than or equal to 100)
-$GuardianSpear1Prob = 25
-$AncientBattleAxe1Prob = 25
-$GuardianShield1Prob = 25 # Requirements: $GuardianSword1Prob + $GuardianSpear1Prob + $AncientBattleAxe1Prob + $GuardianShield1Prob = 100
-$GuardianSwordProb = 25 # Guardian treasures probabilities (positive values less than or equal to 100)
-$GuardianSpearProb = 25
-$AncientBattleAxeProb = 25
-$GuardianShieldProb = 25 # Requirements: $GuardianSwordProb + $GuardianSpearProb + $AncientBattleAxeProb + $GuardianShieldProb = 100
-$DragonboneBokoClubProb = 20 # Best Boko treasures probabilities (positive values less than or equal to 100)
-$DragonboneBokoSpearProb = 20
-$DragonboneBokoBatProb = 20
-$DragonBoneBokoBowProb = 20
-$DragonboneBokoShieldProb = 20 # Requirements: $DragonboneBokoClubProb + $DragonboneBokoSpearProb + $DragonboneBokoBatProb + $DragonBoneBokoBowProb + $DragonboneBokoShieldProb = 100
-$SpikedBokoClubProb = 20 # Medium Boko treasures probabilities (positive values less than or equal to 100)
-$SpikedBokoSpearProb = 20
-$SpikedBokoBatProb = 20
-$SpikedBokoBowProb = 20
-$SpikedBokoShieldProb = 20 # Requirements: $SpikedBokoClubProb + $SpikedBokoSpearProb + $SpikedBokoBatProb + $SpikedBokoBowProb + $SpikedBokoShieldProb = 100
-$BokoClubProb = 20 # Boko treasures probabilities (positive values less than or equal to 100)
-$BokoSpearProb = 20
-$BokoBatProb = 20
-$BokoBowProb = 20
-$BokoShieldProb = 20 # Requirements: $BokoClubProb + $BokoSpearProb + $BokoBatProb + $BokoBowProb + $BokoShieldProb = 100
-$LizalTriBoomerangProb = 25 # Best Lizal treasures probabilities (positive values less than or equal to 100)
-$ForkedLizalSpearProb = 25
-$SteelLizalBowProb = 25
-$SteelLizalShieldProb = 25 # Requirements: $LizalTriBoomerangProb + $ForkedLizalSpearProb + $SteelLizalBowProb + $SteelLizalShieldProb = 100
-$LizalForkedBoomerangProb = 25 # Medium Lizal treasures probabilities (positive values less than or equal to 100)
-$EnhancedLizalSpearProb = 25
-$StrengthenedLizalBowProb = 25
-$ReinforcedLizalShieldProb = 25 # Requirements: $LizalForkedBoomerangProb + $EnhancedLizalSpearProb + $StrengthenedLizalBowProb + $ReinforcedLizalShieldProb = 100
-$LizalBoomerangProb = 25 # Lizal treasures probabilities (positive values less than or equal to 100)
-$LizalSpearProb = 25
-$LizalBowProb = 25
-$LizalShieldProb = 25 # Requirements: $LizalBoomerangProb + $LizalSpearProb + $LizalBowProb + $LizalShieldProb = 100
-$DragonboneMoblinSpearProb = 35 # Best Moblin treasures probabilities (positive values less than or equal to 100)
-$DragonboneMoblinClubProb = 65 # Requirements: $DragonboneMoblinSpearProb + $DragonboneMoblinClubProb = 100
-$SpikedMoblinSpearProb = 35 # Medium Moblin treasures probabilities (positive values less than or equal to 100)
-$SpikedMoblinClubProb = 65 # Requirements: $SpikedMoblinSpearProb + $SpikedMoblinClubProb = 100
-$MoblinSpearProb = 35 # Moblin treasures probabilities (positive values less than or equal to 100)
-$MoblinClubProb = 65 # Requirements: $MoblinSpearProb + $MoblinClubProb = 100
-$RustyBroadswordProb = 25 # Rusty treasures probabilities (positive values less than or equal to 100)
-$RustyHalberdProb = 25
-$RustyClaymoreProb = 25
-$RustyShieldProb = 25 # Requirements: $RustyBroadswordProb + $RustyHalberdProb + $RustyClaymoreProb + $RustyShieldProb = 100
-$FishingHarpoonProb = 11 # Survival treasures probabilities (positive values less than or equal to 100)
-$ThrowingSpearProb = 11
-$FarmerPitchforkProb = 9
-$WoodcutterAxeProb = 5
-$IronSledgehammerProb = 11
-$DoubleAxeProb = 9
-$WoodenBowProb = 11
-$FishermanShieldProb = 11
-$HunterShieldProb = 11
-$WoodenShieldProb = 11 # Requirements: $FishingHarpoonProb + $ThrowingSpearProb + $FarmerPitchforkProb + $WoodcutterAxeProb + $IronSledgehammerProb + $DoubleAxeProb + $WoodenBowProb + $FishermanShieldProb + $HunterShieldProb + $WoodenShieldProb = 100
-$HylianShieldProb = 12 # Legendary treasures probabilities (positive values less than or equal to 100)
-$SeaBreezeBoomerangProb = 11
-$HeroShieldProb = 11
-$SwordProb = 11
-$BiggoronSwordProb = 11
-$SwordOfTheSixSagesProb = 11
-$TwilightBowProb = 11
-$GoddessSwordProb = 11
-$FierceDeitySwordProb = 11 # Requirements: $HylianShieldProb + $SeaBreezeBoomerangProb + $HeroShieldProb + $SwordProb + $BiggoronSwordProb + $SwordOfTheSixSagesProb + $TwilightBowProb + $GoddessSwordProb + $FierceDeitySwordProb = 100
+$TravelerSwordProb:int = 20
+$TravelerSpearProb:int = 20
+$TravelerClaymoreProb:int = 20
+$TravelerBowProb:int = 20
+$TravelerShieldProb:int = 20
+$NormalArrowX5Prob:int = 15
+$FireArrowX5Prob:int = 20
+$IceArrowX5Prob:int = 20
+$ElectricArrowX5Prob:int = 20
+$BombArrowX5Prob:int = 20
+$AncientArrowX3Prob:int = 5
+$NormalArrowX10Prob:int = 18
+$FireArrowX10Prob:int = 20
+$IceArrowX10Prob:int = 20
+$ElectricArrowX10Prob:int = 20
+$BombArrowX10Prob:int = 20
+$AncientArrowX5Prob:int = 2
+$AmberProb:int = 0
+$OpalProb:int = 57
+$TopazProb:int = 19
+$RubyProb:int = 14
+$SapphireProb:int = 10
+$ZoraSwordProb:int = 13
+$CeremonialTridentProb:int = 14
+$SilverscaleSpearProb:int = 15
+$ZoraSpearProb:int = 15
+$SilverLongswordProb:int = 15
+$SilverBowProb:int = 14
+$SilverShieldProb:int = 14
+$MoonlightScimitarProb:int = 13
+$GerudoScimitarProb:int = 15
+$GerudoSpearProb:int = 14
+$GoldenClaymoreProb:int = 15
+$GoldenBowProb:int = 13
+$RadiantShieldProb:int = 15
+$GerudoShieldProb:int = 15
+$FeatheredEdgeProb:int = 20
+$FeatheredSpearProb:int = 15
+$FalconBowProb:int = 25
+$SwallowBowProb:int = 25
+$KiteShieldProb:int = 15
+$DrillshaftProb:int = 35
+$StoneSmasherProb:int = 35
+$CobbleCrusherProb:int = 30
+$DemonCarverProb:int = 30
+$ViciousSickleProb:int = 20
+$WindcleaverProb:int = 30
+$DuplexBowProb:int = 20
+$EightfoldBladeProb:int = 15
+$SerpentineSpearProb:int = 20
+$EdgeOfDualityProb:int = 15
+$EightfoldLongbladeProb:int = 20
+$PhrenicBowProb:int = 15
+$ShieldOfTheMindEyeProb:int = 15
+$SoldierBroadswordProb:int = 20
+$SoldierSpearProb:int = 20
+$SoldierClaymoreProb:int = 20
+$SoldierBowProb:int = 20
+$SoldierShieldProb:int = 20
+$KnightBroadswordProb:int = 20
+$KnightHalberdProb:int = 20
+$KnightClaymoreProb:int = 20
+$KnightBowProb:int = 20
+$KnightShieldProb:int = 20
+$RoyalBroadswordProb:int = 20
+$RoyalHalberdProb:int = 20
+$RoyalClaymoreProb:int = 20
+$RoyalBowProb:int = 20
+$RoyalShieldProb:int = 20
+$RoyalGuardSwordProb:int = 20
+$RoyalGuardSpearProb:int = 20
+$RoyalGuardClaymoreProb:int = 20
+$RoyalGuardBowProb:int = 20
+$RoyalGuardShieldProb:int = 20
+$LightningRodProb:int = 0
+$ThunderstormRodProb:int = 10
+$ThunderbladeProb:int = 30
+$ThunderspearProb:int = 30
+$GreatThunderbladeProb:int = 30
+$ForestDwellerSwordProb:int = 28
+$ForestDwellerSpearProb:int = 19
+$ForestDwellerBowProb:int = 28
+$ForestDwellerShieldProb:int = 25
+$IceRodProb:int = 0
+$BlizzardRodProb:int = 10
+$FrostbladeProb:int = 30
+$FrostspearProb:int = 30
+$GreatFrostbladeProb:int = 30
+$FireRodProb:int = 0
+$MeteorRodProb:int = 10
+$FlamebladeProb:int = 30
+$FlamespearProb:int = 30
+$GreatFlamebladeProb:int = 30
+$BoomerangProb:int = 35
+$GiantBoomerangProb:int = 55
+$WoodenShieldProb:int = 10
+$LynelSwordProb:int = 21
+$LynelSpearProb:int = 16
+$LynelCrusherProb:int = 21
+$LynelBowProb:int = 21
+$LynelShieldProb:int = 21
+$MightyLynelSwordProb:int = 21
+$MightyLynelSpearProb:int = 16
+$MightyLynelCrusherProb:int = 21
+$MightyLynelBowProb:int = 21
+$MightyLynelShieldProb:int = 21
+$SavageLynelSwordProb:int = 21
+$SavageLynelSpearProb:int = 16
+$SavageLynelCrusherProb:int = 21
+$SavageLynelBowProb:int = 21
+$SavageLynelShieldProb:int = 21
+$AncientShortSwordProb:int = 20
+$AncientSpearProb:int = 20
+$AncientBladesawProb:int = 20
+$AncientBowProb:int = 20
+$AncientShieldProb:int = 20
+$GuardianSword2Prob:int = 25
+$GuardianSpear2Prob:int = 25
+$AncientBattleAxe2Prob:int = 25
+$GuardianShield2Prob:int = 25
+$GuardianSword1Prob:int = 25
+$GuardianSpear1Prob:int = 25
+$AncientBattleAxe1Prob:int = 25
+$GuardianShield1Prob:int = 25
+$GuardianSwordProb:int = 25
+$GuardianSpearProb:int = 25
+$AncientBattleAxeProb:int = 25
+$GuardianShieldProb:int = 25
+$DragonboneBokoClubProb:int = 20
+$DragonboneBokoSpearProb:int = 20
+$DragonboneBokoBatProb:int = 20
+$DragonBoneBokoBowProb:int = 20
+$DragonboneBokoShieldProb:int = 20
+$SpikedBokoClubProb:int = 20
+$SpikedBokoSpearProb:int = 20
+$SpikedBokoBatProb:int = 20
+$SpikedBokoBowProb:int = 20
+$SpikedBokoShieldProb:int = 20
+$BokoClubProb:int = 20
+$BokoSpearProb:int = 20
+$BokoBatProb:int = 20
+$BokoBowProb:int = 20
+$BokoShieldProb:int = 20
+$LizalTriBoomerangProb:int = 25
+$ForkedLizalSpearProb:int = 25
+$SteelLizalBowProb:int = 25
+$SteelLizalShieldProb:int = 25
+$LizalForkedBoomerangProb:int = 25
+$EnhancedLizalSpearProb:int = 25
+$StrengthenedLizalBowProb:int = 25
+$ReinforcedLizalShieldProb:int = 25
+$LizalBoomerangProb:int = 25
+$LizalSpearProb:int = 25
+$LizalBowProb:int = 25
+$LizalShieldProb:int = 25
+$DragonboneMoblinSpearProb:int = 35
+$DragonboneMoblinClubProb:int = 65
+$SpikedMoblinSpearProb:int = 35
+$SpikedMoblinClubProb:int = 65
+$MoblinSpearProb:int = 35
+$MoblinClubProb:int = 65
+$RustyBroadswordProb:int = 25
+$RustyHalberdProb:int = 25
+$RustyClaymoreProb:int = 25
+$RustyShieldProb:int = 25
+$FishingHarpoonProb:int = 12
+$ThrowingSpearProb:int = 12
+$FarmerPitchforkProb:int = 10
+$WoodcutterAxeProb:int = 7
+$IronSledgehammerProb:int = 12
+$DoubleAxeProb:int = 11
+$WoodenBowProb:int = 12
+$FishermanShieldProb:int = 12
+$HunterShieldProb:int = 12
+$HylianShieldProb:int = 12
+$SeaBreezeBoomerangProb:int = 11
+$HeroShieldProb:int = 11
+$SwordProb:int = 11
+$BiggoronSwordProb:int = 11
+$SwordOfTheSixSagesProb:int = 11
+$TwilightBowProb:int = 11
+$GoddessSwordProb:int = 11
+$FierceDeitySwordProb:int = 11

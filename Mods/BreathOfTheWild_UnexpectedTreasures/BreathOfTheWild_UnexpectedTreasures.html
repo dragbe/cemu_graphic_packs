@@ -114,7 +114,7 @@ var arrLootTable=[
 {"Forest":[["ForestDwellerSword","Weapon_Sword_025",28],["ForestDwellerSpear","Weapon_Spear_025",19],["ForestDwellerBow","Weapon_Bow_013",28],["ForestDwellerShield","Weapon_Shield_023",25]]},
 {"Frost":[["IceRod","Weapon_Sword_061",0],["BlizzardRod","Weapon_Sword_049",10],["Frostblade","Weapon_Sword_034",30],["Frostspear","Weapon_Spear_034",30],["GreatFrostblade","Weapon_Lsword_034",30]]},
 {"Fire":[["FireRod","Weapon_Sword_060",0],["MeteorRod","Weapon_Sword_048",10],["Flameblade","Weapon_Sword_033",30],["Flamespear","Weapon_Spear_033",30],["GreatFlameblade","Weapon_Lsword_033",30]]},
-{"Boomerang":[["Boomerang","Weapon_Sword_051",35],["GiantBoomerang","Weapon_Lsword_051",65]]},
+{"Climber":[["Boomerang","Weapon_Sword_051",35],["GiantBoomerang","Weapon_Lsword_051",55],["WoodenShield","Weapon_Shield_001",10]]},
 {"Lynel":[["LynelSword","Weapon_Sword_016",21],["LynelSpear","Weapon_Spear_016",16],["LynelCrusher","Weapon_Lsword_016",21],["LynelBow","Weapon_Bow_009",21],["LynelShield","Weapon_Shield_016",21]]},
 {"Mighty Lynel":[["MightyLynelSword","Weapon_Sword_017",21],["MightyLynelSpear","Weapon_Spear_017",16],["MightyLynelCrusher","Weapon_Lsword_017",21],["MightyLynelBow","Weapon_Bow_026",21],["MightyLynelShield","Weapon_Shield_017",21]]},
 {"Savage Lynel":[["SavageLynelSword","Weapon_Sword_018",21],["SavageLynelSpear","Weapon_Spear_018",16],["SavageLynelCrusher","Weapon_Lsword_018",21],["SavageLynelBow","Weapon_Bow_032",21],["SavageLynelShield","Weapon_Shield_018",21]]},
@@ -132,7 +132,7 @@ var arrLootTable=[
 {"Medium Moblin":[["SpikedMoblinSpear","Weapon_Spear_011",35],["SpikedMoblinClub","Weapon_Lsword_011",65]]},
 {"Moblin":[["MoblinSpear","Weapon_Spear_010",35],["MoblinClub","Weapon_Lsword_010",65]]},
 {"Rusty":[["RustyBroadsword","Weapon_Sword_021",25],["RustyHalberd","Weapon_Spear_021",25],["RustyClaymore","Weapon_Lsword_020",25],["RustyShield","Weapon_Shield_021",25]]},
-{"Survival":[["FishingHarpoon","Weapon_Spear_038",11],["ThrowingSpear","Weapon_Spear_030",11],["FarmerPitchfork","Weapon_Spear_022",9],["WoodcutterAxe","Weapon_Lsword_032",5],["IronSledgehammer","Weapon_Lsword_031",11],["DoubleAxe","Weapon_Lsword_030",9],["WoodenBow","Weapon_Bow_038",11],["FishermanShield","Weapon_Shield_032",11],["HunterShield","Weapon_Shield_031",11],["WoodenShield","Weapon_Shield_001",11]]},
+{"Survival":[["FishingHarpoon","Weapon_Spear_038",12],["ThrowingSpear","Weapon_Spear_030",12],["FarmerPitchfork","Weapon_Spear_022",10],["WoodcutterAxe","Weapon_Lsword_032",7],["IronSledgehammer","Weapon_Lsword_031",12],["DoubleAxe","Weapon_Lsword_030",11],["WoodenBow","Weapon_Bow_038",12],["FishermanShield","Weapon_Shield_032",12],["HunterShield","Weapon_Shield_031",12]]},
 {"Legendary":[["HylianShield","Weapon_Shield_030",12],["SeaBreezeBoomerang","Weapon_Sword_059",11],["HeroShield","Weapon_Shield_057",11],["Sword","Weapon_Sword_058",11],["BiggoronSword","Weapon_Lsword_059",11],["SwordOfTheSixSages","Weapon_Lsword_057",11],["TwilightBow","Weapon_Bow_072",11],["GoddessSword","Weapon_Sword_057",11],["FierceDeitySword","Weapon_Lsword_060",11]]}
 ];
 </script>
@@ -163,7 +163,7 @@ for (var intTCId in arrLootTable) {
 				arrLootTable[intTCId][strTCName][intTCContentId][2]--;
 			} while (arrLootTable[intTCId][strTCName][intTCContentId][2]>-1)
 			arrLootTable[intTCId][strTCName][intTCContentId][2]=arrTCRules[intTCId][intTCContentId];
-			document.write("</select></tr>");
+			document.write("</select></td></tr>");
 			arrLootTableInputRules[intTCId][arrLootTableInputRules[intTCId].push(document.getElementById(arrLootTable[intTCId][strTCName][intTCContentId][0]))-1].options.selectedIndex=0;
 		}
 		document.write("</tbody>");
