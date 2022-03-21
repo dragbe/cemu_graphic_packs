@@ -2,13 +2,16 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = Raw Stamina
 path = "The Legend of Zelda: Breath of the Wild/Mods/Raw Stamina"
-description = Stamina without auto recover (Staminax included)
-version = 4
+description = Stamina without auto recover (Staminax included)|- Don't enable the Hunger Wheel and Staminax graphic packs|- Useful for mods with custom stamina settings (don't edit the EnergyAutoRecover parameter in the Player_Link.bgparamlist file)
+version = 5
+
+[Default]
+$MaxYellowStamina:float = 5000
 
 [Preset]
 name = Custom yellow wheel capacity (5000)
-$MaxYellowStamina = 5000
+$MaxYellowStamina:float = 5000
 
 [Preset]
 name = Default yellow wheel capacity (2000)
-$MaxYellowStamina = 2000
+$MaxYellowStamina:float = 2000
