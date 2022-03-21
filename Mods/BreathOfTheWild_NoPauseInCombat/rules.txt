@@ -2,25 +2,35 @@
 titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
 name = No Pause In Combat
 path = "The Legend of Zelda: Breath of the Wild/Mods/No Pause In Combat"
-description = Removes pausing in combat
-version = 4
+description = Disables pausing in combat
+version = 5
+
+[Default]
+$SanctumMaxPausesCount:int = 0 # Maximum pauses count for the Ganon bosses in the Hyrule Castle
+$SanctumNoPauseIfTrueFlag:int = 108 # Flag to cancel the option
+$DataLayerMemoryBase:int = 0x180
 
 [Preset]
 name = No pause in combat for the Ganon bosses in the Hyrule Castle
-$SanctumMaxPausesCount = 0
+$SanctumMaxPausesCount:int = 0
+$SanctumNoPauseIfTrueFlag:int = 108
 
 [Preset]
 name = Enable pauses in combat for the Ganon bosses in the Hyrule Castle
-$SanctumMaxPausesCount = 2147483647
+$SanctumMaxPausesCount:int = 2147483647
+$SanctumNoPauseIfTrueFlag:int = 108
 
 [Preset]
 name = Allow 1 pause in combat for the Ganon bosses in the Hyrule Castle
-$SanctumMaxPausesCount = 1
+$SanctumMaxPausesCount:int = 1
+$SanctumNoPauseIfTrueFlag:int = 108
 
 [Preset]
 name = Allow 2 pauses in combat for the Ganon bosses in the Hyrule Castle
-$SanctumMaxPausesCount = 2
+$SanctumMaxPausesCount:int = 2
+$SanctumNoPauseIfTrueFlag:int = 108
 
 [Preset]
-name = Allow 3 pauses in combat for the Ganon bosses in the Hyrule Castle
-$SanctumMaxPausesCount = 3
+name = Allow 3 pauses in combat for the blight Ganons in the Hyrule Castle
+$SanctumMaxPausesCount:int = 3
+$SanctumNoPauseIfTrueFlag:int = 100
