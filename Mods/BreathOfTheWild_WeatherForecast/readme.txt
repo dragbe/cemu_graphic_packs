@@ -11,4 +11,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_WeatherForecast folder in this directory
 - enable the Weather Forecast graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/11243
+https://gamebanana.com/mods/49859
