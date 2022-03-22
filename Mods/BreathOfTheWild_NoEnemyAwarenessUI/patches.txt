@@ -1,0 +1,44 @@
+[BotwV208]
+moduleMatches = 0x6267BFD0
+
+0x2601a2C = b .+0xE8 # Shows enemy awareness gauge area [cmpwi r29, 0]
+0x2601B34 = li r4, 0 # Same area as above [mtspr spr9, r6]
+0x2601B38 = stw r4, 0xa94(r3) # Same area as above [li r4, 0]
+0x2601B40 = stfs f1, 0xa98(r3) # Same area as above [bctrl]
+0x25d0be0 = b .+0x48 # Shows enemy Detect something UI area [cmpwi r3, 0]
+0x2600c00 = b .+0x70 # Shows enemy Full awareness UI area [cmpwi r3, 0]
+0x274B56C = nop # Shows Lynel Full awareness UI area [lwz r12, +0xe8(r3)]
+0x274B570 = nop # Same area as above [lwz r0, +0x2ec(r12)]
+0x274B574 = stfs f1, 0xa98(r3) # Same area as above [mtctr r0]
+0x274B578 = li r4, 0 # Same area as above [li r4, 4]
+0x274B57C = stw r4, 0xa94(r3) # Same area as above [bctrl]
+0x2986024 = nop # Shows Wizzrobe Full awareness UI area [lwz r12, +0xe8(r3)]
+0x2986028 = nop # Same area as above [lwz r0, +0x2ec(r12)]
+0x298602C = stfs f1, 0xa98(r3) # Same area as above [mtctr r0]
+0x2986030 = li r4, 0 # Same area as above [li r4, 4]
+0x2986034 = stw r4, 0xa94(r3) # Same area as above [bctrl]
+0x201CC4C = b .+0x20 # Shows Molduga awareness UI area [b 0x0201CC70]
+0x201CC60 = b .+0xC # Same area as above [b 0x0201CC70]
+0x201CC68 = b .+0x8 # Same area as above [stw r0, +0xa90(r30)]
+0x201CC6C = li r0, 0 # Same area as above [b 0x0201CC74]
+0x27de294 = li r4, 0 # Shows Octorok Full awareness UI area [li r4, 1]
+0x27ddc80 = mtctr r0 # Same area as above [cmpwi r4, 0]
+0x27ddc88 = bctr # Same area as above [mtctr r0]
+0x26ae814 = li r4, 0 # Shows Octorok Detect something UI area [li r4, 2]
+0x26aece4 = li r4, 0 # Shows afraid Octorok Full awareness UI area [li r4, 4]
+
+#Alternative enemy awareness gauge patch
+#0x02601a64 = nop # [fcmpu cr0, f12, f13]
+#0x02601a68 = nop # [bge 0x02601b44]
+#0x02601a8C = fmr f1, f31 # [mtspr spr9, r9]
+#0x02601a90 = li r4, 0 # [fmr f1, f31]
+#0x02601a94 = stfs f1, 0xa98(r3) # [li r4, 3]
+#0x02601a98 = stw r4, 0xa94(r3) # [bctrl]
+#0x02601ad0 = ble .-0x40 # [ble 0x02601ad8]
+
+#Monitor 0x020224FC area for most enemy awareness UI
+#R4=0 No awareness UI (in combat, awareness loss)
+#R4=1 Special status without UI ???
+#R4=2 Detect something UI (white question mark)
+#R4=3 Awareness gauge UI (question mark gauge)
+#R4=4 Full awareness UI (exclamation point)
