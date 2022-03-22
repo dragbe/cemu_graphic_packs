@@ -10,4 +10,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_LifeExtension folder in this directory
 - enable the Life Extension graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/11338
+https://gamebanana.com/mods/49862
