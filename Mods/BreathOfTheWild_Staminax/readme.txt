@@ -6,4 +6,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_Staminax folder in this directory
 - enable the Staminax graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/11317
+https://gamebanana.com/mods/49861
