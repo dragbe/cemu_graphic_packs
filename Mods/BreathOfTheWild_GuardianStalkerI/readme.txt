@@ -12,4 +12,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_GuardianStalkerI folder in this directory
 - enable the Guardian Stalker I graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/12901
+https://gamebanana.com/mods/49875
