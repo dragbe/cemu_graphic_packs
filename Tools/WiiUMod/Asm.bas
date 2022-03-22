@@ -1,44 +1,64 @@
 Attribute VB_Name = "ASM"
 Option Explicit
 
-Private Function Asm_SearchPPCBl48(ByVal lngFile As Long, ByVal lngTargetBl As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0) As Long
-'bl .+0x?
+Private Function Asm_SearchPPCB48(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0, Optional ByVal lngLongJump As Long = 0, Optional ByVal btBranchLink As Byte = 0) As Long
+'b[l] .+0x?
 Dim lngDataSegment() As Long
 Dim lngStartOffset As Long
-    lngTargetBl = lngTargetBl - lngDeltaOffset + 1
-    lngStartOffset = lngTargetBl - &HFFFFFC
-    If lngStartOffset < 1 Then lngStartOffset = 1
-    lngTargetBl = (lngTargetBl - lngStartOffset) / 4
-    Call File_ReadLongDataSegment(lngFile, lngStartOffset, lngTargetBl, lngDataSegment())
-    Asm_SearchPPCBl48 = 0
-    For lngFile = lngTargetBl To 1 Step -1
-        If Converter_SwapEndian(lngDataSegment(lngFile)) = &H48000000 + ((lngTargetBl - lngFile + 1) * 4 + 1) Then
-            Asm_SearchPPCBl48 = Asm_SearchPPCBl48 + 1
-            ReDim Preserve lngInstructionAddresses(1 To Asm_SearchPPCBl48)
-            lngInstructionAddresses(Asm_SearchPPCBl48) = lngStartOffset + (lngFile - 1) * 4 + lngDeltaOffset - 1
-        End If
-    Next lngFile
-    Erase lngDataSegment
+    lngTargetBranch = lngTargetBranch - lngDeltaOffset + 1 - lngLongJump
+    If lngTargetBranch > 0 Then
+        lngStartOffset = lngTargetBranch - &HFFFFFC
+        If lngStartOffset < 1 Then lngStartOffset = 1
+        lngTargetBranch = (lngTargetBranch - lngStartOffset) / 4
+        Call File_ReadLongDataSegment(lngFile, lngStartOffset, lngTargetBranch, lngDataSegment())
+        For lngFile = lngTargetBranch To 1 Step -1
+            If Converter_SwapEndian(lngDataSegment(lngFile)) = lngLongJump + &H48000000 + ((lngTargetBranch - lngFile + 1) * 4 + btBranchLink) Then
+                Asm_SearchPPCB48 = Asm_SearchPPCB48 + 1
+                ReDim Preserve lngInstructionAddresses(1 To Asm_SearchPPCB48)
+                lngInstructionAddresses(Asm_SearchPPCB48) = lngStartOffset + (lngFile - 1) * 4 + lngDeltaOffset - 1
+            End If
+        Next lngFile
+        Erase lngDataSegment
+    End If
 End Function
 
-Private Function Asm_SearchPPCBl4B(ByVal lngFile As Long, ByVal lngTargetBl As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0) As Long
-'bl .-0x?
+Private Function Asm_SearchPPCBl48(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0, Optional ByVal lngLongJump As Long = 0) As Long
+'bl .+0x?
+    Asm_SearchPPCBl48 = Asm_SearchPPCB48(lngFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset, lngLongJump, 1)
+End Function
+
+Private Function Asm_SearchPPCB4B(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0, Optional ByVal lngLongJump As Long = 0, Optional ByVal btBranchLink As Byte = 0) As Long
+'b[l] .-0x?
 Dim lngDataSegment() As Long
-    lngTargetBl = lngTargetBl - lngDeltaOffset + 1
-    Call File_ReadLongDataSegment(lngFile, lngTargetBl, &H3FFFFF, lngDataSegment)
-    Asm_SearchPPCBl4B = 0
+    lngTargetBranch = lngTargetBranch - lngDeltaOffset + 1 + lngLongJump
+    Call File_ReadLongDataSegment(lngFile, lngTargetBranch, &H3FFFFF, lngDataSegment)
     For lngFile = &H3FFFFF To 1 Step -1
-        If Converter_SwapEndian(lngDataSegment(lngFile)) = &H4B000000 + (((lngFile - 1) * -4 + 1) And &HFFFFFF) Then
-            Asm_SearchPPCBl4B = Asm_SearchPPCBl4B + 1
-            ReDim Preserve lngInstructionAddresses(1 To Asm_SearchPPCBl4B)
-            lngInstructionAddresses(Asm_SearchPPCBl4B) = lngTargetBl + (lngFile - 1) * 4 + lngDeltaOffset - 1
+        If Converter_SwapEndian(lngDataSegment(lngFile)) = &H4B000000 - lngLongJump + (((lngFile - 1) * -4 + btBranchLink) And &HFFFFFF) Then
+            Asm_SearchPPCB4B = Asm_SearchPPCB4B + 1
+            ReDim Preserve lngInstructionAddresses(1 To Asm_SearchPPCB4B)
+            lngInstructionAddresses(Asm_SearchPPCB4B) = lngTargetBranch + (lngFile - 1) * 4 + lngDeltaOffset - 1
         End If
     Next lngFile
     Erase lngDataSegment
 End Function
 
-Public Function Asm_SearchPPCBl(ByRef strExecutableDumpFile As String, ByVal lngTargetBl As Long) As Long
-'Usage example with the immediate window: ?Asm_SearchPPCBl("D:\WiiU\1.23.0\dump\02000000.bin",&H249e2e0)
+Private Function Asm_SearchPPCBl4B(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0, Optional ByVal lngLongJump As Long = 0) As Long
+'bl .-0x?
+    Asm_SearchPPCBl4B = Asm_SearchPPCB4B(lngFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset, lngLongJump, 1)
+End Function
+
+Private Function Asm_SearchPPCB49(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0) As Long
+'b .+0x? (long jump)
+    Asm_SearchPPCB49 = Asm_SearchPPCB48(lngFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset, &H1000000)
+End Function
+
+Private Function Asm_SearchPPCB4A(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0) As Long
+'b .-0x? (long jump)
+    Asm_SearchPPCB4A = Asm_SearchPPCB4B(lngFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset, &H1000000)
+End Function
+
+Public Function Asm_SearchPPCB(ByRef strExecutableDumpFile As String, ByVal lngTargetBranch As Long) As Long
+'Usage example with the immediate window: ?Asm_SearchPPCB("D:\WiiU\1.25.6\dump\02000000.bin",&H249e2e0)
 Dim lngDeltaOffset As Long
 Dim lngInstructionAddresses() As Long
 Dim intFile As Integer
@@ -46,12 +66,74 @@ Dim i As Long
     lngDeltaOffset = File_getDumpOffset(Mid(strExecutableDumpFile, InStrRev(strExecutableDumpFile, "\") + 1))
     intFile = FreeFile
     Open strExecutableDumpFile For Binary As intFile
-    Asm_SearchPPCBl = Asm_SearchPPCBl48(intFile, lngTargetBl, lngInstructionAddresses, lngDeltaOffset)
+    Asm_SearchPPCB = Asm_SearchPPCB48(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
+    For i = Asm_SearchPPCB To 1 Step -1
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
+    Next i
+    Erase lngInstructionAddresses
+    i = Asm_SearchPPCB49(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
+    Asm_SearchPPCB = Asm_SearchPPCB + i
+    Do Until i = 0
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
+        i = i - 1
+    Loop
+    Erase lngInstructionAddresses
+    i = Asm_SearchPPCB4A(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
+    Asm_SearchPPCB = Asm_SearchPPCB + i
+    Do Until i = 0
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
+        i = i - 1
+    Loop
+    Erase lngInstructionAddresses
+    i = Asm_SearchPPCB4B(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
+    Asm_SearchPPCB = Asm_SearchPPCB + i
+    Do Until i = 0
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
+        i = i - 1
+    Loop
+    Erase lngInstructionAddresses
+    Close intFile
+End Function
+
+Private Function Asm_SearchPPCBl49(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0) As Long
+'bl .+0x? (long jump)
+    Asm_SearchPPCBl49 = Asm_SearchPPCBl48(lngFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset, &H1000000)
+End Function
+
+Private Function Asm_SearchPPCBl4A(ByVal lngFile As Long, ByVal lngTargetBranch As Long, ByRef lngInstructionAddresses() As Long, Optional ByVal lngDeltaOffset As Long = 0) As Long
+'bl .-0x? (long jump)
+    Asm_SearchPPCBl4A = Asm_SearchPPCBl4B(lngFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset, &H1000000)
+End Function
+
+Public Function Asm_SearchPPCBl(ByRef strExecutableDumpFile As String, ByVal lngTargetBranch As Long) As Long
+'Usage example with the immediate window: ?Asm_SearchPPCBl("D:\WiiU\1.25.6\dump\02000000.bin",&H249e2e0)
+Dim lngDeltaOffset As Long
+Dim lngInstructionAddresses() As Long
+Dim intFile As Integer
+Dim i As Long
+    lngDeltaOffset = File_getDumpOffset(Mid(strExecutableDumpFile, InStrRev(strExecutableDumpFile, "\") + 1))
+    intFile = FreeFile
+    Open strExecutableDumpFile For Binary As intFile
+    Asm_SearchPPCBl = Asm_SearchPPCBl48(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
     For i = Asm_SearchPPCBl To 1 Step -1
         Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
     Next i
     Erase lngInstructionAddresses
-    i = Asm_SearchPPCBl4B(intFile, lngTargetBl, lngInstructionAddresses, lngDeltaOffset)
+    i = Asm_SearchPPCBl49(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
+    Asm_SearchPPCBl = Asm_SearchPPCBl + i
+    Do Until i = 0
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
+        i = i - 1
+    Loop
+    Erase lngInstructionAddresses
+    i = Asm_SearchPPCBl4A(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
+    Asm_SearchPPCBl = Asm_SearchPPCBl + i
+    Do Until i = 0
+        Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))
+        i = i - 1
+    Loop
+    Erase lngInstructionAddresses
+    i = Asm_SearchPPCBl4B(intFile, lngTargetBranch, lngInstructionAddresses, lngDeltaOffset)
     Asm_SearchPPCBl = Asm_SearchPPCBl + i
     Do Until i = 0
         Debug.Print ("0x" + Hex(lngInstructionAddresses(i)))

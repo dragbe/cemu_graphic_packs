@@ -5,7 +5,7 @@ Public Declare PtrSafe Function CompareMemory Lib "Ntdll.dll" Alias "RtlCompareM
 Public Type stDataMap
     lngLowerOffsets() As Long
     lngDataSize As Long
-    btData() As Byte
+    btdata() As Byte
 End Type
 
 Public Sub Memory_InitDataMap(ByVal strMapDataSource As String, ByRef stMemoryDataMap As stDataMap)
@@ -34,12 +34,11 @@ Dim strLowOffsets() As String
         stMemoryDataMap.lngDataSize = .Item(1, 3).Value
         End With
     End If
-    ReDim stMemoryDataMap.btData(0 To stMemoryDataMap.lngDataSize - 1)
+    ReDim stMemoryDataMap.btdata(0 To stMemoryDataMap.lngDataSize - 1)
 End Sub
 
 Public Function Memory_getMappedDataAddress(ByRef lngHProcess As Long, ByRef lngLngMemoryBase As LongLong, ByRef lngLowerOffsets() As Long) As Long
 Dim i As Integer
-    Memory_getMappedDataAddress = 0
     For i = UBound(lngLowerOffsets) To 0 Step -1
         If ReadProcessMemory(lngHProcess, lngLngMemoryBase + lngLowerOffsets(i) + Memory_getMappedDataAddress, VarPtr(Memory_getMappedDataAddress), 4, 0) <> 0 Then
             Memory_getMappedDataAddress = Converter_SwapEndian(Memory_getMappedDataAddress)

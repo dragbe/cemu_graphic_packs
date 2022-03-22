@@ -12,7 +12,6 @@ Dim strTemp As String
     ReDim btasm(0 To lngCodeCaveSize - 1)
     Get intUnmodded02000000BinFile, lngInjectOffset - 33554431, btasm
     btHash = objEncoder.ComputeHash_2((btasm))
-    strTemp = ""
     For lngCodeCaveSize = LenB(btHash) To 1 Step -1
         strTemp = Right("0" + Hex(AscB(MidB(btHash, lngCodeCaveSize, 1))), 2) + strTemp
     Next lngCodeCaveSize
@@ -40,9 +39,7 @@ Dim intAsmFile As Integer
     strLine = strCemuPath + "log.txt"
     lngCodeCaveOffset = Gfxpack_getCodeCave(strLine, strModName, lngCodeCaveSize)
     strLine = Cemu_GetDumpFolderPath(strCemuPath, File_getTimestamp(strLine))
-    If strLine = "" Then
-        Rpx_CreatePatch = 0
-    Else
+    If strLine <> "" Then
         Rpx_CreatePatch = FreeFile
         Open strCemuPath + "dump\02000000.bin" For Binary As Rpx_CreatePatch
         strGfxpackName = Replace(strModName, " ", "")
@@ -86,7 +83,7 @@ Dim intAsmFile As Integer
     End If
 End Function
 
-Public Function Rpx_WriteMd5DataFiles(ByVal strModName As String, Optional ByVal strCemuPath = "") As Integer
+Public Function Rpx_WriteMd5DataFiles(ByVal strModName As String, Optional ByVal strCemuPath As String = "") As Integer
 Dim btasm() As Byte
 Dim intFile As Integer
     strCemuPath = Cemu_GetRootFolderPath(strCemuPath)

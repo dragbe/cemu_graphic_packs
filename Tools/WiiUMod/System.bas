@@ -86,7 +86,6 @@ Dim objHtml As Object
         System_Clipboard = objHtml.parentWindow.clipboardData.GetData("text")
     Else
         objHtml.parentWindow.clipboardData.setData "text", strText
-        System_Clipboard = ""
     End If
     Set objHtml = Nothing
 End Function
@@ -115,7 +114,6 @@ Public Function System_ToogleProcessById(ByRef lngProcId As Long, ByRef blnOff A
 Dim lngSnapshot As Long
 Dim lngThread As Long
 Dim stThread As THREADENTRY32
-    System_ToogleProcessById = 0
     lngSnapshot = CreateToolhelp32Snapshot(SYSTEM_TH32CS_SNAPTHREAD, 0)
     If lngSnapshot <> -1 Then
         stThread.dwSize = Len(stThread)
@@ -161,7 +159,6 @@ End Function
 
 Public Function System_ToogleProcessByName(ByRef strProcessImageName As String, ByRef blnOff As Boolean) As Long
 Dim stProcess As PROCESSENTRY32
-    System_ToogleProcessByName = 0
     stProcess.th32ProcessID = System_APIGetProcessByName(strProcessImageName, stProcess)
     If stProcess.th32ProcessID <> -1 Then
         System_ToogleProcessByName = System_ToogleProcessById(stProcess.th32ProcessID, blnOff)
@@ -169,11 +166,7 @@ Dim stProcess As PROCESSENTRY32
 End Function
 
 Public Function System_OpenProcessByName(ByRef strProcessImageName As String, ByRef lngProcAccess As SYSTEM_PROC_ACCESS, ByRef stProcess As PROCESSENTRY32) As Long
-    If System_APIGetProcessByName(strProcessImageName, stProcess) <> -1 Then
-        System_OpenProcessByName = OpenProcess(lngProcAccess, 0, stProcess.th32ProcessID)
-    Else
-        System_OpenProcessByName = 0
-    End If
+    If System_APIGetProcessByName(strProcessImageName, stProcess) <> -1 Then System_OpenProcessByName = OpenProcess(lngProcAccess, 0, stProcess.th32ProcessID)
 End Function
 
 Public Function System_ReadProcessLongMemoryDataSegment(ByRef lngHProcess As Long, ByRef lngLngMemoryBase As LongLong, ByVal lngDataCount As Long, ByRef lngDataSegment() As Long) As Long

@@ -44,7 +44,6 @@ Private Function File_InitTextFilters(ByVal strTextFiltersSource As String, Opti
 Dim lngFiltersCount As Long
 Dim xlsTextFiltersRange As Range
 Dim intFile As Integer
-    File_InitTextFilters = 0
     stTextFilters.intFiltersCount = 0
     If lngTargetDataMask = 0 Then
         If InStr(strTextFiltersSource, ":") < 3 Then
@@ -189,7 +188,6 @@ End Sub
 
 Public Function File_getMappedDataAddress(ByVal intFile As Integer, ByVal lngDeltaOffset As Long, ByRef lngLowerOffsets() As Long) As Long
 Dim i As Integer
-    File_getMappedDataAddress = 0
     For i = UBound(lngLowerOffsets) To 0 Step -1
         Get intFile, File_getMappedDataAddress + lngLowerOffsets(i) - lngDeltaOffset + 1, File_getMappedDataAddress
         File_getMappedDataAddress = Converter_SwapEndian(File_getMappedDataAddress)
@@ -206,11 +204,7 @@ Public Function File_getDumpOffset(ByRef strDumpFileBasename As String) As Long
 Dim objRegExp As Object
     Set objRegExp = CreateObject("VBScript.RegExp")
     objRegExp.Pattern = "^[0-9a-fA-F]{8}.bin$"
-    If objRegExp.test(strDumpFileBasename) Then
-        File_getDumpOffset = CLng("&H" + Left(strDumpFileBasename, 8))
-    Else
-        File_getDumpOffset = 0
-    End If
+    If objRegExp.test(strDumpFileBasename) Then File_getDumpOffset = CLng("&H" + Left(strDumpFileBasename, 8))
     Set objRegExp = Nothing
 End Function
 

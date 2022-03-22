@@ -6,7 +6,6 @@ Public Function Arithmetic_StrNandCmp(ByRef str1 As String, ByRef str2 As String
 'Usage example with the immediate window: ?Arithmetic_StrNandCmp("00050000101c9500", "00050000101c9X00")
 Dim btLen As Byte
 Dim btPower As Byte
-    Arithmetic_StrNandCmp = 0
     btPower = Len(str1)
     btLen = Len(str2)
     If btLen < btPower Then btLen = btPower

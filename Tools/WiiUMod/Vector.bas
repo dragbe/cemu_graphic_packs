@@ -2,9 +2,7 @@ Attribute VB_Name = "Vector"
 Option Explicit
 
 Public Function Vector_ItemIndexes(ByRef lpVector As LongPtr, ByRef lpItem As LongPtr, ByVal intItemSize As Integer, ByVal intItemsCount As Integer, ByRef intItemOffsets() As Integer, Optional ByVal intLbound As Integer = 0) As Integer
-    If intItemsCount = 0 Then
-        Vector_ItemIndexes = 0
-    Else
+    If intItemsCount <> 0 Then
         intItemsCount = intItemsCount * intItemSize
         Do
             intItemsCount = intItemsCount - intItemSize

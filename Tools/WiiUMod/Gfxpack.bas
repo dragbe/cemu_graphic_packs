@@ -5,7 +5,6 @@ Public Function Gfxpack_Str2Asm(ByVal strValue As String, Optional ByVal btField
 'Usage example with the immediate window: ?Gfxpack_Str2Asm("Zelda")
 Dim strWord As String
 Dim btLength As Byte
-    Gfxpack_Str2Asm = ""
     btLength = Len(strValue)
     btFieldSize = (btFieldSize - btLength) \ 4
     Do Until btFieldSize = 0
@@ -31,7 +30,6 @@ Public Function Gfxpack_GetUserDefinedMapUnitData(ByVal strDataTypes As String, 
 Dim i As Integer
 Dim j As Integer
 Dim strDataTypesNames() As String
-    Gfxpack_GetUserDefinedMapUnitData = ""
     strDataTypesNames = Split(strDataTypes, "|")
     strDataTypes = " " + strDataLabel + vbCrLf
     For i = UBound(strDataTypesNames) To 0 Step -1
@@ -49,7 +47,6 @@ End Function
 Public Function Gfxpack_getCodeCave(ByRef strCemuLogFilePath As String, ByRef strGfxpackName As String, ByRef lngCodeCaveSize As Long) As Long
 Dim stCemuLogData() As stExtractedTextData
 Dim strTempFilePath As String
-    Gfxpack_getCodeCave = 0
     strTempFilePath = File_getTempFilePath
     If strTempFilePath <> "" Then
         lngCodeCaveSize = FreeFile

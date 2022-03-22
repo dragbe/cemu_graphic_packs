@@ -23,15 +23,15 @@ Dim objInventoryItem As stInventoryItem
 Dim strSearchString As String * 15
 Dim i As Integer
 Dim lngStartOffset As Long
-Dim lngDeltaOffset As Long
+Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
 Dim intInputFile As Integer
 Dim intOutputFile As Integer
-    Deprecated_Botw_MemorySearcherInventoryDataIniFile = 0
-    intInputFile = Cemu_openDumpFile(strDumpFolderPath, lngDeltaOffset)
-    Get intInputFile, Deprecated_Botw_GetInventoryDataAddress(intInputFile, lngDeltaOffset) - lngDeltaOffset + 228613, lngStartOffset '&H37CEC + 25 = 228613
-    Get intInputFile, Converter_SwapEndian(lngStartOffset) - lngDeltaOffset + 1, lngStartOffset
+    CEMU_DUMP_FILE = CEMU_DUMP_10000000
+    intInputFile = Cemu_openDumpFile(strDumpFolderPath, CEMU_DUMP_FILE)
+    Get intInputFile, Deprecated_Botw_GetInventoryDataAddress(intInputFile, CEMU_DUMP_FILE) - CEMU_DUMP_FILE + 228613, lngStartOffset '&H37CEC + 25 = 228613
+    Get intInputFile, Converter_SwapEndian(lngStartOffset) - CEMU_DUMP_FILE + 1, lngStartOffset
     Deprecated_Botw_MemorySearcherInventoryDataIniFile = Converter_SwapEndian(lngStartOffset)
-    lngStartOffset = Deprecated_Botw_MemorySearcherInventoryDataIniFile - lngDeltaOffset + 1
+    lngStartOffset = Deprecated_Botw_MemorySearcherInventoryDataIniFile - CEMU_DUMP_FILE + 1
     Get intInputFile, lngStartOffset + 36, strSearchString
     If strSearchString = "Obj_DRStone_Get" Then
         objInventoryItem.lngPreviousItemAddress = lngStartOffset
@@ -46,7 +46,7 @@ Dim intOutputFile As Integer
                 End If
             End If
             Deprecated_Botw_MemorySearcherInventoryDataIniFile = Converter_SwapEndian(objInventoryItem.lngPreviousItemAddress)
-            objInventoryItem.lngPreviousItemAddress = Deprecated_Botw_MemorySearcherInventoryDataIniFile - lngDeltaOffset + 1
+            objInventoryItem.lngPreviousItemAddress = Deprecated_Botw_MemorySearcherInventoryDataIniFile - CEMU_DUMP_FILE + 1
         Loop Until objInventoryItem.lngPreviousItemAddress = lngStartOffset
         Close intOutputFile
     End If
