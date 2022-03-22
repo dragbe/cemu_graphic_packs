@@ -6,4 +6,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_ClimbingInTheRain folder in this directory
 - enable the Climbing In The Rain graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/11239
+https://gamebanana.com/mods/49858
