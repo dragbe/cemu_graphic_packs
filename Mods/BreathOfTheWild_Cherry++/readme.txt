@@ -10,4 +10,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_Cherry++ folder in this directory
 - enable the Cherry++ graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/13029
+https://gamebanana.com/mods/49879
