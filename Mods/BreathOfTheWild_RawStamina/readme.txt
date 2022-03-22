@@ -5,7 +5,6 @@ NOTES
 - Yellow stamina depletes in priority
 - Custom yellow stamina gauge capacity
 - Useful for mods with custom stamina settings (don't edit the EnergyAutoRecover parameter in the Player_Link.bgparamlist file)
-- See readme.txt and rules.txt for additional information
 
 INSTALLATION INSTRUCTIONS
 - browse to your Cemu folder
@@ -13,4 +12,4 @@ INSTALLATION INSTRUCTIONS
 - store the BreathOfTheWild_RawStamina folder in this directory
 - enable the Raw Stamina graphic pack in Cemu
 
-https://gamebanana.com/gamefiles/11396
+https://gamebanana.com/mods/49867
