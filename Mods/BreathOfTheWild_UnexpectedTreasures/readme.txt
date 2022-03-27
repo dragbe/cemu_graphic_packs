@@ -2,6 +2,7 @@ Randomizes the treasure chests content|location with the ability to assign them 
 
 NOTES
 - Data Layer mod (last version) required for the 'advanced' treasure chests
+- Respawnable Treasure Chests (RTC version) required
 - Web page to customize the loot chances table
 
 INSTALLATION INSTRUCTIONS
