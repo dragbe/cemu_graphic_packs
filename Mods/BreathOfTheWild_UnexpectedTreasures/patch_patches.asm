@@ -179,7 +179,7 @@ _BOTW_UnexpectedTreasures_LastTreasureChestId:
 .int 0
 .int 0
 # [EID=7] Climbing Boots treasure chest -> Climber treasure chest
-.int 2231710576 # Tahno O'ah Shrine (Dungeon119) Static, 0xe93ef4d0
+.int 3913217232 # Tahno O'ah Shrine (Dungeon119) Static, 0xe93ef4d0
 .int 20 # IsGet_Obj_DRStone_Get
 .int 52 # LastBossGanonBeastGenerateFlag
 .int 8 # If (bool) IsGet_Obj_DRStone_Get = 0
