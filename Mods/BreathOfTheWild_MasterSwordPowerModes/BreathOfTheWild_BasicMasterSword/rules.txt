@@ -1,1 +1,6 @@
-
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Basic Master Sword
+path = "The Legend of Zelda: Breath of the Wild/Mods/Basic Master Sword"
+description = Disables the 'non-fully upgraded master sword' holy power in the presence of evil
+version = 4
