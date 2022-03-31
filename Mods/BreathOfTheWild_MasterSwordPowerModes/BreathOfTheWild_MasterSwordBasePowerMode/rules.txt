@@ -1,6 +1,0 @@
-[Definition]
-titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
-name = Master Sword Base Power Mode
-path = "The Legend of Zelda: Breath of the Wild/Mods/Master Sword Base Power Mode"
-description = Disables master sword holy power in the presence of evil
-version = 4
