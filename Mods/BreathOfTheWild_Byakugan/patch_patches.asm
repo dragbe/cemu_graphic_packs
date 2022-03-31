@@ -73,8 +73,8 @@ blr
 
 0x02A3B60C = bla _BOTW_Byakugan_TargetGuardianComponent # Target guardian with stasis area [mr r3, r28]
 0x0204fDFC = bla _BOTW_Byakugan_TargetGuardianChildComponents # Propagate the guardian stasis status on all its elements [rlwinm. r0, r0, 0, 27, 27]
-0x0204fE04 = bla _BOTW_Byakugan_TargetGuardianChildComponent # Same area as above [mr r3, r30]
-0x0204fE08 = bne .+0x30 # Same area as above [li r4, 0x10]
+0x0204fE04 = bla _BOTW_Byakugan_TargetGuardianChildComponent # [mr r3, r30]
+0x0204fE08 = bne .+0x30 # [li r4, 0x10]
 0x0204ABDC = bla _BOTW_Byakugan_HandleGuardianParentComponent # Handle the guardian parent component stasis status [cmpwi r8, 0]
 0x02FAFE28 = li r28, 1 # Enemy life gauge hidden status update area [li r28, 0]
-0x02FAFE44 = li r28, 1 # Same area as above [li r28, 0]
+0x02FAFE44 = li r28, 1 # [li r28, 0]
