@@ -54,8 +54,8 @@ stfs f1, 0x1a28(r31)
 blr
 
 0x02ff15CC = lfs f12, 0x1d34(r31) # Inventory yellow stamina update by eating cooked foods [lfs f1, +0x18(r1)]
-0x02ff15D0 = bla _BOTW_Staminax_UpdateInventoryYellowStamina # Same area as above [lfs f12, +0x1d34(r31)]
+0x02ff15D0 = bla _BOTW_Staminax_UpdateInventoryYellowStamina # [lfs f12, +0x1d34(r31)]
 0x02fe1778 = bla _BOTW_Staminax_UpdateInventoryYellowStaminaPreview # Inventory yellow stamina preview update area [fcmpu cr0, f13, f1]
-0x02fe1784 = bla _BOTW_Staminax_LimitInventoryYellowStaminaPreview # Same area as above [bge 0x02fe17cc]
+0x02fe1784 = bla _BOTW_Staminax_LimitInventoryYellowStaminaPreview # [bge 0x02fe17cc]
 0x02D90CD0 = bla _BOTW_Staminax_UpdateYellowStamina # Yellow stamina update area [fadds f13, f12, f29]
 0x02d9d5BC = bla _BOTW_Staminax_LimitYellowStamina # Yellow stamina update on inventory close or on NPC rewards [lfs f13, +0x20(r30)]
