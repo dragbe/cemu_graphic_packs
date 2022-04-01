@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Patch Codecaves Viewer</title>
+<meta name="description" content="Patch injection points and codecaves table" />
+</head>
+<body>
+<script src="BreathOfTheWild_PatchCodecaves.js"></script>
+<div align="center"><form name="frmUserInput">Injection Point&nbsp;<input name="txtInjectionPoint" type="text" minlength="3" maxlength="10" pattern="^0[xX][0-9a-fA-F]{1,8}$" value="0x0a564D91"><input type="button" onclick="checkInjectionPoint();" value="CHECK"></form></div><br>
+<table align="center" style="border:2px solid;">
+<tr align="center" style="background-color:YELLOW;"><td>Codecave start offset</td><td>Codecave end offset</td><td>Graphic Packs</td><td>Comment</td></tr>
+<script>
+function checkInjectionPoint() {
+var intInjectPointOffset=parseInt(document.frmUserInput.txtInjectionPoint.value,16);
+	for (var i=arrPatchCodecaves.length-2;i>=0;i--) {
+		if ((intInjectPointOffset>=arrPatchCodecaves[i][0]) && (intInjectPointOffset<=arrPatchCodecaves[i][1])) {
+			alert("Not usable");
+			return;
+		}
+	}
+	alert("Usable");
+	return;
+}
+for (var i=arrPatchCodecaves.length-2;i>=0;i--) {
+	document.write("<tr style=\"background-color:BEIGE;\" valign=\"middle\"><td align=\"center\">"+arrPatchCodecaves[i][0].toString(16)+"</td><td align=\"center\">"+arrPatchCodecaves[i][1].toString(16)+"</td><td align=\"center\">"+arrPatchCodecaves[i][2]+"</td><td align=\"left\">"+arrPatchCodecaves[i][3]+"</td></tr>");
+}
+</script>
+</table>
+</body>
+</html>
