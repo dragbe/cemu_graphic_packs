@@ -1,13 +1,12 @@
 Attribute VB_Name = "CRC"
 Option Explicit
-
 Public Function Crc_CRC32(ByRef strInput As String) As Long
 'Usage example with the immediate window: ?Crc_CRC32("Zelda")
 Static lngCrc32Table(0 To 255) As Long
-Dim i As Integer
-Dim iLookup As Integer
-Dim intBufferSize As Integer
-Dim buffer() As Byte
+Dim btIlookup As Byte
+Dim lngBufferSize As Long
+Dim btBuffer() As Byte
+Dim i As Long
     If lngCrc32Table(255) = 0 Then
         lngCrc32Table(0) = 0
         lngCrc32Table(1) = 1996959894
@@ -266,13 +265,13 @@ Dim buffer() As Byte
         lngCrc32Table(254) = 1510334235
         lngCrc32Table(255) = 755167117
     End If
-    buffer = StrConv(strInput, vbFromUnicode)
+    btBuffer = StrConv(strInput, vbFromUnicode)
     Crc_CRC32 = &HFFFFFFFF
-    intBufferSize = UBound(buffer)
-    For i = LBound(buffer) To intBufferSize
-        iLookup = (Crc_CRC32 And &HFF) Xor buffer(i)
+    lngBufferSize = UBound(btBuffer)
+    For i = LBound(btBuffer) To lngBufferSize
+        btIlookup = (Crc_CRC32 And &HFF) Xor btBuffer(i)
         Crc_CRC32 = ((Crc_CRC32 And &HFFFFFF00) \ &H100) And 16777215
-        Crc_CRC32 = Crc_CRC32 Xor lngCrc32Table(iLookup)
+        Crc_CRC32 = Crc_CRC32 Xor lngCrc32Table(btIlookup)
     Next i
     Crc_CRC32 = Not Crc_CRC32
 End Function

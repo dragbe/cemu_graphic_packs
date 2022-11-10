@@ -1,5 +1,7 @@
 Attribute VB_Name = "Botw"
 Option Explicit
+Private Const BOTW_GAMEDATASCOUNT As Byte = 18
+Private Const BOTW_INVENTORYITEM_PROPERTIESCOUNT = 11
 Public Enum BOTW_INVENTORYITEM_FILTERS
     BOTW_WEAPONSONLY = 1
     BOTW_BOWSONLY = 2
@@ -13,11 +15,25 @@ Public Enum BOTW_INVENTORYITEM_FILTERS
     BOTW_KEYITEMSONLY = 512
     BOTW_ALLITEMS = BOTW_WEAPONSONLY Or BOTW_BOWSONLY Or BOTW_ARROWSONLY Or BOTW_SHIELDSONLY Or BOTW_HEADARMORSONLY Or BOTW_UPPERARMORSONLY Or BOTW_LOWERARMORSONLY Or BOTW_MATERIALSONLY Or BOTW_FOODSONLY Or BOTW_KEYITEMSONLY
 End Enum
+Public Enum BOTW_INVENTORYITEM_PROPERTIES
+    BOTW_PREVIOUSITEM_PROPERTY = 1
+    BOTW_NEXTITEM_PROPERTY = 2
+    BOTW_ITEMTYPE_PROPERTY = 4
+    BOTW_ITEMSUBTYPE_PROPERTY = 8
+    BOTW_ITEMQTYDUR_PROPERTY = 16
+    BOTW_ITEMEQUIPPEDFLAG_PROPERTY = 32
+    BOTW_ITEMBONUSVALUE_PROPERTY = 64
+    BOTW_ITEMBONUSDURATION_PROPERTY = 128
+    BOTW_ITEMBONUSTYPE_PROPERTY = 256
+    BOTW_ITEMEFFECTTYPE_PROPERTY = 512
+    BOTW_ITEMEFFECTLEVEL_PROPERTY = 1024
+    BOTW_ITEM_ALLPROPERTIES = BOTW_ITEMEFFECTLEVEL_PROPERTY Or BOTW_ITEMEFFECTTYPE_PROPERTY Or BOTW_ITEMBONUSTYPE_PROPERTY Or BOTW_ITEMBONUSDURATION_PROPERTY Or BOTW_ITEMBONUSVALUE_PROPERTY Or BOTW_ITEMEQUIPPEDFLAG_PROPERTY Or BOTW_ITEMQTYDUR_PROPERTY Or BOTW_ITEMSUBTYPE_PROPERTY Or BOTW_ITEMTYPE_PROPERTY Or BOTW_NEXTITEM_PROPERTY Or BOTW_PREVIOUSITEM_PROPERTY
+End Enum
 Public Type stRecipeIngredient
     lngIdAddress As Long
     lngLessUsefulField As Long
     lngStr64TypeSize As Long
-    strId As String * 64
+    btActorName(1 To 64)
 End Type
 Public Type stRecipe
     stIngredients(1 To 5) As stRecipeIngredient
@@ -33,7 +49,7 @@ Public Type stInventoryItem
     lngIdAddress As Long
     lngLessUsefulField As Long
     lngStr64TypeSize As Long
-    strId As String * 64
+    btActorName(1 To 64) As Byte
     lngBonusValue As Long
     lngBonusDuration As Long
     lngBonusType As Long
@@ -53,7 +69,7 @@ Public Type stGameData
 End Type
 Private Type stGameDataMap
     stGameDatas() As stGameData
-    intDataCount As Integer
+    lngDataCount As Long
     strDataType As String
     intDataTypeSize As Integer
     intDataHashOffset As Integer
@@ -93,105 +109,87 @@ Public Enum BOTW_GAMEDATAS
     BOTW_VECTOR2FARRAYGAMEDATA = 16
     BOTW_VECTOR3FARRAYGAMEDATA = 17
     BOTW_VECTOR4FARRAYGAMEDATA = 18
+    BOTW_ALLGAMEDATA = &H3FFFF
+End Enum
+Public Enum BOTW_MEMORYDATAS
+    BOTW_MEMORY_GAMEDATA = 1
+    BOTW_MEMORY_GAMEROMPLAYER = 2
+    BOTW_MEMORY_INVENTORY = 3
+    BOTW_MEMORY_LOCATIONMARKER = 4
+    BOTW_MEMORY_SAVEDATA = 5
+    BOTW_MEMORY_REMOTEBOMBTIMERS = 6
+    BOTW_MEMORY_NONAME = 7
+    BOTW_MEMORY_GAMESPEED = 8
+    BOTW_MEMORY_MASTERCYCLEZERO = 9
 End Enum
 Public Type stGameBinDataMap
     lngCount As Long
     lngSize As Long
     lngAddress As Long
 End Type
-Public stGameDataMaps(1 To 18) As stGameDataMap
-Private stGameBinDataMaps(1 To 18) As stGameBinDataMap
-Public stHashesTable() As stGameData
-
-Public Function Botw_readInventoryBinData(ByRef stMemoryDataMap As stDataMap, Optional ByVal strCemuFolderPath As String = "") As Long
-Dim stProcess As PROCESSENTRY32
-Dim stCemuLogData() As stExtractedTextData
-Dim lngLngMemoryBase As LongLong
-    strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
-    Call Memory_InitDataMap("MemoryData.A4:C4", stMemoryDataMap)
-    stProcess.dwSize = Cemu_openProcess(SYSTEM_PROC_VMREAD, stProcess)
-    If stProcess.dwSize <> 0 Then
-        If System_ToogleProcessById(stProcess.th32ProcessID, True) > 0 Then
-            stProcess.dwFlags = File_ExtractText("Cemu.A2:C32", stCemuLogData, strCemuFolderPath + "log.txt", CEMU_LOG_WIIUMEMORYBASE)
-            If stProcess.dwFlags = 1 Then
-                lngLngMemoryBase = CLngLng("&H" + stCemuLogData(1).objData.Item(0).SubMatches(0))
-                Botw_readInventoryBinData = Memory_getMappedDataAddress(stProcess.dwSize, lngLngMemoryBase, stMemoryDataMap.lngLowerOffsets)
-                If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Botw_readInventoryBinData, VarPtr(stMemoryDataMap.btdata(0)), stMemoryDataMap.lngDataSize, 0) = 0 Then Botw_readInventoryBinData = 0
-                Set stCemuLogData(1).objData = Nothing
-                Erase stCemuLogData
-            End If
-            System_ToogleProcessById stProcess.th32ProcessID, False
-        End If
-        CloseHandle stProcess.dwSize
-    Else
-        strCemuFolderPath = Cemu_GetDumpFolderPath(strCemuFolderPath)
-        If strCemuFolderPath <> "" Then
-            stProcess.dwFlags = CEMU_DUMP_10000000
-            stProcess.dwSize = Cemu_openDumpFile(strCemuFolderPath, stProcess.dwFlags)
-            Botw_readInventoryBinData = File_getMappedDataAddress(stProcess.dwSize, stProcess.dwFlags, stMemoryDataMap.lngLowerOffsets)
-            Get stProcess.dwSize, Botw_readInventoryBinData - stProcess.dwFlags + 1, stMemoryDataMap.btdata
-            Close stProcess.dwSize
-        End If
-    End If
-End Function
-
-Private Sub Botw_InitGameDataMap(ByVal intNamesColumn As Integer)
-Dim i As Integer
+Public stGameDataMaps(1 To BOTW_GAMEDATASCOUNT) As stGameDataMap
+Private stGameBinDataMaps(1 To BOTW_GAMEDATASCOUNT) As stGameBinDataMap
+Private Sub Botw_InitGameDataMap(ByVal lngNamesColumn As Long, Optional ByVal lngGameData As Long = BOTW_ALLGAMEDATA)
+Dim i As Long
 Dim xlsWorksheet As Worksheet
 Dim xlsUserDataRange As Range
 Dim xlsRange As Range
 Dim btGameDataCount As Byte
 Dim stCurrentGameData As stGameData
-    btGameDataCount = UBound(stGameDataMaps)
+Dim lngForcedDataCount As Long
+Dim lngCurrentRow As Long
+    btGameDataCount = BOTW_GAMEDATASCOUNT
     Set xlsWorksheet = ThisWorkbook.Worksheets("GameData")
-    Set xlsRange = xlsWorksheet.Range("A2:E" + CStr(btGameDataCount + 1)).Cells
-    If intNamesColumn = 1 Then
-        Do Until btGameDataCount = 0
-            With stGameDataMaps(btGameDataCount)
-            ReDim .stGameDatas(1 To 1)
-            .stGameDatas(1).strDataName = xlsRange.Item(btGameDataCount, 1).Text
-            .intDataCount = 1
-            .strDataType = xlsRange.Item(btGameDataCount, 2).Text
-            .intDataTypeSize = xlsRange.Item(btGameDataCount, 3).Value
-            .intDataHashOffset = xlsRange.Item(btGameDataCount, 4).Value
-            End With
-            btGameDataCount = btGameDataCount - 1
-        Loop
-    Else
-        Set xlsUserDataRange = xlsWorksheet.Range(Chr(64 + intNamesColumn) + "2:" + Chr(63 + intNamesColumn + btGameDataCount) + "32767").Cells
+    Set xlsRange = xlsWorksheet.Range("A2:F" + CStr(btGameDataCount + 1)).Cells
+    If lngNamesColumn = 1 Then
         Do
-            With stGameDataMaps(btGameDataCount)
-            .intDataCount = xlsRange.Item(btGameDataCount, 5).Value
-            If .intDataCount > 0 Then
-                ReDim .stGameDatas(1 To .intDataCount)
-                For .intDataCount = 1 To 32766
-                    stCurrentGameData.strDataName = xlsUserDataRange.Item(.intDataCount, btGameDataCount).Text
-                    If stCurrentGameData.strDataName = "" Then
-                        .intDataCount = .intDataCount - 1
-                        If .intDataCount = 0 Then Erase .stGameDatas
-                        Exit For
-                    Else
+            If (lngGameData And (2^ ^ (btGameDataCount - 1))) <> 0 Then
+                With stGameDataMaps(btGameDataCount)
+                ReDim .stGameDatas(1 To 1)
+                .stGameDatas(1).strDataName = xlsRange.Item(btGameDataCount, 1).Text
+                .lngDataCount = 1
+                .strDataType = xlsRange.Item(btGameDataCount, 2).Text
+                .intDataTypeSize = xlsRange.Item(btGameDataCount, 3).Value
+                .intDataHashOffset = xlsRange.Item(btGameDataCount, 4).Value
+                End With
+            End If
+            btGameDataCount = btGameDataCount - 1
+        Loop Until btGameDataCount = 0
+    Else
+        Set xlsUserDataRange = xlsWorksheet.Range(Chr(64 + lngNamesColumn) + "2:" + Chr(63 + lngNamesColumn + btGameDataCount) + xlsWorksheet.Range("E" + CStr(2 + BOTW_GAMEDATASCOUNT)).Text).Cells
+        Do
+            If (lngGameData And (2^ ^ (btGameDataCount - 1))) Then
+                With stGameDataMaps(btGameDataCount)
+                lngForcedDataCount = xlsRange.Item(btGameDataCount, 5).Value
+                i = xlsRange.Item(btGameDataCount, 6).Value
+                If lngForcedDataCount > i Then lngForcedDataCount = i
+                If lngForcedDataCount > 0 Then
+                    ReDim .stGameDatas(1 To lngForcedDataCount)
+                    .lngDataCount = 0
+                    Do
+                        .lngDataCount = .lngDataCount + 1
+                        lngCurrentRow = Xlsdata_SkipRowBlankCells(xlsUserDataRange, lngCurrentRow + 1, btGameDataCount, stCurrentGameData.strDataName, .lngDataCount)
                         stCurrentGameData.lngHash = Crc_CRC32(stCurrentGameData.strDataName)
                         stCurrentGameData.strHash = Right("0000000" + Hex(stCurrentGameData.lngHash), 8)
-                        For i = .intDataCount - 1 To 1 Step -1
+                        For i = .lngDataCount - 1 To 1 Step -1
                             If stCurrentGameData.strHash > .stGameDatas(i).strHash Then
                                 Exit For
                             Else
-                                intNamesColumn = i + 1
-                                .stGameDatas(intNamesColumn) = .stGameDatas(i)
-                                xlsUserDataRange.Item(intNamesColumn, btGameDataCount).Value = .stGameDatas(i).strDataName
+                                lngNamesColumn = i + 1
+                                .stGameDatas(lngNamesColumn) = .stGameDatas(i)
+                                xlsUserDataRange.Item(lngNamesColumn, btGameDataCount).Value = .stGameDatas(i).strDataName
                             End If
                         Next i
-                        intNamesColumn = i + 1
-                        .stGameDatas(intNamesColumn) = stCurrentGameData
-                        xlsUserDataRange.Item(intNamesColumn, btGameDataCount).Value = stCurrentGameData.strDataName
-                    End If
-                Next .intDataCount
+                        lngNamesColumn = i + 1
+                        .stGameDatas(lngNamesColumn) = stCurrentGameData
+                        xlsUserDataRange.Item(lngNamesColumn, btGameDataCount).Value = stCurrentGameData.strDataName
+                    Loop Until .lngDataCount = lngForcedDataCount
+                End If
+                .strDataType = xlsRange.Item(btGameDataCount, 2).Text
+                .intDataTypeSize = xlsRange.Item(btGameDataCount, 3).Value
+                .intDataHashOffset = xlsRange.Item(btGameDataCount, 4).Value
+                End With
             End If
-            .strDataType = xlsRange.Item(btGameDataCount, 2).Text
-            .intDataTypeSize = xlsRange.Item(btGameDataCount, 3).Value
-            .intDataHashOffset = xlsRange.Item(btGameDataCount, 4).Value
-            End With
             btGameDataCount = btGameDataCount - 1
         Loop Until btGameDataCount = 0
         Set xlsUserDataRange = Nothing
@@ -199,7 +197,6 @@ Dim stCurrentGameData As stGameData
     Set xlsRange = Nothing
     Set xlsWorksheet = Nothing
 End Sub
-
 Public Function Botw_ReadGameBinData(ByRef stMemoryDataMap As stDataMap, Optional ByVal strCemuFolderPath As String = "") As Long
 Dim stProcess As PROCESSENTRY32
 Dim stCemuLogData() As stExtractedTextData
@@ -209,39 +206,39 @@ Dim lngVectorDataAddresses() As Long
 Static lngDataArrayInfos(1 To 4) As Long
     strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
     Call Memory_InitDataMap("MemoryData.A2:C2", stMemoryDataMap)
-    stProcess.dwSize = Cemu_openProcess(SYSTEM_PROC_VMREAD, stProcess)
+    stProcess.dwSize = Cemu_OpenProcess(SYSTEM_PROC_VMREAD, stProcess)
     If stProcess.dwSize <> 0 Then
-        If System_ToogleProcessById(stProcess.th32ProcessID, True) > 0 Then
+        If System_ToogleProcessById(stProcess.th32ProcessID, -1) > 0 Then
             stProcess.dwFlags = File_ExtractText("Cemu.A2:C32", stCemuLogData, strCemuFolderPath + "log.txt", CEMU_LOG_WIIUMEMORYBASE)
             If stProcess.dwFlags = 1 Then
                 lngLngMemoryBase = CLngLng("&H" + stCemuLogData(1).objData.Item(0).SubMatches(0))
-                Botw_ReadGameBinData = Memory_getMappedDataAddress(stProcess.dwSize, lngLngMemoryBase, stMemoryDataMap.lngLowerOffsets)
+                Botw_ReadGameBinData = Memory_GetMappedData(stProcess.dwSize, lngLngMemoryBase, stMemoryDataMap.lngLowerOffsets)
                 If Botw_ReadGameBinData <> 0 Then
                     If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Botw_ReadGameBinData + 4, VarPtr(stGameBinDataMaps(1)), stMemoryDataMap.lngDataSize, 0) <> 0 Then
                         Call Botw_InitGameDataMap(7)
-                        stProcess.dwFlags = UBound(stGameDataMaps)
+                        stProcess.dwFlags = BOTW_GAMEDATASCOUNT
                         Do
                             If stGameBinDataMaps(stProcess.dwFlags).lngCount <> 0 Then
-                                stGameBinDataMaps(stProcess.dwFlags).lngCount = Converter_SwapEndian(stGameBinDataMaps(stProcess.dwFlags).lngCount)
+                                stGameBinDataMaps(stProcess.dwFlags).lngCount = Converter_SwapEndian32(stGameBinDataMaps(stProcess.dwFlags).lngCount)
                                 With stGameDataMaps(stProcess.dwFlags)
-                                If System_ReadProcessLongMemoryDataSegment(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian(stGameBinDataMaps(stProcess.dwFlags).lngAddress), stGameBinDataMaps(stProcess.dwFlags).lngCount, lngVectorDataAddresses) <> 0 Then
+                                If Memory_ReadProcessLongMemoryDataSegment(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian32(stGameBinDataMaps(stProcess.dwFlags).lngAddress), stGameBinDataMaps(stProcess.dwFlags).lngCount, lngVectorDataAddresses) <> 0 Then
                                     If .intDataHashOffset < 0 Then
                                         .intDataHashOffset = 8 - .intDataHashOffset
                                         For stGameBinDataMaps(stProcess.dwFlags).lngSize = stGameBinDataMaps(stProcess.dwFlags).lngCount To 1 Step -1
-                                            If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)), VarPtr(lngDataArrayInfos(1)), 16, 0) <> 0 Then
-                                                lngDataArrayInfos(4) = Converter_SwapEndian(lngDataArrayInfos(4)) + Converter_SwapEndian(lngDataArrayInfos(1)) * .intDataHashOffset - 8
+                                            If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian32(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)), VarPtr(lngDataArrayInfos(1)), 16, 0) <> 0 Then
+                                                lngDataArrayInfos(4) = Converter_SwapEndian32(lngDataArrayInfos(4)) + Converter_SwapEndian32(lngDataArrayInfos(1)) * .intDataHashOffset - 8
                                                 If lngDataArrayInfos(4) > stMemoryDataMap.lngDataSize Then stMemoryDataMap.lngDataSize = lngDataArrayInfos(4)
                                                 If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + lngDataArrayInfos(4), VarPtr(lngDataArrayInfos(2)), 4, 0) <> 0 Then
-                                                    lngDataArrayInfos(2) = Converter_SwapEndian(lngDataArrayInfos(2))
-                                                    For lngDataArrayInfos(3) = .intDataCount To 1 Step -1
+                                                    lngDataArrayInfos(2) = Converter_SwapEndian32(lngDataArrayInfos(2))
+                                                    For lngDataArrayInfos(3) = .lngDataCount To 1 Step -1
                                                         If .stGameDatas(lngDataArrayInfos(3)).lngHash = lngDataArrayInfos(2) Then
                                                             .stGameDatas(lngDataArrayInfos(3)).lngHash = lngDataArrayInfos(4)
-                                                            If lngDataArrayInfos(3) <> .intDataCount Then
+                                                            If lngDataArrayInfos(3) <> .lngDataCount Then
                                                                 stSwapGameData = .stGameDatas(lngDataArrayInfos(3))
-                                                                .stGameDatas(lngDataArrayInfos(3)) = .stGameDatas(.intDataCount)
-                                                                .stGameDatas(.intDataCount) = stSwapGameData
+                                                                .stGameDatas(lngDataArrayInfos(3)) = .stGameDatas(.lngDataCount)
+                                                                .stGameDatas(.lngDataCount) = stSwapGameData
                                                             End If
-                                                            .intDataCount = .intDataCount - 1
+                                                            .lngDataCount = .lngDataCount - 1
                                                             Exit For
                                                         End If
                                                     Next lngDataArrayInfos(3)
@@ -250,13 +247,13 @@ Static lngDataArrayInfos(1 To 4) As Long
                                         Next stGameBinDataMaps(stProcess.dwFlags).lngSize
                                     Else
                                         For stGameBinDataMaps(stProcess.dwFlags).lngSize = stGameBinDataMaps(stProcess.dwFlags).lngCount To 1 Step -1
-                                            lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) = Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)) + .intDataHashOffset
+                                            lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) = Converter_SwapEndian32(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)) + .intDataHashOffset
                                             If lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) > stMemoryDataMap.lngDataSize Then stMemoryDataMap.lngDataSize = lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)
-                                            If .intDataCount <> 0 Then
+                                            If .lngDataCount <> 0 Then
                                                 If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize), VarPtr(lngDataArrayInfos(2)), 4, 0) <> 0 Then
-                                                    If Converter_SwapEndian(lngDataArrayInfos(2)) = .stGameDatas(.intDataCount).lngHash Then
-                                                        .stGameDatas(.intDataCount).lngHash = lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)
-                                                        .intDataCount = .intDataCount - 1
+                                                    If Converter_SwapEndian32(lngDataArrayInfos(2)) = .stGameDatas(.lngDataCount).lngHash Then
+                                                        .stGameDatas(.lngDataCount).lngHash = lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)
+                                                        .lngDataCount = .lngDataCount - 1
                                                     End If
                                                 End If
                                             End If
@@ -280,54 +277,53 @@ Static lngDataArrayInfos(1 To 4) As Long
                 Set stCemuLogData(1).objData = Nothing
                 Erase stCemuLogData
             End If
-            System_ToogleProcessById stProcess.th32ProcessID, False
+            System_ToogleProcessById stProcess.th32ProcessID, 1
         End If
         CloseHandle stProcess.dwSize
     Else
         strCemuFolderPath = Cemu_GetDumpFolderPath(strCemuFolderPath)
         If strCemuFolderPath <> "" Then
-            stProcess.th32ProcessID = CEMU_DUMP_10000000
-            stProcess.dwSize = Cemu_openDumpFile(strCemuFolderPath, stProcess.th32ProcessID)
-            Botw_ReadGameBinData = File_getMappedDataAddress(stProcess.dwSize, stProcess.th32ProcessID, stMemoryDataMap.lngLowerOffsets)
+            stProcess.dwSize = Cemu_OpenDumpFile(strCemuFolderPath, CEMU_DUMP_10000000)
+            Botw_ReadGameBinData = File_GetMappedData(stProcess.dwSize, CEMU_DUMP_10000000, stMemoryDataMap.lngLowerOffsets)
             If Botw_ReadGameBinData <> 0 Then
-                Get stProcess.dwSize, Botw_ReadGameBinData - stProcess.th32ProcessID + 5, stGameBinDataMaps
+                Get stProcess.dwSize, Botw_ReadGameBinData - CEMU_DUMP_10000000 + 5, stGameBinDataMaps
                 Call Botw_InitGameDataMap(7)
-                stProcess.dwFlags = UBound(stGameDataMaps)
+                stProcess.dwFlags = BOTW_GAMEDATASCOUNT
                 Do
                     If stGameBinDataMaps(stProcess.dwFlags).lngCount <> 0 Then
-                        stGameBinDataMaps(stProcess.dwFlags).lngCount = Converter_SwapEndian(stGameBinDataMaps(stProcess.dwFlags).lngCount)
+                        stGameBinDataMaps(stProcess.dwFlags).lngCount = Converter_SwapEndian32(stGameBinDataMaps(stProcess.dwFlags).lngCount)
                         With stGameDataMaps(stProcess.dwFlags)
-                        Call File_ReadLongDataSegment(stProcess.dwSize, Converter_SwapEndian(stGameBinDataMaps(stProcess.dwFlags).lngAddress) - stProcess.th32ProcessID + 1, stGameBinDataMaps(stProcess.dwFlags).lngCount, lngVectorDataAddresses)
+                        Call File_ReadLongDataSegment(stProcess.dwSize, Converter_SwapEndian32(stGameBinDataMaps(stProcess.dwFlags).lngAddress) - CEMU_DUMP_10000000 + 1, stGameBinDataMaps(stProcess.dwFlags).lngCount, lngVectorDataAddresses)
                         If .intDataHashOffset < 0 Then
                             .intDataHashOffset = 8 - .intDataHashOffset
                             For stGameBinDataMaps(stProcess.dwFlags).lngSize = stGameBinDataMaps(stProcess.dwFlags).lngCount To 1 Step -1
-                                Get stProcess.dwSize, Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)) - stProcess.th32ProcessID + 1, lngDataArrayInfos
-                                lngDataArrayInfos(4) = Converter_SwapEndian(lngDataArrayInfos(4)) + Converter_SwapEndian(lngDataArrayInfos(1)) * .intDataHashOffset - 8
+                                Get stProcess.dwSize, Converter_SwapEndian32(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)) - CEMU_DUMP_10000000 + 1, lngDataArrayInfos
+                                lngDataArrayInfos(4) = Converter_SwapEndian32(lngDataArrayInfos(4)) + Converter_SwapEndian32(lngDataArrayInfos(1)) * .intDataHashOffset - 8
                                 If lngDataArrayInfos(4) > stMemoryDataMap.lngDataSize Then stMemoryDataMap.lngDataSize = lngDataArrayInfos(4)
-                                Get stProcess.dwSize, lngDataArrayInfos(4) - stProcess.th32ProcessID + 1, lngDataArrayInfos(2)
-                                lngDataArrayInfos(2) = Converter_SwapEndian(lngDataArrayInfos(2))
-                                For lngDataArrayInfos(3) = .intDataCount To 1 Step -1
+                                Get stProcess.dwSize, lngDataArrayInfos(4) - CEMU_DUMP_10000000 + 1, lngDataArrayInfos(2)
+                                lngDataArrayInfos(2) = Converter_SwapEndian32(lngDataArrayInfos(2))
+                                For lngDataArrayInfos(3) = .lngDataCount To 1 Step -1
                                     If .stGameDatas(lngDataArrayInfos(3)).lngHash = lngDataArrayInfos(2) Then
                                         .stGameDatas(lngDataArrayInfos(3)).lngHash = lngDataArrayInfos(4)
-                                        If lngDataArrayInfos(3) <> .intDataCount Then
+                                        If lngDataArrayInfos(3) <> .lngDataCount Then
                                             stSwapGameData = .stGameDatas(lngDataArrayInfos(3))
-                                            .stGameDatas(lngDataArrayInfos(3)) = .stGameDatas(.intDataCount)
-                                            .stGameDatas(.intDataCount) = stSwapGameData
+                                            .stGameDatas(lngDataArrayInfos(3)) = .stGameDatas(.lngDataCount)
+                                            .stGameDatas(.lngDataCount) = stSwapGameData
                                         End If
-                                        .intDataCount = .intDataCount - 1
+                                        .lngDataCount = .lngDataCount - 1
                                         Exit For
                                     End If
                                 Next lngDataArrayInfos(3)
                             Next stGameBinDataMaps(stProcess.dwFlags).lngSize
                         Else
                             For stGameBinDataMaps(stProcess.dwFlags).lngSize = stGameBinDataMaps(stProcess.dwFlags).lngCount To 1 Step -1
-                                lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) = Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)) + .intDataHashOffset
+                                lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) = Converter_SwapEndian32(lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)) + .intDataHashOffset
                                 If lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) > stMemoryDataMap.lngDataSize Then stMemoryDataMap.lngDataSize = lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)
-                                If .intDataCount <> 0 Then
-                                    Get stProcess.dwSize, lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) - stProcess.th32ProcessID + 1, lngDataArrayInfos(2)
-                                    If Converter_SwapEndian(lngDataArrayInfos(2)) = .stGameDatas(.intDataCount).lngHash Then
-                                        .stGameDatas(.intDataCount).lngHash = lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)
-                                        .intDataCount = .intDataCount - 1
+                                If .lngDataCount <> 0 Then
+                                    Get stProcess.dwSize, lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize) - CEMU_DUMP_10000000 + 1, lngDataArrayInfos(2)
+                                    If Converter_SwapEndian32(lngDataArrayInfos(2)) = .stGameDatas(.lngDataCount).lngHash Then
+                                        .stGameDatas(.lngDataCount).lngHash = lngVectorDataAddresses(stGameBinDataMaps(stProcess.dwFlags).lngSize)
+                                        .lngDataCount = .lngDataCount - 1
                                     End If
                                 End If
                             Next stGameBinDataMaps(stProcess.dwFlags).lngSize
@@ -339,32 +335,96 @@ Static lngDataArrayInfos(1 To 4) As Long
                 Loop Until stProcess.dwFlags = 0
                 stMemoryDataMap.lngDataSize = stMemoryDataMap.lngDataSize + 8 - Botw_ReadGameBinData
                 ReDim stMemoryDataMap.btdata(0 To stMemoryDataMap.lngDataSize - 1)
-                Get stProcess.dwSize, Botw_ReadGameBinData - stProcess.th32ProcessID + 1, stMemoryDataMap.btdata
+                Get stProcess.dwSize, Botw_ReadGameBinData - CEMU_DUMP_10000000 + 1, stMemoryDataMap.btdata
             End If
             Close stProcess.dwSize
         End If
     End If
 End Function
-
-Public Function Botw_MemorySearcherInventoryDataIniFile(Optional ByVal strCemuFolderPath As String = "", Optional ByVal ITEMTYPEFILTER As BOTW_INVENTORYITEM_FILTERS = BOTW_ALLITEMS, Optional ByVal strItemIdFilter As String = "*") As Long
-'Usage example with the immediate window: ?Botw_MemorySearcherInventoryDataIniFile("", BOTW_ALLITEMS)
-'Output: D:\WiiU\1.23.0\memorySearcher\00050000101c9<3|4|5|X>00.ini
+Public Function Botw_MemorySearcherInventoryDataIniFile(Optional ByVal strCemuFolderPath As String = "", Optional ByVal BOTW_ITEM_PROPERTIES As BOTW_INVENTORYITEM_PROPERTIES = BOTW_ITEM_ALLPROPERTIES, Optional ByVal ITEMTYPEFILTER As BOTW_INVENTORYITEM_FILTERS = BOTW_ALLITEMS, Optional ByVal strItemIdFilter As String = "*") As Long
+'Usage example with the immediate window: ?Botw_MemorySearcherInventoryDataIniFile("", BOTW_ITEMSUBTYPE_PROPERTY Or BOTW_ITEMQTYDUR_PROPERTY, BOTW_WEAPONSONLY)
+'Output: D:\WiiU\Default\memorySearcher\00050000101c9<3|4|5|X>00.ini
 Dim objInventoryItem As stInventoryItem
 Dim stMemoryDataMap As stDataMap
+Dim lngItemDataAddress As Long
+Dim stMemorySearcherEntries(0 To BOTW_INVENTORYITEM_PROPERTIESCOUNT - 1) As stGameData
     strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
-    Botw_MemorySearcherInventoryDataIniFile = Botw_readInventoryBinData(stMemoryDataMap, strCemuFolderPath)
+    Botw_MemorySearcherInventoryDataIniFile = Cemu_ReadWiiuMappedData(stMemoryDataMap, "MemoryData.A4:C4", 0, strCemuFolderPath)
     If Botw_MemorySearcherInventoryDataIniFile <> 0 Then
-        objInventoryItem.strId = Cemu_GetBotwTitleId
+        With stMemorySearcherEntries(Log(BOTW_PREVIOUSITEM_PROPERTY) / Log(2))
+        .strHash = Cemu_GetBotwTitleId
         stMemoryDataMap.lngLowerOffsets(0) = FreeFile
-        Open strCemuFolderPath + "memorySearcher\" + Left(objInventoryItem.strId, 8) + Mid(objInventoryItem.strId, 10, 8) + ".ini" For Output As stMemoryDataMap.lngLowerOffsets(0)
+        Open strCemuFolderPath + "memorySearcher\" + Left(.strHash, 8) + Mid(.strHash, 10, 8) + ".ini" For Output As stMemoryDataMap.lngLowerOffsets(0)
+        .lngHash = 0
+        .strDataName = ".PreviousItemAddress"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_NEXTITEM_PROPERTY) / Log(2))
+        .lngHash = &H4
+        .strDataName = ".NextItemAddress"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMTYPE_PROPERTY) / Log(2))
+        .lngHash = &H8
+        .strDataName = ".Type"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMSUBTYPE_PROPERTY) / Log(2))
+        .lngHash = &HC
+        .strDataName = ".SubType"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMQTYDUR_PROPERTY) / Log(2))
+        .lngHash = &H10
+        .strDataName = ".QtyDur"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMEQUIPPEDFLAG_PROPERTY) / Log(2))
+        .lngHash = &H14
+        .strDataName = ".EquippedFlag"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMBONUSVALUE_PROPERTY) / Log(2))
+        .lngHash = &H64
+        .strDataName = ".BonusValue"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMBONUSDURATION_PROPERTY) / Log(2))
+        .lngHash = &H68
+        .strDataName = ".BonusDuration"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMBONUSTYPE_PROPERTY) / Log(2))
+        .lngHash = &H6C
+        .strDataName = ".lngBonusType"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMEFFECTTYPE_PROPERTY) / Log(2))
+        .lngHash = &H70
+        .strDataName = ".lngEffectType"
+        .strHash = "int32"
+        End With
+        With stMemorySearcherEntries(Log(BOTW_ITEMEFFECTLEVEL_PROPERTY) / Log(2))
+        .lngHash = &H74
+        .strDataName = ".lngEffectLevel"
+        .strHash = "float"
+        End With
         For stMemoryDataMap.lngDataSize = 228044 To 108 Step -544
             If stMemoryDataMap.btdata(stMemoryDataMap.lngDataSize + 36) <> 0 Then
                 Call CopyMemory(VarPtr(objInventoryItem), VarPtr(stMemoryDataMap.btdata(stMemoryDataMap.lngDataSize)), 544)
-                If (ITEMTYPEFILTER And (2^ ^ Converter_SwapEndian(objInventoryItem.lngType))) <> 0 Then
-                    strCemuFolderPath = Left(objInventoryItem.strId, InStr(objInventoryItem.strId, Chr(0)) - 1)
+                If (ITEMTYPEFILTER And (2^ ^ Converter_SwapEndian32(objInventoryItem.lngType))) <> 0 Then
+                    strCemuFolderPath = Converter_CNullTerminatedString(objInventoryItem.btActorName)
                     If strCemuFolderPath Like strItemIdFilter Then
-                        Print #stMemoryDataMap.lngLowerOffsets(0), "[Entry]" + vbCrLf + "description=" + strCemuFolderPath + " (Qty|Dur)" + vbCrLf + "address=0x" + Hex(Botw_MemorySearcherInventoryDataIniFile + stMemoryDataMap.lngDataSize + &H10) + vbCrLf + "type=int32" + vbCrLf + "value=" + vbCrLf
-                        'Add other inventory item data here
+                        lngItemDataAddress = Botw_MemorySearcherInventoryDataIniFile + stMemoryDataMap.lngDataSize
+                        stMemorySearcherEntries(0).lngHash = BOTW_INVENTORYITEM_PROPERTIESCOUNT
+                        Do
+                            stMemorySearcherEntries(0).lngHash = stMemorySearcherEntries(0).lngHash - 1
+                            If (BOTW_ITEM_PROPERTIES And (2^ ^ stMemorySearcherEntries(0).lngHash)) <> 0 Then
+                                With stMemorySearcherEntries(stMemorySearcherEntries(0).lngHash)
+                                    Call Cemu_WriteMemorySearcherEntry(stMemoryDataMap.lngLowerOffsets(0), strCemuFolderPath + .strDataName, lngItemDataAddress + .lngHash, .strHash)
+                                End With
+                            End If
+                        Loop Until stMemorySearcherEntries(0).lngHash = 0
                     End If
                 End If
             End If
@@ -374,46 +434,37 @@ Dim stMemoryDataMap As stDataMap
         Erase stMemoryDataMap.btdata
     End If
 End Function
-
-Public Sub Botw_InitHashesTable()
+Public Function Botw_InitHashesTable(ByRef strDataSource As String, ByRef stHashesTable() As stGameData, Optional ByRef strSeparator As String = "") As Long
 Dim xlsWorksheet As Worksheet
-Dim i As Long
-    Set xlsWorksheet = Worksheets("SaveData")
-    ReDim stHashesTable(1 To xlsWorksheet.Range("B1").Value)
-    With xlsWorksheet.Range("A1:A" + xlsWorksheet.Range("B1").Text).Cells
-    For i = .Rows.Count To 1 Step -1
-        stHashesTable(i).strDataName = .Item(i, 1).Text
-        stHashesTable(i).lngHash = Crc_CRC32(stHashesTable(i).strDataName)
-        'stHashesTable(i).strHash = Right("0000000" + Hex(stHashesTable(i).lngHash), 8)
-    Next i
-    End With
-    Set xlsWorksheet = Nothing
-End Sub
-
-Public Function Botw_GetGameSavePath(Optional ByVal strCemuFolderPath As String = "", Optional ByVal lngLngMinFileTimestamp As LongLong = 0) As String
-'Usage example with the immediate window: ?Botw_GetGameSavePath()
-Dim lngLngCurrentFileTimestamp As LongLong
-Dim strSaveFileName As String
-    strSaveFileName = Cemu_GetTitleId(strCemuFolderPath)
-    strCemuFolderPath = Replace(Cemu_GetMlc01Path(strCemuFolderPath), "/", "\") + "\usr\save\" + Left(strSaveFileName, 8) + "\" + Right(strSaveFileName, 8) + "\user\80000001\"
-    strSaveFileName = Dir(strCemuFolderPath + "?", vbDirectory)
-    If strSaveFileName <> "" Then
-        Do
-            strSaveFileName = strCemuFolderPath + strSaveFileName + "\game_data.sav"
-            lngLngCurrentFileTimestamp = File_getTimestamp(strSaveFileName)
-            If lngLngCurrentFileTimestamp > lngLngMinFileTimestamp Then
-                Botw_GetGameSavePath = strSaveFileName
-                lngLngMinFileTimestamp = lngLngCurrentFileTimestamp
-            End If
-            strSaveFileName = Dir
-        Loop Until strSaveFileName = ""
+    If strSeparator = "" Then
+        Set xlsWorksheet = Worksheets(strDataSource)
+        Botw_InitHashesTable = xlsWorksheet.Range("B1").Value
+        If Botw_InitHashesTable > 0 Then
+            ReDim stHashesTable(1 To Botw_InitHashesTable)
+            With xlsWorksheet.Range("A1:A" + xlsWorksheet.Range("B1").Text).Cells
+            Do
+                stHashesTable(Botw_InitHashesTable).strDataName = .Item(Botw_InitHashesTable, 1).Text
+                stHashesTable(Botw_InitHashesTable).lngHash = Crc_CRC32(stHashesTable(Botw_InitHashesTable).strDataName)
+                'stHashesTable(Botw_InitHashesTable).strHash = Right("0000000" + Hex(stHashesTable(Botw_InitHashesTable).lngHash), 8)
+                Botw_InitHashesTable = Botw_InitHashesTable - 1
+            Loop Until Botw_InitHashesTable = 0
+            Botw_InitHashesTable = .Rows.Count
+            End With
+        End If
+        Set xlsWorksheet = Nothing
+    Else
+        'TODO
     End If
 End Function
-
+Public Function Botw_GetGameSavePath(Optional ByRef strCemuFolderPath As String = "", Optional ByRef lngLngMinFileTimestamp As LongLong = 0) As String
+'Usage example with the immediate window: ?Botw_GetGameSavePath()
+    Botw_GetGameSavePath = Cemu_GetTitleId(strCemuFolderPath)
+    Botw_GetGameSavePath = File_GetMostRecentFileDir(Replace(Cemu_GetMlc01Path(strCemuFolderPath), "/", "\") + "\usr\save\" + Left(Botw_GetGameSavePath, 8) + "\" + Right(Botw_GetGameSavePath, 8) + "\user\80000001\", "?", "game_data.sav", lngLngMinFileTimestamp)
+End Function
 Public Function Botw_SaveDataCmp(Optional ByVal strCemuFolderPath As String = "") As Integer
 'Usage example with the immediate window: ?Botw_SaveDataCmp()
-'Input: D:\WiiU\1.25.6\mlc01\usr\save\00050000\101C9500\user\80000001\game_data.sav
-'Output: D:\WiiU\1.25.6\mlc01\usr\save\00050000\101C9500\user\80000001\?\game_data.sav.diff
+'Input: D:\WiiU\Default\mlc01\usr\save\00050000\101C9500\user\80000001\game_data.sav
+'Output: D:\WiiU\Default\mlc01\usr\save\00050000\101C9500\user\80000001\?\game_data.sav.diff
 '?: the most recent save slot
 Dim intFile As Integer
 Dim intOutFile As Integer
@@ -422,35 +473,42 @@ Dim lngSaveData(1 To 2) As Long
 Dim lngSaveDataIndex As Long
 Dim lngLngHash As LongLong
 Dim lngLngExpectedHash As LongLong
+Dim stHashesTable() As stGameData
     strCemuFolderPath = Botw_GetGameSavePath(strCemuFolderPath)
     If strCemuFolderPath <> "" Then
-        Call Botw_InitHashesTable
         intFile = FreeFile
-        Open strCemuFolderPath For Binary As intFile
+        Open strCemuFolderPath For Binary Access Read As intFile
         intOutFile = FreeFile
         Open strCemuFolderPath + ".diff" For Output As intOutFile
         Botw_SaveDataCmp = FreeFile
-        Open Left(strCemuFolderPath, Len(strCemuFolderPath) - 15) + "game_data.sav" For Binary As Botw_SaveDataCmp
+        Open Left(strCemuFolderPath, Len(strCemuFolderPath) - 15) + "game_data.sav" For Binary Access Read As Botw_SaveDataCmp
         Get Botw_SaveDataCmp, 9, lngSaveDataIndex
         Get intFile, 9, lngSaveDataIndex
-        lngSaveDataIndex = UBound(stHashesTable)
+        lngSaveDataIndex = Botw_InitHashesTable("Savedata", stHashesTable)
         Do Until EOF(Botw_SaveDataCmp)
             Get Botw_SaveDataCmp, , lngOldSaveData
             Get intFile, , lngSaveData
             If lngOldSaveData(2) <> lngSaveData(2) Then
-                lngSaveData(1) = Converter_SwapEndian(lngSaveData(1))
+                lngSaveData(1) = Converter_SwapEndian32(lngSaveData(1))
                 If stHashesTable(lngSaveDataIndex).lngHash <> lngSaveData(1) Then
+                    Print #intOutFile, Right("0000000" + Hex(lngOldSaveData(2)), 8);
+                    Print #intOutFile, " ";
+                    Print #intOutFile, Right("0000000" + Hex(lngSaveData(2)), 8);
+                    Print #intOutFile, " ";
+                    Print #intOutFile, Right("0000000" + Hex(lngSaveData(1)), 8);
+                    Print #intOutFile, " ";
                     lngLngHash = Converter_CULng(lngSaveData(1))
-                    strCemuFolderPath = Right("0000000" + Hex(lngSaveData(1)), 8)
                     Do While lngLngHash > lngLngExpectedHash And lngSaveDataIndex > 1
                         lngSaveDataIndex = lngSaveDataIndex - 1
                         lngLngExpectedHash = Converter_CULng(stHashesTable(lngSaveDataIndex).lngHash)
                     Loop
                     If lngLngHash = lngLngExpectedHash Then
-                        Print #intOutFile, stHashesTable(lngSaveDataIndex).strDataName + " " + strCemuFolderPath
+                        Print #intOutFile, stHashesTable(lngSaveDataIndex).strDataName;
+                        Print #intOutFile, " ";
                     Else
-                        Print #intOutFile, "UNKNOWN " + strCemuFolderPath
+                        Print #intOutFile, "UNKNOWN ";
                     End If
+                    Print #intOutFile, CStr(lngSaveData(1))
                 End If
             End If
         Loop
@@ -460,81 +518,103 @@ Dim lngLngExpectedHash As LongLong
         Erase stHashesTable
     End If
 End Function
-
-Private Function Botw_FGameDataCmp(ByVal intFile1 As Integer, ByVal intFile2 As Integer, ByVal lngOffset As Long, ByVal intDataSize As Integer, ByRef lngDataHash) As Long
-Static btBinData1(0 To 255) As Byte
-Static btBinData2(0 To 255) As Byte
+Private Function Botw_FGameDataCmp(ByVal intFile1 As Integer, ByVal intFile2 As Integer, ByVal lngOffset As Long, ByVal intDataSize As Integer, ByRef lngDataHash, ByRef strDataDump1 As String, ByRef strDataDump2 As String) As Long
+Static btBinData1(0 To 259) As Byte
+Static btBinData2(0 To 259) As Byte
     Get intFile1, lngOffset, btBinData1
     Get intFile2, lngOffset, btBinData2
     Call CopyMemory(VarPtr(lngDataHash), VarPtr(btBinData1(intDataSize - 4)), 4)
-    lngDataHash = Converter_SwapEndian(lngDataHash)
+    lngDataHash = Converter_SwapEndian32(lngDataHash)
+    strDataDump1 = Memory_HexDump(btBinData1, , "", intDataSize)
+    strDataDump2 = Memory_HexDump(btBinData2, , "", intDataSize)
     Botw_FGameDataCmp = CompareMemory(VarPtr(btBinData1(0)), VarPtr(btBinData2(0)), intDataSize)
 End Function
-
 Private Function Botw_FgetGameROMPlayerDataAddress(ByVal intFile As Integer, ByVal lngDeltaOffset As Long) As Long
 Static lngLowerOffsets(0 To 1) As Long
     If lngLowerOffsets(1) = 0 Then
-        lngLowerOffsets(0) = 48 '0x30
-        lngLowerOffsets(1) = 273039160 '0x10460000 + 0x3F38
+        lngLowerOffsets(0) = &H30
+        lngLowerOffsets(1) = &H10463F38
     End If
-    Botw_FgetGameROMPlayerDataAddress = File_getMappedDataAddress(intFile, lngDeltaOffset, lngLowerOffsets)
+    Botw_FgetGameROMPlayerDataAddress = File_GetMappedData(intFile, lngDeltaOffset, lngLowerOffsets)
 End Function
-
 Public Function Botw_FgetGameDataAddress(ByVal intFile As Integer, ByVal lngDeltaOffset As Long) As Long
 Static lngLowerOffsets(0 To 2) As Long
     If lngLowerOffsets(2) = 0 Then
         lngLowerOffsets(0) = 0
-        lngLowerOffsets(1) = 1808 '0x710
-        lngLowerOffsets(2) = 273077680 '0x10470000 - 0x2a50
+        lngLowerOffsets(1) = &H710
+        lngLowerOffsets(2) = &H1046D5B0 '0x10470000 - 0x2a50
     End If
-    Botw_FgetGameDataAddress = File_getMappedDataAddress(intFile, lngDeltaOffset, lngLowerOffsets)
+    Botw_FgetGameDataAddress = File_GetMappedData(intFile, lngDeltaOffset, lngLowerOffsets)
 End Function
-
 Public Function Botw_PgetGameROMPlayerDataAddress(ByRef lngProcess As Long, ByRef lngLngMemoryBase As LongLong) As Long
 Static lngLowerOffsets(0 To 1) As Long
     If lngLowerOffsets(1) = 0 Then
-        lngLowerOffsets(0) = 48 '0x30
-        lngLowerOffsets(1) = 273039160 '0x10460000 + 0x3F38
+        lngLowerOffsets(0) = &H30
+        lngLowerOffsets(1) = &H10463F38
     End If
-    Botw_PgetGameROMPlayerDataAddress = Memory_getMappedDataAddress(lngProcess, lngLngMemoryBase, lngLowerOffsets)
+    Botw_PgetGameROMPlayerDataAddress = Memory_GetMappedData(lngProcess, lngLngMemoryBase, lngLowerOffsets)
 End Function
-
 Public Function Botw_PgetGameDataAddress(ByRef lngProcess As Long, ByRef lngLngMemoryBase As LongLong) As Long
 Static lngLowerOffsets(0 To 2) As Long
     If lngLowerOffsets(2) = 0 Then
         lngLowerOffsets(0) = 0
-        lngLowerOffsets(1) = 1808 '0x710
-        lngLowerOffsets(2) = 273077680 '0x10470000 - 0x2a50
+        lngLowerOffsets(1) = &H710
+        lngLowerOffsets(2) = &H1046D5B0 '0x10470000 - 0x2a50
     End If
-    Botw_PgetGameDataAddress = Memory_getMappedDataAddress(lngProcess, lngLngMemoryBase, lngLowerOffsets)
+    Botw_PgetGameDataAddress = Memory_GetMappedData(lngProcess, lngLngMemoryBase, lngLowerOffsets)
 End Function
-
+Public Function Botw_PgetBasicGameDataAddress(ByRef lngProcess As Long, ByRef lngLngMemoryBase As LongLong) As Long
+'Greater then 0xA0000000 -> return a signed long
+Static lngLowerOffsets(0 To 2) As Long
+    If lngLowerOffsets(2) = 0 Then
+        lngLowerOffsets(0) = 0
+        lngLowerOffsets(1) = &H70C
+        lngLowerOffsets(2) = &H1046D5B0 '0x10470000 - 0x2a50
+    End If
+    Botw_PgetBasicGameDataAddress = Memory_GetMappedData(lngProcess, lngLngMemoryBase, lngLowerOffsets)
+End Function
+Public Function Botw_PgetSaveMgrQueuedUpdateDataAddress(ByRef lngProcess As Long, ByRef lngLngMemoryBase As LongLong) As Long
+Static lngLowerOffsets(0 To 1) As Long
+    If lngLowerOffsets(1) = 0 Then
+        lngLowerOffsets(0) = &H71C
+        lngLowerOffsets(1) = &H1046D5B0 '0x10470000 - 0x2a50
+    End If
+    Botw_PgetSaveMgrQueuedUpdateDataAddress = Memory_GetMappedData(lngProcess, lngLngMemoryBase, lngLowerOffsets)
+End Function
 Public Function Botw_PgetSaveDataAddress(ByRef lngProcess As Long, ByRef lngLngMemoryBase As LongLong) As Long
 Static lngLowerOffsets(0 To 1) As Long
     If lngLowerOffsets(1) = 0 Then
-        lngLowerOffsets(0) = 2336 '0x920
-        lngLowerOffsets(1) = 273077784 '0x10470000 - 0x29E8
+        lngLowerOffsets(0) = &H920
+        lngLowerOffsets(1) = &H1046D618 '0x10470000 - 0x29E8
     End If
-    Botw_PgetSaveDataAddress = Memory_getMappedDataAddress(lngProcess, lngLngMemoryBase, lngLowerOffsets)
+    Botw_PgetSaveDataAddress = Memory_GetMappedData(lngProcess, lngLngMemoryBase, lngLowerOffsets)
 End Function
-
-Public Function Botw_GameDataCmp(ByVal strDumpFolderPath1 As String, ByVal strDumpFolderPath2 As String) As Long
-'Usage example with the immediate window: ?Botw_GameDataCmp("D:\WiiU\bcml\dump\ramDump1623276340\", "D:\WiiU\bcml\dump\ramDump1624645914\")
-'Output: D:\WiiU\1.23.0\dump\ramDump1623276340-ramDump1624645914.txt
+Private Function Botw_BasicGameDataSize(ByRef stCurrentGameDataMap As stGameDataMap) As Integer
+    With stCurrentGameDataMap
+    If .intDataTypeSize < 4 Then
+        Botw_BasicGameDataSize = 4
+    ElseIf Left(.strDataType, 3) = "str" Then
+        Botw_BasicGameDataSize = .intDataTypeSize + 12
+    Else
+        Botw_BasicGameDataSize = .intDataTypeSize
+    End If
+    End With
+End Function
+Public Function Botw_GameDataCmp(ByVal strDumpFolderPath1 As String, ByVal strDumpFolderPath2 As String) As Integer
+'Usage example with the immediate window: ?Botw_GameDataCmp("D:\WiiU\Default\ramDump1623276340\", "D:\WiiU\Default\dump\ramDump1624645914\")
+'Output: D:\WiiU\Default\dump\ramDump1623276340-ramDump1624645914.txt
 Dim btGameDataMapsLength As Byte
 Dim intInputFile As Integer
 Dim intOutputFile As Integer
-Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
 Dim lngVectorDataAddresses() As Long
 Static lngDataArrayInfos(1 To 4) As Long
-    CEMU_DUMP_FILE = CEMU_DUMP_10000000
-    intInputFile = Cemu_openDumpFile(strDumpFolderPath1, CEMU_DUMP_FILE)
-    lngDataArrayInfos(1) = Botw_FgetGameDataAddress(intInputFile, CEMU_DUMP_FILE)
+    intInputFile = Cemu_OpenDumpFile(strDumpFolderPath1, CEMU_DUMP_10000000)
+    lngDataArrayInfos(1) = Botw_FgetGameDataAddress(intInputFile, CEMU_DUMP_10000000)
     If lngDataArrayInfos(1) <> 0 Then
-        Get intInputFile, lngDataArrayInfos(1) - CEMU_DUMP_FILE + 5, stGameBinDataMaps
+        Get intInputFile, lngDataArrayInfos(1) - CEMU_DUMP_10000000 + 5, stGameBinDataMaps
         Call Botw_InitGameDataMap(1)
-        Botw_GameDataCmp = Cemu_openDumpFile(strDumpFolderPath2, CEMU_DUMP_FILE)
-        btGameDataMapsLength = UBound(stGameDataMaps)
+        Botw_GameDataCmp = Cemu_OpenDumpFile(strDumpFolderPath2, CEMU_DUMP_10000000)
+        btGameDataMapsLength = BOTW_GAMEDATASCOUNT
         strDumpFolderPath1 = Left(strDumpFolderPath1, Len(strDumpFolderPath1) - 1)
         lngDataArrayInfos(1) = InStrRev(strDumpFolderPath1, "\")
         strDumpFolderPath2 = Mid(strDumpFolderPath2, lngDataArrayInfos(1) + 1)
@@ -542,27 +622,37 @@ Static lngDataArrayInfos(1 To 4) As Long
         Open Left(strDumpFolderPath1, lngDataArrayInfos(1)) + Mid(strDumpFolderPath1, lngDataArrayInfos(1) + 1) + "-" + Left(strDumpFolderPath2, Len(strDumpFolderPath2) - 1) + ".txt" For Output As intOutputFile
         Do
             If stGameBinDataMaps(btGameDataMapsLength).lngCount <> 0 Then
-                stGameBinDataMaps(btGameDataMapsLength).lngCount = Converter_SwapEndian(stGameBinDataMaps(btGameDataMapsLength).lngCount)
-                Call File_ReadLongDataSegment(intInputFile, Converter_SwapEndian(stGameBinDataMaps(btGameDataMapsLength).lngAddress) - CEMU_DUMP_FILE + 1, stGameBinDataMaps(btGameDataMapsLength).lngCount, lngVectorDataAddresses)
+                stGameBinDataMaps(btGameDataMapsLength).lngCount = Converter_SwapEndian32(stGameBinDataMaps(btGameDataMapsLength).lngCount)
+                Call File_ReadLongDataSegment(intInputFile, Converter_SwapEndian32(stGameBinDataMaps(btGameDataMapsLength).lngAddress) - CEMU_DUMP_10000000 + 1, stGameBinDataMaps(btGameDataMapsLength).lngCount, lngVectorDataAddresses)
                 With stGameDataMaps(btGameDataMapsLength)
-                Print #intOutputFile, vbCrLf + "[" + .stGameDatas(1).strDataName + "]"
+                Print #intOutputFile, vbCrLf;
+                Print #intOutputFile, "[";
+                Print #intOutputFile, .stGameDatas(1).strDataName;
+                Print #intOutputFile, "]"
                 Erase .stGameDatas
                 .intDataTypeSize = .intDataTypeSize + 4
                 If .intDataHashOffset < 0 Then
                     .intDataHashOffset = 8 - .intDataHashOffset
                     For stGameBinDataMaps(btGameDataMapsLength).lngSize = stGameBinDataMaps(btGameDataMapsLength).lngCount To 1 Step -1
-                        Get intInputFile, Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(btGameDataMapsLength).lngSize)) - CEMU_DUMP_FILE + 1, lngDataArrayInfos
-                        lngDataArrayInfos(1) = Converter_SwapEndian(lngDataArrayInfos(1))
-                        lngDataArrayInfos(4) = Converter_SwapEndian(lngDataArrayInfos(4)) + lngDataArrayInfos(1) * .intDataHashOffset - 3
+                        Get intInputFile, Converter_SwapEndian32(lngVectorDataAddresses(stGameBinDataMaps(btGameDataMapsLength).lngSize)) - CEMU_DUMP_10000000 + 1, lngDataArrayInfos
+                        lngDataArrayInfos(1) = Converter_SwapEndian32(lngDataArrayInfos(1))
+                        lngDataArrayInfos(4) = Converter_SwapEndian32(lngDataArrayInfos(4)) + lngDataArrayInfos(1) * .intDataHashOffset - 3
                         Do
-                            If Botw_FGameDataCmp(intInputFile, Botw_GameDataCmp, lngDataArrayInfos(4) - .intDataTypeSize, .intDataTypeSize, lngDataArrayInfos(2)) <> .intDataTypeSize Then Print #intOutputFile, Right("0000000" + Hex(lngDataArrayInfos(2)), 8) + " (" + CStr(lngDataArrayInfos(2)) + ") [" + CStr(lngDataArrayInfos(1)) + "]"
+                            If Botw_FGameDataCmp(intInputFile, Botw_GameDataCmp, lngDataArrayInfos(4) - .intDataTypeSize, .intDataTypeSize, lngDataArrayInfos(2), strDumpFolderPath1, strDumpFolderPath2) <> .intDataTypeSize Then
+                                GoSub Botw_GameDataCmpSub
+                                Print #intOutputFile, " ";
+                                Print #intOutputFile, CStr(lngDataArrayInfos(1))
+                            End If
                             lngDataArrayInfos(4) = lngDataArrayInfos(4) - stGameDataMaps(btGameDataMapsLength).intDataHashOffset
                             lngDataArrayInfos(1) = lngDataArrayInfos(1) - 1
                         Loop Until lngDataArrayInfos(1) = 0
                     Next stGameBinDataMaps(btGameDataMapsLength).lngSize
                 Else
                     For stGameBinDataMaps(btGameDataMapsLength).lngSize = stGameBinDataMaps(btGameDataMapsLength).lngCount To 1 Step -1
-                        If Botw_FGameDataCmp(intInputFile, Botw_GameDataCmp, Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(btGameDataMapsLength).lngSize)) - CEMU_DUMP_FILE + 5 + .intDataHashOffset - stGameDataMaps(btGameDataMapsLength).intDataTypeSize, stGameDataMaps(btGameDataMapsLength).intDataTypeSize, lngDataArrayInfos(2)) <> stGameDataMaps(btGameDataMapsLength).intDataTypeSize Then Print #intOutputFile, Right("0000000" + Hex(lngDataArrayInfos(2)), 8) + " (" + CStr(lngDataArrayInfos(2)) + ")"
+                        If Botw_FGameDataCmp(intInputFile, Botw_GameDataCmp, Converter_SwapEndian32(lngVectorDataAddresses(stGameBinDataMaps(btGameDataMapsLength).lngSize)) - CEMU_DUMP_10000000 + 5 + .intDataHashOffset - stGameDataMaps(btGameDataMapsLength).intDataTypeSize, stGameDataMaps(btGameDataMapsLength).intDataTypeSize, lngDataArrayInfos(2), strDumpFolderPath1, strDumpFolderPath2) <> stGameDataMaps(btGameDataMapsLength).intDataTypeSize Then
+                            GoSub Botw_GameDataCmpSub
+                            Print #intOutputFile, vbCrLf;
+                        End If
                     Next stGameBinDataMaps(btGameDataMapsLength).lngSize
                 End If
                 End With
@@ -574,43 +664,49 @@ Static lngDataArrayInfos(1 To 4) As Long
         Close Botw_GameDataCmp
     End If
     Close intInputFile
+    Exit Function
+Botw_GameDataCmpSub:
+    Print #intOutputFile, strDumpFolderPath1;
+    Print #intOutputFile, " ";
+    Print #intOutputFile, strDumpFolderPath2;
+    Print #intOutputFile, " ";
+    Print #intOutputFile, Right("0000000" + Hex(lngDataArrayInfos(2)), 8);
+    Print #intOutputFile, " ";
+    Print #intOutputFile, CStr(lngDataArrayInfos(2));
+    Return
 End Function
-
 Public Function Botw_MemorySearcherGameROMPlayerDataIniFile(Optional ByVal strCemuFolderPath As String = "") As Long
 'Usage example with the immediate window: ?Botw_MemorySearcherGameROMPlayerDataIniFile()
-'Output: D:\WiiU\1.23.0\memorySearcher\00050000101c9<3|4|5|X>00.ini
+'Output: D:\WiiU\Default\memorySearcher\00050000101c9<3|4|5|X>00.ini
 Dim stProcess As PROCESSENTRY32
 Dim stCemuLogData() As stExtractedTextData
 Dim lngLngMemoryBase As LongLong
     strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
     stProcess.dwFlags = File_ExtractText("Cemu.A2:C32", stCemuLogData, strCemuFolderPath + "log.txt", CEMU_LOG_WIIUMEMORYBASE Or CEMU_LOG_TITLEID)
     If stProcess.dwFlags = 2 Then
-        stProcess.dwSize = Cemu_openProcess(SYSTEM_PROC_VMREAD, stProcess)
+        stProcess.dwSize = Cemu_OpenProcess(SYSTEM_PROC_VMREAD, stProcess)
         If stProcess.dwSize <> 0 Then
-            If System_ToogleProcessById(stProcess.th32ProcessID, True) > 0 Then
+            If System_ToogleProcessById(stProcess.th32ProcessID, -1) > 0 Then
                 lngLngMemoryBase = CLngLng("&H" + stCemuLogData(1).objData.Item(0).SubMatches(0))
                 Botw_MemorySearcherGameROMPlayerDataIniFile = Botw_PgetGameROMPlayerDataAddress(stProcess.dwSize, lngLngMemoryBase)
                 If Botw_MemorySearcherGameROMPlayerDataIniFile <> 0 Then
-                    Call Cemu_InitMemorySearcherDataMap("GameROMPlayer")
                     stProcess.cntUsage = FreeFile
                     Open strCemuFolderPath + "memorySearcher\" + Left(stCemuLogData(2).objData.Item(0).SubMatches(0), 8) + Mid(stCemuLogData(2).objData.Item(0).SubMatches(0), 10) + ".ini" For Output As stProcess.cntUsage
-                    Call Cemu_WriteMemorySearcherIniFile(stProcess.cntUsage, stProcess.dwSize, Botw_MemorySearcherGameROMPlayerDataIniFile, lngLngMemoryBase)
+                    If Cemu_LoadMemorySearcherDataMap("GameROMPlayer") > 0 Then Call Cemu_WriteMemorySearcherIniFile(stProcess.cntUsage, stProcess.dwSize, Botw_MemorySearcherGameROMPlayerDataIniFile, lngLngMemoryBase)
                     Close stProcess.cntUsage
                 End If
-                System_ToogleProcessById stProcess.th32ProcessID, False
+                System_ToogleProcessById stProcess.th32ProcessID, 1
             End If
             CloseHandle stProcess.dwSize
         Else
             strCemuFolderPath = Cemu_GetDumpFolderPath(strCemuFolderPath)
             If strCemuFolderPath <> "" Then
-                stProcess.th32ProcessID = CEMU_DUMP_10000000
-                stProcess.dwSize = Cemu_openDumpFile(strCemuFolderPath, stProcess.th32ProcessID)
-                Botw_MemorySearcherGameROMPlayerDataIniFile = Botw_FgetGameROMPlayerDataAddress(stProcess.dwSize, stProcess.th32ProcessID)
+                stProcess.dwSize = Cemu_OpenDumpFile(strCemuFolderPath, CEMU_DUMP_10000000)
+                Botw_MemorySearcherGameROMPlayerDataIniFile = Botw_FgetGameROMPlayerDataAddress(stProcess.dwSize, CEMU_DUMP_10000000)
                 If Botw_MemorySearcherGameROMPlayerDataIniFile <> 0 Then
-                    Call Cemu_InitMemorySearcherDataMap("GameROMPlayer")
                     stProcess.cntUsage = FreeFile
                     Open strCemuFolderPath + "..\..\memorySearcher\" + Left(stCemuLogData(2).objData.Item(0).SubMatches(0), 8) + Mid(stCemuLogData(2).objData.Item(0).SubMatches(0), 10) + ".ini" For Output As stProcess.cntUsage
-                    Call Cemu_WriteMemorySearcherIniFile(stProcess.cntUsage, stProcess.dwSize, Botw_MemorySearcherGameROMPlayerDataIniFile, stProcess.th32ProcessID)
+                    If Cemu_LoadMemorySearcherDataMap("GameROMPlayer") > 0 Then Call Cemu_WriteMemorySearcherIniFile(stProcess.cntUsage, stProcess.dwSize, Botw_MemorySearcherGameROMPlayerDataIniFile, CEMU_DUMP_10000000)
                     Close stProcess.cntUsage
                 End If
                 Close stProcess.dwSize
@@ -621,116 +717,144 @@ Dim lngLngMemoryBase As LongLong
         Erase stCemuLogData
     End If
 End Function
-
 Public Function Botw_MemorySearcherGameDataIniFile(Optional ByVal strCemuFolderPath As String = "") As Long
 'Usage example with the immediate window: ?Botw_MemorySearcherGameDataIniFile()
-'Output: D:\WiiU\1.23.0\memorySearcher\00050000101c9<3|4|5|X>00.ini
+'Output: D:\WiiU\Default\memorySearcher\00050000101c9<3|4|5|X>00.ini
 Dim stProcess As PROCESSENTRY32
 Dim stCemuLogData() As stExtractedTextData
 Dim lngLngMemoryBase As LongLong
-Dim lngVectorDataAddresses() As Long
-Static lngDataArrayInfos(1 To 4) As Long
+Dim lngGameDataAddresses() As Long
+Dim lngBasicGameDataAddresses() As Long
+Static lngGameDataArrayInfos(1 To 4) As Long
+Static lngBasicGameDataArrayInfos(1 To 4) As Long
+Static stBasicGameBinDataMaps(1 To BOTW_GAMEDATASCOUNT) As stGameBinDataMap
     strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
     stProcess.dwFlags = File_ExtractText("Cemu.A2:C32", stCemuLogData, strCemuFolderPath + "log.txt", CEMU_LOG_WIIUMEMORYBASE Or CEMU_LOG_TITLEID)
     If stProcess.dwFlags = 2 Then
-        stProcess.dwSize = Cemu_openProcess(SYSTEM_PROC_VMREAD, stProcess)
+        stProcess.dwSize = Cemu_OpenProcess(SYSTEM_PROC_VMREAD, stProcess)
         If stProcess.dwSize <> 0 Then
-            If System_ToogleProcessById(stProcess.th32ProcessID, True) > 0 Then
+            If System_ToogleProcessById(stProcess.th32ProcessID, -1) > 0 Then
                 lngLngMemoryBase = CLngLng("&H" + stCemuLogData(1).objData.Item(0).SubMatches(0))
-                Botw_MemorySearcherGameDataIniFile = Botw_PgetGameDataAddress(stProcess.dwSize, lngLngMemoryBase)
+                Botw_MemorySearcherGameDataIniFile = Botw_PgetBasicGameDataAddress(stProcess.dwSize, lngLngMemoryBase)
                 If Botw_MemorySearcherGameDataIniFile <> 0 Then
-                    If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Botw_MemorySearcherGameDataIniFile + 4, VarPtr(stGameBinDataMaps(1)), 216, 0) <> 0 Then
-                        Call Botw_InitGameDataMap(7)
-                        stCemuLogData(1).intLine = UBound(stGameDataMaps)
-                        stProcess.cntUsage = FreeFile
-                        Open strCemuFolderPath + "memorySearcher\" + Left(stCemuLogData(2).objData.Item(0).SubMatches(0), 8) + Mid(stCemuLogData(2).objData.Item(0).SubMatches(0), 10) + ".ini" For Output As stProcess.cntUsage
-                        Do
-                            If stGameDataMaps(stCemuLogData(1).intLine).intDataCount <> 0 Then
-                                If stGameBinDataMaps(stCemuLogData(1).intLine).lngCount <> 0 Then
-                                    stGameBinDataMaps(stCemuLogData(1).intLine).lngCount = Converter_SwapEndian(stGameBinDataMaps(stCemuLogData(1).intLine).lngCount)
-                                    If System_ReadProcessLongMemoryDataSegment(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian(stGameBinDataMaps(stCemuLogData(1).intLine).lngAddress), stGameBinDataMaps(stCemuLogData(1).intLine).lngCount, lngVectorDataAddresses) <> 0 Then
-                                        If stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset < 0 Then
-                                            stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset = 8 - stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
-                                            For stGameBinDataMaps(stCemuLogData(1).intLine).lngSize = stGameBinDataMaps(stCemuLogData(1).intLine).lngCount To 1 Step -1
-                                                If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)), VarPtr(lngDataArrayInfos(1)), 16, 0) <> 0 Then
-                                                    lngDataArrayInfos(1) = Converter_SwapEndian(lngDataArrayInfos(1))
-                                                    lngDataArrayInfos(4) = Converter_SwapEndian(lngDataArrayInfos(4)) + lngDataArrayInfos(1) * stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset - 8
-                                                    If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + lngDataArrayInfos(4), VarPtr(lngDataArrayInfos(2)), 4, 0) <> 0 Then
-                                                        lngDataArrayInfos(2) = Converter_SwapEndian(lngDataArrayInfos(2))
-                                                        GoSub Botw_MemorySearcherGameDataIniFileSub0
-                                                        If stGameDataMaps(stCemuLogData(1).intLine).intDataCount = 0 Then Exit For
+                    If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Botw_MemorySearcherGameDataIniFile + 4294967300^, VarPtr(stBasicGameBinDataMaps(1)), 216, 0) <> 0 Then
+                        Botw_MemorySearcherGameDataIniFile = Botw_PgetGameDataAddress(stProcess.dwSize, lngLngMemoryBase)
+                        If Botw_MemorySearcherGameDataIniFile <> 0 Then
+                            If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Botw_MemorySearcherGameDataIniFile + 4, VarPtr(stGameBinDataMaps(1)), 216, 0) <> 0 Then
+                                Call Botw_InitGameDataMap(7)
+                                stCemuLogData(1).intLine = BOTW_GAMEDATASCOUNT
+                                stProcess.cntUsage = FreeFile
+                                Open strCemuFolderPath + "memorySearcher\" + Left(stCemuLogData(2).objData.Item(0).SubMatches(0), 8) + Mid(stCemuLogData(2).objData.Item(0).SubMatches(0), 10) + ".ini" For Output As stProcess.cntUsage
+                                Do
+                                    If stGameDataMaps(stCemuLogData(1).intLine).lngDataCount <> 0 Then
+                                        If stGameBinDataMaps(stCemuLogData(1).intLine).lngCount <> 0 Then
+                                            stGameBinDataMaps(stCemuLogData(1).intLine).lngCount = Converter_SwapEndian32(stGameBinDataMaps(stCemuLogData(1).intLine).lngCount)
+                                            If Memory_ReadProcessLongMemoryDataSegment(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian32(stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress) + 4294967296^, stGameBinDataMaps(stCemuLogData(1).intLine).lngCount, lngBasicGameDataAddresses) <> 0 Then
+                                                If Memory_ReadProcessLongMemoryDataSegment(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian32(stGameBinDataMaps(stCemuLogData(1).intLine).lngAddress), stGameBinDataMaps(stCemuLogData(1).intLine).lngCount, lngGameDataAddresses) <> 0 Then
+                                                    stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress = Botw_BasicGameDataSize(stGameDataMaps(stCemuLogData(1).intLine))
+                                                    Botw_MemorySearcherGameDataIniFile = 8 + stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress
+                                                    If stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset < 0 Then
+                                                        stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset = 8 - stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
+                                                        For stGameBinDataMaps(stCemuLogData(1).intLine).lngSize = stGameBinDataMaps(stCemuLogData(1).intLine).lngCount To 1 Step -1
+                                                            If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian32(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + 4294967296^, VarPtr(lngBasicGameDataArrayInfos(1)), 16, 0) <> 0 Then
+                                                                If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Converter_SwapEndian32(lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)), VarPtr(lngGameDataArrayInfos(1)), 16, 0) <> 0 Then
+                                                                    lngGameDataArrayInfos(1) = Converter_SwapEndian32(lngGameDataArrayInfos(1))
+                                                                    lngGameDataArrayInfos(4) = Converter_SwapEndian32(lngGameDataArrayInfos(4)) + lngGameDataArrayInfos(1) * stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset - 8
+                                                                    lngBasicGameDataArrayInfos(4) = Converter_SwapEndian32(lngBasicGameDataArrayInfos(4)) + lngGameDataArrayInfos(1) * Botw_MemorySearcherGameDataIniFile
+                                                                    If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + lngGameDataArrayInfos(4), VarPtr(lngGameDataArrayInfos(2)), 4, 0) <> 0 Then
+                                                                        lngGameDataArrayInfos(2) = Converter_SwapEndian32(lngGameDataArrayInfos(2))
+                                                                        GoSub Botw_MemorySearcherGameDataIniFileSub0
+                                                                        If stGameDataMaps(stCemuLogData(1).intLine).lngDataCount = 0 Then Exit For
+                                                                    End If
+                                                                End If
+                                                            End If
+                                                        Next stGameBinDataMaps(stCemuLogData(1).intLine).lngSize
+                                                    Else
+                                                        For stGameBinDataMaps(stCemuLogData(1).intLine).lngSize = stGameBinDataMaps(stCemuLogData(1).intLine).lngCount To 1 Step -1
+                                                            lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) = Converter_SwapEndian32(lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
+                                                            lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) = Converter_SwapEndian32(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + Botw_MemorySearcherGameDataIniFile
+                                                            If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize), VarPtr(lngGameDataArrayInfos(2)), 4, 0) <> 0 Then
+                                                                If Converter_SwapEndian32(lngGameDataArrayInfos(2)) = stGameDataMaps(stCemuLogData(1).intLine).stGameDatas(stGameDataMaps(stCemuLogData(1).intLine).lngDataCount).lngHash Then
+                                                                    GoSub Botw_MemorySearcherGameDataIniFileSub1
+                                                                    stGameDataMaps(stCemuLogData(1).intLine).lngDataCount = stGameDataMaps(stCemuLogData(1).intLine).lngDataCount - 1
+                                                                    If stGameDataMaps(stCemuLogData(1).intLine).lngDataCount = 0 Then Exit For
+                                                                End If
+                                                            End If
+                                                        Next stGameBinDataMaps(stCemuLogData(1).intLine).lngSize
                                                     End If
                                                 End If
-                                            Next stGameBinDataMaps(stCemuLogData(1).intLine).lngSize
-                                        Else
-                                            For stGameBinDataMaps(stCemuLogData(1).intLine).lngSize = stGameBinDataMaps(stCemuLogData(1).intLine).lngCount To 1 Step -1
-                                                lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) = Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
-                                                If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize), VarPtr(lngDataArrayInfos(2)), 4, 0) <> 0 Then
-                                                    If Converter_SwapEndian(lngDataArrayInfos(2)) = stGameDataMaps(stCemuLogData(1).intLine).stGameDatas(stGameDataMaps(stCemuLogData(1).intLine).intDataCount).lngHash Then
-                                                        GoSub Botw_MemorySearcherGameDataIniFileSub1
-                                                        stGameDataMaps(stCemuLogData(1).intLine).intDataCount = stGameDataMaps(stCemuLogData(1).intLine).intDataCount - 1
-                                                        If stGameDataMaps(stCemuLogData(1).intLine).intDataCount = 0 Then Exit For
-                                                    End If
-                                                End If
-                                            Next stGameBinDataMaps(stCemuLogData(1).intLine).lngSize
+                                                Erase lngGameDataAddresses
+                                            End If
+                                            Erase lngBasicGameDataAddresses
                                         End If
+                                        Erase stGameDataMaps(stCemuLogData(1).intLine).stGameDatas
                                     End If
-                                    Erase lngVectorDataAddresses
-                                End If
+                                    stCemuLogData(1).intLine = stCemuLogData(1).intLine - 1
+                                Loop Until stCemuLogData(1).intLine = 0
+                                Close stProcess.cntUsage
                             End If
-                            stCemuLogData(1).intLine = stCemuLogData(1).intLine - 1
-                        Loop Until stCemuLogData(1).intLine = 0
-                        Close stProcess.cntUsage
+                        End If
                     End If
                 End If
-                System_ToogleProcessById stProcess.th32ProcessID, False
+                System_ToogleProcessById stProcess.th32ProcessID, 1
             End If
             CloseHandle stProcess.dwSize
         Else
             strCemuFolderPath = Cemu_GetDumpFolderPath(strCemuFolderPath)
             If strCemuFolderPath <> "" Then
-                stProcess.th32ProcessID = CEMU_DUMP_10000000
-                stProcess.dwSize = Cemu_openDumpFile(strCemuFolderPath, stProcess.th32ProcessID)
-                Botw_MemorySearcherGameDataIniFile = Botw_FgetGameDataAddress(stProcess.dwSize, stProcess.th32ProcessID)
+                stProcess.dwSize = Cemu_OpenDumpFile(strCemuFolderPath, CEMU_DUMP_10000000)
+                Botw_MemorySearcherGameDataIniFile = Botw_FgetGameDataAddress(stProcess.dwSize, CEMU_DUMP_10000000)
                 If Botw_MemorySearcherGameDataIniFile <> 0 Then
-                    Get stProcess.dwSize, Botw_MemorySearcherGameDataIniFile - stProcess.th32ProcessID + 5, stGameBinDataMaps
+                    Get stProcess.dwSize, Botw_MemorySearcherGameDataIniFile - CEMU_DUMP_10000000 + 5, stGameBinDataMaps
+                    stProcess.cntThreads = Cemu_OpenDumpFile(strCemuFolderPath, CEMU_DUMP_A0000000)
+                    Botw_MemorySearcherGameDataIniFile = Botw_PgetBasicGameDataAddress(stProcess.cntThreads, lngLngMemoryBase)
+                    Get stProcess.dwSize, Botw_MemorySearcherGameDataIniFile - CEMU_DUMP_A0000000 + 5, stBasicGameBinDataMaps
                     Call Botw_InitGameDataMap(7)
-                    stCemuLogData(1).intLine = UBound(stGameDataMaps)
+                    stCemuLogData(1).intLine = BOTW_GAMEDATASCOUNT
                     stProcess.cntUsage = FreeFile
                     Open strCemuFolderPath + "..\..\memorySearcher\" + Left(stCemuLogData(2).objData.Item(0).SubMatches(0), 8) + Mid(stCemuLogData(2).objData.Item(0).SubMatches(0), 10) + ".ini" For Output As stProcess.cntUsage
                     Do
-                        If stGameDataMaps(stCemuLogData(1).intLine).intDataCount <> 0 Then
+                        If stGameDataMaps(stCemuLogData(1).intLine).lngDataCount <> 0 Then
                             If stGameBinDataMaps(stCemuLogData(1).intLine).lngCount <> 0 Then
-                                stGameBinDataMaps(stCemuLogData(1).intLine).lngCount = Converter_SwapEndian(stGameBinDataMaps(stCemuLogData(1).intLine).lngCount)
-                                Call File_ReadLongDataSegment(stProcess.dwSize, Converter_SwapEndian(stGameBinDataMaps(stCemuLogData(1).intLine).lngAddress) - stProcess.th32ProcessID + 1, stGameBinDataMaps(stCemuLogData(1).intLine).lngCount, lngVectorDataAddresses)
+                                stGameBinDataMaps(stCemuLogData(1).intLine).lngCount = Converter_SwapEndian32(stGameBinDataMaps(stCemuLogData(1).intLine).lngCount)
+                                Call File_ReadLongDataSegment(stProcess.dwSize, Converter_SwapEndian32(stGameBinDataMaps(stCemuLogData(1).intLine).lngAddress) - CEMU_DUMP_10000000 + 1, stGameBinDataMaps(stCemuLogData(1).intLine).lngCount, lngGameDataAddresses)
+                                Call File_ReadLongDataSegment(stProcess.cntThreads, Converter_SwapEndian32(stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress) - CEMU_DUMP_A0000000 + 1, stGameBinDataMaps(stCemuLogData(1).intLine).lngCount, lngBasicGameDataAddresses)
+                                stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress = Botw_BasicGameDataSize(stGameDataMaps(stCemuLogData(1).intLine))
+                                Botw_MemorySearcherGameDataIniFile = 8 + stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress
                                 If stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset < 0 Then
                                     stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset = 8 - stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
                                     For stGameBinDataMaps(stCemuLogData(1).intLine).lngSize = stGameBinDataMaps(stCemuLogData(1).intLine).lngCount To 1 Step -1
-                                        Get stProcess.dwSize, Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) - stProcess.th32ProcessID + 1, lngDataArrayInfos
-                                        lngDataArrayInfos(1) = Converter_SwapEndian(lngDataArrayInfos(1))
-                                        lngDataArrayInfos(4) = Converter_SwapEndian(lngDataArrayInfos(4)) + lngDataArrayInfos(1) * stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset - 8
-                                        Get stProcess.dwSize, lngDataArrayInfos(4) - stProcess.th32ProcessID + 1, lngDataArrayInfos(2)
-                                        lngDataArrayInfos(2) = Converter_SwapEndian(lngDataArrayInfos(2))
+                                        Get stProcess.dwSize, Converter_SwapEndian32(lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) - CEMU_DUMP_10000000 + 1, lngGameDataArrayInfos
+                                        Get stProcess.cntThreads, Converter_SwapEndian32(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) - CEMU_DUMP_A0000000 + 1, lngBasicGameDataArrayInfos
+                                        lngGameDataArrayInfos(1) = Converter_SwapEndian32(lngGameDataArrayInfos(1))
+                                        lngGameDataArrayInfos(4) = Converter_SwapEndian32(lngGameDataArrayInfos(4)) + lngGameDataArrayInfos(1) * stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset - 8
+                                        lngBasicGameDataArrayInfos(4) = Converter_SwapEndian32(lngBasicGameDataArrayInfos(4)) + lngGameDataArrayInfos(1) * Botw_MemorySearcherGameDataIniFile
+                                        Get stProcess.dwSize, lngGameDataArrayInfos(4) - CEMU_DUMP_10000000 + 1, lngGameDataArrayInfos(2)
+                                        lngGameDataArrayInfos(2) = Converter_SwapEndian32(lngGameDataArrayInfos(2))
                                         GoSub Botw_MemorySearcherGameDataIniFileSub0
-                                        If stGameDataMaps(stCemuLogData(1).intLine).intDataCount = 0 Then Exit For
+                                        If stGameDataMaps(stCemuLogData(1).intLine).lngDataCount = 0 Then Exit For
                                     Next stGameBinDataMaps(stCemuLogData(1).intLine).lngSize
                                 Else
                                     For stGameBinDataMaps(stCemuLogData(1).intLine).lngSize = stGameBinDataMaps(stCemuLogData(1).intLine).lngCount To 1 Step -1
-                                        lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) = Converter_SwapEndian(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
-                                        Get stProcess.dwSize, lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.th32ProcessID + 1, lngDataArrayInfos(2)
-                                        If Converter_SwapEndian(lngDataArrayInfos(2)) = stGameDataMaps(stCemuLogData(1).intLine).stGameDatas(stGameDataMaps(stCemuLogData(1).intLine).intDataCount).lngHash Then
+                                        lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) = Converter_SwapEndian32(lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + stGameDataMaps(stCemuLogData(1).intLine).intDataHashOffset
+                                        lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) = Converter_SwapEndian32(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize)) + Botw_MemorySearcherGameDataIniFile
+                                        Get stProcess.dwSize, lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - CEMU_DUMP_10000000 + 1, lngGameDataArrayInfos(2)
+                                        If Converter_SwapEndian32(lngGameDataArrayInfos(2)) = stGameDataMaps(stCemuLogData(1).intLine).stGameDatas(stGameDataMaps(stCemuLogData(1).intLine).lngDataCount).lngHash Then
                                             GoSub Botw_MemorySearcherGameDataIniFileSub1
-                                            stGameDataMaps(stCemuLogData(1).intLine).intDataCount = stGameDataMaps(stCemuLogData(1).intLine).intDataCount - 1
-                                            If stGameDataMaps(stCemuLogData(1).intLine).intDataCount = 0 Then Exit For
+                                            stGameDataMaps(stCemuLogData(1).intLine).lngDataCount = stGameDataMaps(stCemuLogData(1).intLine).lngDataCount - 1
+                                            If stGameDataMaps(stCemuLogData(1).intLine).lngDataCount = 0 Then Exit For
                                         End If
                                     Next stGameBinDataMaps(stCemuLogData(1).intLine).lngSize
                                 End If
-                                Erase lngVectorDataAddresses
+                                Erase lngBasicGameDataAddresses
+                                Erase lngGameDataAddresses
                             End If
+                            Erase stGameDataMaps(stCemuLogData(1).intLine).stGameDatas
                         End If
                         stCemuLogData(1).intLine = stCemuLogData(1).intLine - 1
                     Loop Until stCemuLogData(1).intLine = 0
                     Close stProcess.cntUsage
+                    Close stProcess.cntThreads
                 End If
                 Close stProcess.dwSize
             End If
@@ -742,68 +866,68 @@ Static lngDataArrayInfos(1 To 4) As Long
     Exit Function
 Botw_MemorySearcherGameDataIniFileSub0:
     With stGameDataMaps(stCemuLogData(1).intLine)
-    For lngDataArrayInfos(3) = .intDataCount To 1 Step -1
-        If .stGameDatas(lngDataArrayInfos(3)).lngHash = lngDataArrayInfos(2) Then
-            .stGameDatas(lngDataArrayInfos(3)).strDataName = "[Entry]" + vbCrLf + "description=" + .stGameDatas(lngDataArrayInfos(3)).strDataName + "["
-            .stGameDatas(lngDataArrayInfos(3)).strHash = "]," + .stGameDatas(lngDataArrayInfos(3)).strHash + "(" + CStr(lngDataArrayInfos(2)) + ")" + vbCrLf + "address=0x"
+    For lngGameDataArrayInfos(3) = .lngDataCount To 1 Step -1
+        If .stGameDatas(lngGameDataArrayInfos(3)).lngHash = lngGameDataArrayInfos(2) Then
+            .stGameDatas(lngGameDataArrayInfos(3)).strDataName = .stGameDatas(lngGameDataArrayInfos(3)).strDataName + ","
+            .stGameDatas(lngGameDataArrayInfos(3)).strHash = "," + .stGameDatas(lngGameDataArrayInfos(3)).strHash + "," + CStr(lngGameDataArrayInfos(2)) + ","
             If Left(.strDataType, 3) = "str" Then
-                strCemuFolderPath = vbCrLf + "type=int64" + vbCrLf + "value=" + vbCrLf
                 Do
+                    strCemuFolderPath = .stGameDatas(lngGameDataArrayInfos(3)).strDataName + CStr(lngGameDataArrayInfos(1)) + .stGameDatas(lngGameDataArrayInfos(3)).strHash
                     For stProcess.dwFlags = .intDataTypeSize To 8 Step -8
-                        Print #stProcess.cntUsage, .stGameDatas(lngDataArrayInfos(3)).strDataName + CStr(lngDataArrayInfos(1)) + .stGameDatas(lngDataArrayInfos(3)).strHash + Hex(lngDataArrayInfos(4) - stProcess.dwFlags) + strCemuFolderPath
+                        Call Cemu_WriteMemorySearcherEntry(stProcess.cntUsage, strCemuFolderPath + Hex(lngBasicGameDataArrayInfos(4) - stProcess.dwFlags), lngGameDataArrayInfos(4) - stProcess.dwFlags, "int64")
                     Next stProcess.dwFlags
-                    lngDataArrayInfos(4) = lngDataArrayInfos(4) - .intDataHashOffset
-                    lngDataArrayInfos(1) = lngDataArrayInfos(1) - 1
-                Loop Until lngDataArrayInfos(1) = 0
+                    lngGameDataArrayInfos(4) = lngGameDataArrayInfos(4) - .intDataHashOffset
+                    lngBasicGameDataArrayInfos(4) = lngBasicGameDataArrayInfos(4) - Botw_MemorySearcherGameDataIniFile
+                    lngGameDataArrayInfos(1) = lngGameDataArrayInfos(1) - 1
+                Loop Until lngGameDataArrayInfos(1) = 0
             Else
-                strCemuFolderPath = vbCrLf + "type=" + .strDataType + vbCrLf + "value=" + vbCrLf
                 If .intDataTypeSize > 4 Then
                     Do
+                        strCemuFolderPath = .stGameDatas(lngGameDataArrayInfos(3)).strDataName + CStr(lngGameDataArrayInfos(1)) + .stGameDatas(lngGameDataArrayInfos(3)).strHash
                         For stProcess.dwFlags = .intDataTypeSize To 4 Step -4
-                            Print #stProcess.cntUsage, .stGameDatas(lngDataArrayInfos(3)).strDataName + CStr(lngDataArrayInfos(1)) + .stGameDatas(lngDataArrayInfos(3)).strHash + Hex(lngDataArrayInfos(4) - stProcess.dwFlags) + strCemuFolderPath
+                            Call Cemu_WriteMemorySearcherEntry(stProcess.cntUsage, strCemuFolderPath + Hex(lngBasicGameDataArrayInfos(4) - stProcess.dwFlags), lngGameDataArrayInfos(4) - stProcess.dwFlags, .strDataType)
                         Next stProcess.dwFlags
-                        lngDataArrayInfos(4) = lngDataArrayInfos(4) - .intDataHashOffset
-                        lngDataArrayInfos(1) = lngDataArrayInfos(1) - 1
-                    Loop Until lngDataArrayInfos(1) = 0
+                        lngGameDataArrayInfos(4) = lngGameDataArrayInfos(4) - .intDataHashOffset
+                        lngBasicGameDataArrayInfos(4) = lngBasicGameDataArrayInfos(4) - Botw_MemorySearcherGameDataIniFile
+                        lngGameDataArrayInfos(1) = lngGameDataArrayInfos(1) - 1
+                    Loop Until lngGameDataArrayInfos(1) = 0
                 Else
-                    lngDataArrayInfos(4) = lngDataArrayInfos(4) - .intDataTypeSize
+                    lngGameDataArrayInfos(4) = lngGameDataArrayInfos(4) - .intDataTypeSize
+                    lngBasicGameDataArrayInfos(4) = lngBasicGameDataArrayInfos(4) - stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress
                     Do
-                        Print #stProcess.cntUsage, .stGameDatas(lngDataArrayInfos(3)).strDataName + CStr(lngDataArrayInfos(1)) + .stGameDatas(lngDataArrayInfos(3)).strHash + Hex(lngDataArrayInfos(4)) + strCemuFolderPath
-                        lngDataArrayInfos(4) = lngDataArrayInfos(4) - .intDataHashOffset
-                        lngDataArrayInfos(1) = lngDataArrayInfos(1) - 1
-                    Loop Until lngDataArrayInfos(1) = 0
+                        Call Cemu_WriteMemorySearcherEntry(stProcess.cntUsage, .stGameDatas(lngGameDataArrayInfos(3)).strDataName + CStr(lngGameDataArrayInfos(1)) + .stGameDatas(lngGameDataArrayInfos(3)).strHash + Hex(lngBasicGameDataArrayInfos(4)), lngGameDataArrayInfos(4), .strDataType)
+                        lngGameDataArrayInfos(4) = lngGameDataArrayInfos(4) - .intDataHashOffset
+                        lngBasicGameDataArrayInfos(4) = lngBasicGameDataArrayInfos(4) - Botw_MemorySearcherGameDataIniFile
+                        lngGameDataArrayInfos(1) = lngGameDataArrayInfos(1) - 1
+                    Loop Until lngGameDataArrayInfos(1) = 0
                 End If
             End If
-            If lngDataArrayInfos(3) <> .intDataCount Then .stGameDatas(lngDataArrayInfos(3)) = .stGameDatas(.intDataCount)
-            .intDataCount = .intDataCount - 1
+            If lngGameDataArrayInfos(3) <> .lngDataCount Then .stGameDatas(lngGameDataArrayInfos(3)) = .stGameDatas(.lngDataCount)
+            .lngDataCount = .lngDataCount - 1
             Exit For
         End If
-    Next lngDataArrayInfos(3)
+    Next lngGameDataArrayInfos(3)
     End With
     Return
 Botw_MemorySearcherGameDataIniFileSub1:
     With stGameDataMaps(stCemuLogData(1).intLine)
-    .stGameDatas(.intDataCount).strDataName = "[Entry]" + vbCrLf + "description=" + .stGameDatas(.intDataCount).strDataName
-    .stGameDatas(.intDataCount).strHash = "," + .stGameDatas(.intDataCount).strHash + "(" + CStr(.stGameDatas(.intDataCount).lngHash) + ")" + vbCrLf + "address=0x"
+    .stGameDatas(.lngDataCount).strDataName = .stGameDatas(.lngDataCount).strDataName + "," + .stGameDatas(.lngDataCount).strHash + "," + CStr(.stGameDatas(.lngDataCount).lngHash) + ","
     If Left(.strDataType, 3) = "str" Then
-        strCemuFolderPath = vbCrLf + "type=int64" + vbCrLf + "value=" + vbCrLf
         For stProcess.dwFlags = .intDataTypeSize To 8 Step -8
-            Print #stProcess.cntUsage, .stGameDatas(.intDataCount).strDataName + .stGameDatas(.intDataCount).strHash + Hex(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.dwFlags) + strCemuFolderPath
+            Call Cemu_WriteMemorySearcherEntry(stProcess.cntUsage, .stGameDatas(.lngDataCount).strDataName + Hex(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.dwFlags), lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.dwFlags, "int64")
         Next stProcess.dwFlags
     Else
-        strCemuFolderPath = vbCrLf + "type=" + .strDataType + vbCrLf + "value=" + vbCrLf
         If .intDataTypeSize > 4 Then
             For stProcess.dwFlags = .intDataTypeSize To 4 Step -4
-                Print #stProcess.cntUsage, .stGameDatas(.intDataCount).strDataName + .stGameDatas(.intDataCount).strHash + Hex(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.dwFlags) + strCemuFolderPath
+                Call Cemu_WriteMemorySearcherEntry(stProcess.cntUsage, .stGameDatas(.lngDataCount).strDataName + Hex(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.dwFlags), lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stProcess.dwFlags, .strDataType)
             Next stProcess.dwFlags
         Else
-            Print #stProcess.cntUsage, .stGameDatas(.intDataCount).strDataName + .stGameDatas(.intDataCount).strHash + Hex(lngVectorDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - .intDataTypeSize) + strCemuFolderPath
+            Call Cemu_WriteMemorySearcherEntry(stProcess.cntUsage, .stGameDatas(.lngDataCount).strDataName + Hex(lngBasicGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - stBasicGameBinDataMaps(stCemuLogData(1).intLine).lngAddress), lngGameDataAddresses(stGameBinDataMaps(stCemuLogData(1).intLine).lngSize) - .intDataTypeSize, .strDataType)
         End If
     End If
     End With
     Return
 End Function
-
 Private Function Botw_NextMapUnitObject(ByRef stMapUnitObjects() As stMapObject, ByVal intStartIndex As Integer, ByRef btSearchByte As Byte) As Integer
     Botw_NextMapUnitObject = intStartIndex
     Do Until Botw_NextMapUnitObject = 0
@@ -814,7 +938,6 @@ Private Function Botw_NextMapUnitObject(ByRef stMapUnitObjects() As stMapObject,
         Botw_NextMapUnitObject = Botw_NextMapUnitObject - 1
     Loop
 End Function
-
 Public Function Botw_LoadMapObjectsData(ByVal strWkSheetName As String, ByRef stMapObjects() As stMapObject) As Integer
 Dim stCurrentMapObject As stMapObject
 Dim xlsRange As Range
@@ -835,7 +958,7 @@ Dim xlsWkSheet As Worksheet
                 Exit For
             Else
                 .strHashId = Right("0000000" + .strHashId, 8)
-                .lngHashId = Converter_SwapEndian(CLng("&H" + .strHashId))
+                .lngHashId = Converter_SwapEndian32(CLng("&H" + .strHashId))
                 For i = Botw_LoadMapObjectsData - 1 To 1 Step -1
                     If .strHashId < stMapObjects(i).strHashId Then
                         Exit For
@@ -870,9 +993,9 @@ Dim xlsWkSheet As Worksheet
                         .lngCoordinates(2) = Converter_Sng2LngVar(CSng(strMapObjectPropertyValues(1)))
                         .lngCoordinates(3) = Converter_Sng2LngVar(CSng(strMapObjectPropertyValues(2)))
                         xlsRange.Item(i, 9).Value = Right("0000000" + Hex(.lngCoordinates(1)), 8) + Right(Hex(.lngCoordinates(2)), 8) + Right(Hex(.lngCoordinates(3)), 8)
-                        .lngCoordinates(1) = Converter_SwapEndian(.lngCoordinates(1))
-                        .lngCoordinates(2) = Converter_SwapEndian(.lngCoordinates(2))
-                        .lngCoordinates(3) = Converter_SwapEndian(.lngCoordinates(3))
+                        .lngCoordinates(1) = Converter_SwapEndian32(.lngCoordinates(1))
+                        .lngCoordinates(2) = Converter_SwapEndian32(.lngCoordinates(2))
+                        .lngCoordinates(3) = Converter_SwapEndian32(.lngCoordinates(3))
                         Erase strMapObjectPropertyValues
                     Else
                         If Left(strWkSheetName, 10) = "  Rotate: " Then
@@ -889,9 +1012,9 @@ Dim xlsWkSheet As Worksheet
                                 .lngRotationFactors(2) = Converter_Sng2LngVar(CSng(strMapObjectPropertyValues(1)))
                                 .lngRotationFactors(3) = Converter_Sng2LngVar(CSng(strMapObjectPropertyValues(2)))
                                 xlsRange.Item(i, 3).Value = Right("0000000" + Hex(.lngRotationFactors(1)), 8) + Right("0000000" + Hex(.lngRotationFactors(2)), 8) + Right("0000000" + Hex(.lngRotationFactors(3)), 8)
-                                .lngRotationFactors(1) = Converter_SwapEndian(.lngRotationFactors(1))
-                                .lngRotationFactors(2) = Converter_SwapEndian(.lngRotationFactors(2))
-                                .lngRotationFactors(3) = Converter_SwapEndian(.lngRotationFactors(3))
+                                .lngRotationFactors(1) = Converter_SwapEndian32(.lngRotationFactors(1))
+                                .lngRotationFactors(2) = Converter_SwapEndian32(.lngRotationFactors(2))
+                                .lngRotationFactors(3) = Converter_SwapEndian32(.lngRotationFactors(3))
                                 Erase strMapObjectPropertyValues
                             Else
                                 .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) = 4
@@ -899,7 +1022,7 @@ Dim xlsWkSheet As Worksheet
                                 .lngRotationFactors(2) = -266111927
                                 .lngRotationFactors(3) = -266111927
                                 xlsRange.Item(i, 3).Value = Right("0000000" + Hex(.lngRotationFactors(1)), 8)
-                                .lngRotationFactors(1) = Converter_SwapEndian(.lngRotationFactors(1))
+                                .lngRotationFactors(1) = Converter_SwapEndian32(.lngRotationFactors(1))
                             End If
                             xlsRange.Item(i, 2).Value = strWkSheetName
                         Else
@@ -917,9 +1040,9 @@ Dim xlsWkSheet As Worksheet
                                     .lngScaleFactors(2) = Converter_Sng2LngVar(CSng(strMapObjectPropertyValues(1)))
                                     .lngScaleFactors(3) = Converter_Sng2LngVar(CSng(strMapObjectPropertyValues(2)))
                                     xlsRange.Item(i, 7).Value = Right("0000000" + Hex(.lngScaleFactors(1)), 8) + Right("0000000" + Hex(.lngScaleFactors(2)), 8) + Right("0000000" + Hex(.lngScaleFactors(3)), 8)
-                                    .lngScaleFactors(1) = Converter_SwapEndian(.lngScaleFactors(1))
-                                    .lngScaleFactors(2) = Converter_SwapEndian(.lngScaleFactors(2))
-                                    .lngScaleFactors(3) = Converter_SwapEndian(.lngScaleFactors(3))
+                                    .lngScaleFactors(1) = Converter_SwapEndian32(.lngScaleFactors(1))
+                                    .lngScaleFactors(2) = Converter_SwapEndian32(.lngScaleFactors(2))
+                                    .lngScaleFactors(3) = Converter_SwapEndian32(.lngScaleFactors(3))
                                     Erase strMapObjectPropertyValues
                                 Else
                                     .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) = 4
@@ -927,7 +1050,7 @@ Dim xlsWkSheet As Worksheet
                                     .lngScaleFactors(2) = -266111927
                                     .lngScaleFactors(3) = -266111927
                                     xlsRange.Item(i, 7).Value = Right("0000000" + Hex(.lngScaleFactors(1)), 8)
-                                    .lngScaleFactors(1) = Converter_SwapEndian(.lngScaleFactors(1))
+                                    .lngScaleFactors(1) = Converter_SwapEndian32(.lngScaleFactors(1))
                                 End If
                                 xlsRange.Item(i, 6).Value = strWkSheetName
                             Else
@@ -940,7 +1063,7 @@ Dim xlsWkSheet As Worksheet
                                     .lngSRTHash = CLng(strWkSheetName)
                                     xlsRange.Item(i, 4).Value = strWkSheetName
                                     xlsRange.Item(i, 5).Value = Right("0000000" + Hex(.lngSRTHash), 8)
-                                    .lngSRTHash = Converter_SwapEndian(CLng(strWkSheetName))
+                                    .lngSRTHash = Converter_SwapEndian32(CLng(strWkSheetName))
                                 End If
                             End If
                         End If
@@ -959,7 +1082,6 @@ Dim xlsWkSheet As Worksheet
     Set xlsRange = Nothing
     Set xlsWkSheet = Nothing
 End Function
-
 Public Function Botw_MemorySearcherMapObjectsIniFile(ByVal strDumpFolderPath As String, ByVal strWkSheetName As String, Optional ByVal lngMapUnitDataOffset As Long = &H13000000, Optional ByVal lngTranslateDataOffset As Long = &H30000000) As Integer
 'TODO
 'strWkSheetName: MainField_I-7_Dynamic for example
@@ -973,10 +1095,8 @@ Dim lngMapUnitDataAddresses(0 To 3) As Long
 Dim btMapUnitDataBytes() As Byte
 Dim intInputFile As Integer
 Dim intOutputFile As Integer
-Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
     Botw_MemorySearcherMapObjectsIniFile = Botw_LoadMapObjectsData(strWkSheetName, stMapObjects)
-    CEMU_DUMP_FILE = CEMU_DUMP_10000000
-    intInputFile = Cemu_openDumpFile(strDumpFolderPath, CEMU_DUMP_FILE)
+    intInputFile = Cemu_OpenDumpFile(strDumpFolderPath, CEMU_DUMP_10000000)
     intOutputFile = FreeFile
     Open strDumpFolderPath + "00050000101c9X00.mapobjects.ini" For Output As intOutputFile
     If Botw_MemorySearcherMapObjectsIniFile < 0 Then
@@ -996,7 +1116,7 @@ Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
                         With stMapObjects(intIndex)
                         Do
                             lngHashId = lngHashId + 1
-                            btMapUnitDataBytes = Converter_Var2Bytes(.stMapUnitObjectDataMap.ptrData(lngHashId), .stMapUnitObjectDataMap.btDataSize(lngHashId))
+                            Call Converter_Var2Bytes(btMapUnitDataBytes, .stMapUnitObjectDataMap.ptrData(lngHashId), .stMapUnitObjectDataMap.btDataSize(lngHashId))
                             lngMapUnitDataAddresses(lngHashId) = Vector_InBytes(lngMapUnitDataAddresses(lngHashId - 1) + .stMapUnitObjectDataMap.btDataSize(lngHashId - 1), btBuffer, btMapUnitDataBytes)
                             Erase btMapUnitDataBytes
                         Loop Until lngHashId = .stMapUnitObjectDataMap.btDataCount Or lngMapUnitDataAddresses(lngHashId) = 0
@@ -1011,7 +1131,7 @@ Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
                                 If .stMapUnitObjectDataMap.strDataLabel(.stMapUnitObjectDataMap.btDataCount) <> " " Then
                                     Do
                                         .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) = .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) - 4
-                                        Print #intOutputFile, strDumpFolderPath + .stMapUnitObjectDataMap.strDataLabel(.stMapUnitObjectDataMap.btDataCount) + Chr(90 - .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) / 4) + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 2 + lngHashId + .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) + lngMapUnitDataAddresses(.stMapUnitObjectDataMap.btDataCount)) + strWkSheetName
+                                        Print #intOutputFile, strDumpFolderPath + .stMapUnitObjectDataMap.strDataLabel(.stMapUnitObjectDataMap.btDataCount) + Chr(90 - .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) \ 4) + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 2 + lngHashId + .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) + lngMapUnitDataAddresses(.stMapUnitObjectDataMap.btDataCount)) + strWkSheetName
                                     Loop Until .stMapUnitObjectDataMap.btDataSize(.stMapUnitObjectDataMap.btDataCount) = 0
                                 End If
                                 .stMapUnitObjectDataMap.btDataCount = .stMapUnitObjectDataMap.btDataCount - 1
@@ -1039,9 +1159,9 @@ Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
                         With stMapObjects(Botw_MemorySearcherMapObjectsIniFile)
                         strDumpFolderPath = "[Entry]" + vbCrLf + "description=" + .strUnitConfigName + "_" + .strHashId + "_"
                         strWkSheetName = vbCrLf + "type=float" + vbCrLf + "value=" + vbCrLf
-                        Print #intOutputFile, strDumpFolderPath + "X" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 3 + lngTranslateDataOffset) + strWkSheetName
-                        Print #intOutputFile, strDumpFolderPath + "Y" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 7 + lngTranslateDataOffset) + strWkSheetName
-                        Print #intOutputFile, strDumpFolderPath + "Z" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 11 + lngTranslateDataOffset) + strWkSheetName
+                        Print #intOutputFile, strDumpFolderPath + "X" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 3 + lngTranslateDataOffset) + strWkSheetName
+                        Print #intOutputFile, strDumpFolderPath + "Y" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 7 + lngTranslateDataOffset) + strWkSheetName
+                        Print #intOutputFile, strDumpFolderPath + "Z" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 11 + lngTranslateDataOffset) + strWkSheetName
                         End With
                         Botw_MemorySearcherMapObjectsIniFile = Botw_MemorySearcherMapObjectsIniFile - 1
                         Do Until EOF(intInputFile) Or Botw_MemorySearcherMapObjectsIniFile = 0
@@ -1052,9 +1172,9 @@ Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
                                     With stMapObjects(Botw_MemorySearcherMapObjectsIniFile)
                                     strDumpFolderPath = "[Entry]" + vbCrLf + "description=" + .strUnitConfigName + "_" + .strHashId + "_"
                                     strWkSheetName = vbCrLf + "type=float" + vbCrLf + "value=" + vbCrLf
-                                    Print #intOutputFile, strDumpFolderPath + "X" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 3 + lngTranslateDataOffset) + strWkSheetName
-                                    Print #intOutputFile, strDumpFolderPath + "Y" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 7 + lngTranslateDataOffset) + strWkSheetName
-                                    Print #intOutputFile, strDumpFolderPath + "Z" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_FILE + 11 + lngTranslateDataOffset) + strWkSheetName
+                                    Print #intOutputFile, strDumpFolderPath + "X" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 3 + lngTranslateDataOffset) + strWkSheetName
+                                    Print #intOutputFile, strDumpFolderPath + "Y" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 7 + lngTranslateDataOffset) + strWkSheetName
+                                    Print #intOutputFile, strDumpFolderPath + "Z" + vbCrLf + "address=0x" + Hex(CEMU_DUMP_10000000 + 11 + lngTranslateDataOffset) + strWkSheetName
                                     End With
                                     Botw_MemorySearcherMapObjectsIniFile = Botw_MemorySearcherMapObjectsIniFile - 1
                                 End If
@@ -1068,7 +1188,7 @@ Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
             End If
         Next i
     Loop
-    lngHashId = Botw_FgetGameROMPlayerDataAddress(intInputFile, CEMU_DUMP_FILE)
+    lngHashId = Botw_FgetGameROMPlayerDataAddress(intInputFile, CEMU_DUMP_10000000)
     strDumpFolderPath = "[Entry]" + vbCrLf + "description="
     strWkSheetName = vbCrLf + "type=float" + vbCrLf + "value=" + vbCrLf
     With ThisWorkbook.Worksheets("GameROMPlayer").Cells
@@ -1079,4 +1199,139 @@ Dim CEMU_DUMP_FILE As CEMU_DUMP_FILES
     Close intOutputFile
     Close intInputFile
     Erase stMapObjects
+End Function
+Public Function Botw_readSaveMgrQueuedUpdateData(Optional ByVal strCemuFolderPath As String = "") As Long
+'lis r3, 0x1047
+'lwz r3, -0x2A50(r3)
+'mr r29, r3
+'r29=0x3F43B0E4 (minor infos: lwz r3, 0x720(r29) r3=a0000238,lwz r3, 0x724(r29) r3=3f5fec48)
+'lwz r3, 0x71C(r29)
+'r3=0x3F43BA20
+'Dim stProcess As PROCESSENTRY32
+'Dim stCemuLogData() As stExtractedTextData
+'Dim lngLngMemoryBase As LongLong
+'    strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
+'    Call Memory_InitDataMap("MemoryData.A4:C4", stMemoryDataMap)
+'    stProcess.dwSize = Cemu_openProcess(SYSTEM_PROC_VMREAD, stProcess)
+'    If stProcess.dwSize <> 0 Then
+'        If System_ToogleProcessById(stProcess.th32ProcessID, -1) > 0 Then
+'            stProcess.dwFlags = File_ExtractText("Cemu.A2:C32", stCemuLogData, strCemuFolderPath + "log.txt", CEMU_LOG_WIIUMEMORYBASE)
+'            If stProcess.dwFlags = 1 Then
+'                lngLngMemoryBase = CLngLng("&H" + stCemuLogData(1).objData.Item(0).SubMatches(0))
+'                Botw_readInventoryBinData = Memory_GetMappedData(stProcess.dwSize, lngLngMemoryBase, stMemoryDataMap.lngLowerOffsets)
+'                If ReadProcessMemory(stProcess.dwSize, lngLngMemoryBase + Botw_readInventoryBinData, VarPtr(stMemoryDataMap.btdata(0)), stMemoryDataMap.lngDataSize, 0) = 0 Then Botw_readInventoryBinData = 0
+'                Set stCemuLogData(1).objData = Nothing
+'                Erase stCemuLogData
+'            End If
+'            System_ToogleProcessById stProcess.th32ProcessID, 1
+'        End If
+'        CloseHandle stProcess.dwSize
+'    Else
+'        strCemuFolderPath = Cemu_GetDumpFolderPath(strCemuFolderPath)
+'        If strCemuFolderPath <> "" Then
+'            stProcess.dwSize = Cemu_openDumpFile(strCemuFolderPath, CEMU_DUMP_10000000)
+'            Botw_readInventoryBinData = File_getMappedData(stProcess.dwSize, CEMU_DUMP_10000000, stMemoryDataMap.lngLowerOffsets)
+'            Get stProcess.dwSize, Botw_readInventoryBinData - CEMU_DUMP_10000000 + 1, stMemoryDataMap.btdata
+'            Close stProcess.dwSize
+'        End If
+'    End If
+End Function
+Public Function Botw_GetGameDataName(ByRef str10000000DumpFile As String, ByVal lngDataIndexMemoryLocation As Long, ByRef BOTW_GAMEDATA As BOTW_GAMEDATAS) As String
+'Usage example with the immediate window: ?Botw_GetGameDataName("D:\WiiU\Default\dump\10000000.bin",&h1046608C,BOTW_BOOLGAMEDATA)
+Dim intFile As Integer
+Dim lnglngDataHash As LongLong
+Dim stHashesTable() As stGameData
+    intFile = FreeFile
+    Open str10000000DumpFile For Binary Access Read As intFile
+    With stGameBinDataMaps(BOTW_GAMEDATA)
+    .lngAddress = Botw_FgetGameDataAddress(intFile, CEMU_DUMP_10000000)
+    If .lngAddress <> 0 Then
+        Get intFile, lngDataIndexMemoryLocation - CEMU_DUMP_10000000 + 1, lngDataIndexMemoryLocation
+        If lngDataIndexMemoryLocation <> 0 Then
+            lngDataIndexMemoryLocation = Converter_SwapEndian32(lngDataIndexMemoryLocation)
+            Get intFile, .lngAddress - CEMU_DUMP_10000000 - 7 + BOTW_GAMEDATA * 12, stGameBinDataMaps(BOTW_GAMEDATA)
+            If lngDataIndexMemoryLocation < Converter_SwapEndian32(.lngCount) Then
+                Call Botw_InitGameDataMap(1, 2^ ^ (BOTW_GAMEDATA - 1))
+                Get intFile, Converter_SwapEndian32(.lngAddress) + lngDataIndexMemoryLocation * 4 - CEMU_DUMP_10000000 + 1, .lngAddress
+                Get intFile, Converter_SwapEndian32(.lngAddress) + stGameDataMaps(BOTW_GAMEDATA).intDataHashOffset - CEMU_DUMP_10000000 + 1, .lngAddress
+                .lngAddress = Converter_SwapEndian32(.lngAddress)
+                lnglngDataHash = Converter_CULng(.lngAddress)
+                For lngDataIndexMemoryLocation = Botw_InitHashesTable("Savedata", stHashesTable) - 1 To 1 Step -1
+                    If lnglngDataHash < Converter_CULng(stHashesTable(lngDataIndexMemoryLocation).lngHash) Then
+                        Exit For
+                    ElseIf .lngAddress = stHashesTable(lngDataIndexMemoryLocation).lngHash Then
+                        Botw_GetGameDataName = stHashesTable(lngDataIndexMemoryLocation).strDataName
+                        Exit For
+                    End If
+                Next lngDataIndexMemoryLocation
+                Erase stHashesTable
+                Erase stGameDataMaps(BOTW_GAMEDATA).stGameDatas
+            End If
+        End If
+    End If
+    Close intFile
+    End With
+End Function
+Public Function Botw_GetSaveDataName(ByRef lngHash As Long) As String
+Dim xlsWorksheet As Worksheet
+Dim i As Long
+    Set xlsWorksheet = Worksheets("SaveData")
+    With xlsWorksheet.Range("A1:A" + xlsWorksheet.Range("B1").Text).Cells
+    For i = .Rows.Count To 1 Step -1
+        If lngHash = Crc_CRC32(.Item(i, 1).Text) Then
+            Botw_GetSaveDataName = .Item(i, 1).Text
+            Exit For
+        End If
+    Next i
+    End With
+    Set xlsWorksheet = Nothing
+End Function
+Public Function Botw_MemorySearcherMemoryDataIniFile(ByVal BOTW_MEMORYDATA As BOTW_MEMORYDATAS, Optional ByRef blnSuspendCemu As Boolean = True, Optional ByVal blnOverwriteIniFile As Boolean = False, Optional ByVal strCemuFolderPath As String = "") As Long
+'Usage example with the immediate window: ?Botw_MemorySearcherMemoryDataIniFile(BOTW_MEMORY_MASTERCYCLEZERO)
+'Output: D:\WiiU\Default\memorySearcher\00050000101c9<3|4|5|X>00.ini
+Dim stProcess As PROCESSENTRY32
+Dim stCemuLogData() As stExtractedTextData
+Dim strRow As String
+Dim lngLngMemoryBase As LongLong
+Dim strDataMembers() As String
+Dim strMapFields() As String
+    strCemuFolderPath = Cemu_GetRootFolderPath(strCemuFolderPath)
+    stProcess.dwFlags = File_ExtractText("Cemu.A2:C32", stCemuLogData, strCemuFolderPath + "log.txt", CEMU_LOG_WIIUMEMORYBASE Or CEMU_LOG_TITLEID)
+    If stProcess.dwFlags = 2 Then
+        stProcess.dwSize = Cemu_OpenProcess(SYSTEM_PROC_VMREAD, stProcess)
+        If stProcess.dwSize <> 0 Then
+            If System_ToogleProcessById(stProcess.th32ProcessID, CInt(blnSuspendCemu)) > 0 Then
+                lngLngMemoryBase = CLngLng("&H" + stCemuLogData(1).objData.Item(0).SubMatches(0))
+                strRow = CStr(BOTW_MEMORYDATA + 1)
+                With Worksheets("MemoryData").Range("A" + strRow + ":D" + strRow).Cells
+                strRow = .Item(1, 2).Text
+                Botw_MemorySearcherMemoryDataIniFile = Memory_PortableGetMappedData(stProcess.dwSize, lngLngMemoryBase, strRow, vbLf)
+                If Botw_MemorySearcherMemoryDataIniFile <> 0 Then
+                    strDataMembers = Split(.Item(1, 4).Text, vbLf)
+                    BOTW_MEMORYDATA = UBound(strDataMembers) + 1
+                    Call Cemu_InitMemorySearcherDataMap(BOTW_MEMORYDATA)
+                    Do
+                        BOTW_MEMORYDATA = BOTW_MEMORYDATA - 1
+                        strMapFields = Split(strDataMembers(BOTW_MEMORYDATA), " ", 5)
+                        If UBound(strMapFields) = 3 Then
+                            Call Cemu_AddMemorySearcherDataMap(strMapFields(0), Cemu_GetMemorySearcherDataIndex(strMapFields(1)), CLng(strMapFields(2)), CLng(strMapFields(3)) + Botw_MemorySearcherMemoryDataIniFile)
+                        Else
+                            Call Cemu_AddMemorySearcherDataMap(strMapFields(0), Cemu_GetMemorySearcherDataIndex(strMapFields(1)), CLng(strMapFields(2)), CLng(strMapFields(3)) + Memory_PortableGetMappedData(stProcess.dwSize, lngLngMemoryBase, strMapFields(4) + " " + strRow))
+                        End If
+                        Erase strMapFields
+                    Loop Until BOTW_MEMORYDATA = 0
+                    Erase strDataMembers
+                    stProcess.cntUsage = File_Create(strCemuFolderPath + "memorySearcher\" + Left(stCemuLogData(2).objData.Item(0).SubMatches(0), 8) + Mid(stCemuLogData(2).objData.Item(0).SubMatches(0), 10) + ".ini", 0, blnOverwriteIniFile)
+                    Call Cemu_WriteMemorySearcherIniFile(stProcess.cntUsage, stProcess.dwSize, 0, lngLngMemoryBase)
+                    Close stProcess.cntUsage
+                End If
+                End With
+                System_ToogleProcessById stProcess.th32ProcessID, -CInt(blnSuspendCemu)
+            End If
+            CloseHandle stProcess.dwSize
+        End If
+        Set stCemuLogData(1).objData = Nothing
+        Set stCemuLogData(2).objData = Nothing
+        Erase stCemuLogData
+    End If
 End Function

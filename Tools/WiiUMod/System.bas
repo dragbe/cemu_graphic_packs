@@ -2,7 +2,6 @@ Attribute VB_Name = "system"
 Option Explicit
 Public Declare PtrSafe Function CreateDirectory Lib "kernel32.dll" Alias "CreateDirectoryA" (ByVal lpPathName As String, ByVal lpSecurityAttributes As LongPtr) As Long
 Public Declare PtrSafe Function CloseHandle Lib "kernel32.dll" (ByVal hObject As Long) As Long
-Public Declare PtrSafe Function ReadProcessMemory Lib "kernel32" (ByVal hProcess As Long, ByVal lngBaseAddress As LongPtr, ByVal lpBuffer As LongPtr, ByVal lngSize As Long, ByRef lpNumberOfBytesWritten As Long) As Long
 Private Declare PtrSafe Function GetTempPath Lib "kernel32" Alias "GetTempPathA" (ByVal nBufferLength As Long, ByVal lpBuffer As String) As Long
 Private Declare PtrSafe Function SuspendThread Lib "kernel32" (ByVal hthread As Long) As Long
 Private Declare PtrSafe Function ResumeThread Lib "kernel32" (ByVal hthread As Long) As Long
@@ -39,7 +38,7 @@ Public Type PROCESSENTRY32
     pcPriClassBase As Long
     pcPriClassBaseB As Long
     dwFlags As Long
-    szExeFile As String * MAXPATH
+    szExeFile As String * FILE_MAXPATH
 End Type
 Private Type THREADENTRY32
     dwSize As Long
@@ -78,103 +77,98 @@ Public Enum SYSTEM_PROC_ACCESS
     SYSTEM_PROC_VMREAD = &H10
     SYSTEM_PROC_VMWRITE = &H20
 End Enum
-
 Public Function System_Clipboard(Optional ByVal strText As Variant = "") As String
 Dim objHtml As Object
     Set objHtml = CreateObject("htmlfile")
+    With objHtml.parentWindow.clipboardData
     If strText = "" Then
-        System_Clipboard = objHtml.parentWindow.clipboardData.GetData("text")
+        System_Clipboard = .GetData("text")
     Else
-        objHtml.parentWindow.clipboardData.setData "text", strText
+        .setData "text", strText
     End If
+    End With
     Set objHtml = Nothing
 End Function
-
 Public Function System_WMIGetProcessByName(ByRef strProcessImageName As String, ByRef objProcess As Object) As Long
 'objProcess.processid
 'objProcess.name
 'objProcess.executablepath
 '...
-    Dim objWmiSet As Object
-    Dim objWmi As Object
+Dim objWmiSet As Object
+Dim objWmi As Object
     Set objWmi = GetObject("winmgmts:root\cimv2")
     Set objWmiSet = objWmi.ExecQuery("SELECT * FROM win32_process WHERE Name LIKE '" + strProcessImageName + "'")
-    If objWmiSet.Count = 0 Then
+    With objWmiSet
+    If .Count = 0 Then
         Set objProcess = Nothing
         System_WMIGetProcessByName = -1
     Else
-        Set objProcess = objWmiSet.itemindex(0)
+        Set objProcess = .itemindex(0)
         System_WMIGetProcessByName = objProcess.ProcessId
     End If
+    End With
     Set objWmiSet = Nothing
     Set objWmi = Nothing
 End Function
- 
-Public Function System_ToogleProcessById(ByRef lngProcId As Long, ByRef blnOff As Boolean) As Long
+Public Function System_ToogleProcessById(ByRef lngProcId As Long, ByRef intTargetProcessState As Integer) As Long
 Dim lngSnapshot As Long
 Dim lngThread As Long
 Dim stThread As THREADENTRY32
-    lngSnapshot = CreateToolhelp32Snapshot(SYSTEM_TH32CS_SNAPTHREAD, 0)
-    If lngSnapshot <> -1 Then
-        stThread.dwSize = Len(stThread)
-        If Thread32First(lngSnapshot, stThread) Then
-            Do
-                If stThread.th32OwnerProcessID = lngProcId Then
-                    lngThread = OpenThread(SYSTEM_THREAD_SUSPENDRESUME, 0, stThread.th32ThreadID)
-                    If lngThread <> 0 Then
-                        If blnOff Then SuspendThread (lngThread) Else ResumeThread (lngThread)
-                        CloseHandle lngThread
-                        System_ToogleProcessById = System_ToogleProcessById + 1
+    If intTargetProcessState = 0 Then
+        System_ToogleProcessById = 1
+    Else
+        lngSnapshot = CreateToolhelp32Snapshot(SYSTEM_TH32CS_SNAPTHREAD, 0)
+        If lngSnapshot <> -1 Then
+            With stThread
+            .dwSize = Len(stThread)
+            If Thread32First(lngSnapshot, stThread) Then
+                Do
+                    If .th32OwnerProcessID = lngProcId Then
+                        lngThread = OpenThread(SYSTEM_THREAD_SUSPENDRESUME, 0, .th32ThreadID)
+                        If lngThread <> 0 Then
+                            If intTargetProcessState > 0 Then
+                                ResumeThread lngThread
+                            Else
+                                SuspendThread lngThread
+                            End If
+                            CloseHandle lngThread
+                            System_ToogleProcessById = System_ToogleProcessById + 1
+                        End If
                     End If
-                End If
-            Loop While Thread32Next(lngSnapshot, stThread)
+                Loop While Thread32Next(lngSnapshot, stThread)
+            End If
+            End With
+            CloseHandle lngSnapshot
         End If
-        CloseHandle lngSnapshot
     End If
 End Function
-
 Public Function System_APIGetProcessByName(ByRef strProcessImageName As String, ByRef stProcess As PROCESSENTRY32) As Long
 Dim lngSnapshot As Long
-Dim ProcessId As Long
     lngSnapshot = CreateToolhelp32Snapshot(SYSTEM_TH32CS_SNAPPROCESS, 0&)
+    System_APIGetProcessByName = -1
     If lngSnapshot <> -1 Then
-        stProcess.dwSize = Len(stProcess)
+        With stProcess
+        .dwSize = Len(stProcess)
         If ProcessFirst(lngSnapshot, stProcess) Then
             Do
-                If LCase(Left(stProcess.szExeFile, InStr(1, stProcess.szExeFile, Chr(0)) - 1)) = LCase(strProcessImageName) Then
-                    System_APIGetProcessByName = stProcess.th32ProcessID
-                    CloseHandle lngSnapshot
-                    Exit Function
-                End If
-            Loop While ProcessNext(lngSnapshot, stProcess)
-            System_APIGetProcessByName = -1
-        Else
-            System_APIGetProcessByName = -1
+                If LCase(Left(.szExeFile, InStr(1, .szExeFile, vbNullChar) - 1)) = LCase(strProcessImageName) Then System_APIGetProcessByName = .th32ProcessID
+            Loop While ProcessNext(lngSnapshot, stProcess) And System_APIGetProcessByName = -1
         End If
+        End With
         CloseHandle lngSnapshot
-    Else
-        System_APIGetProcessByName = -1
     End If
 End Function
-
-Public Function System_ToogleProcessByName(ByRef strProcessImageName As String, ByRef blnOff As Boolean) As Long
+Public Function System_ToogleProcessByName(ByRef strProcessImageName As String, ByRef intTargetProcessState As Integer) As Long
 Dim stProcess As PROCESSENTRY32
-    stProcess.th32ProcessID = System_APIGetProcessByName(strProcessImageName, stProcess)
-    If stProcess.th32ProcessID <> -1 Then
-        System_ToogleProcessByName = System_ToogleProcessById(stProcess.th32ProcessID, blnOff)
-    End If
+    With stProcess
+    .th32ProcessID = System_APIGetProcessByName(strProcessImageName, stProcess)
+    If .th32ProcessID <> -1 Then System_ToogleProcessByName = System_ToogleProcessById(.th32ProcessID, intTargetProcessState)
+    End With
 End Function
-
 Public Function System_OpenProcessByName(ByRef strProcessImageName As String, ByRef lngProcAccess As SYSTEM_PROC_ACCESS, ByRef stProcess As PROCESSENTRY32) As Long
     If System_APIGetProcessByName(strProcessImageName, stProcess) <> -1 Then System_OpenProcessByName = OpenProcess(lngProcAccess, 0, stProcess.th32ProcessID)
 End Function
-
-Public Function System_ReadProcessLongMemoryDataSegment(ByRef lngHProcess As Long, ByRef lngLngMemoryBase As LongLong, ByVal lngDataCount As Long, ByRef lngDataSegment() As Long) As Long
-    ReDim lngDataSegment(1 To lngDataCount)
-    System_ReadProcessLongMemoryDataSegment = ReadProcessMemory(lngHProcess, lngLngMemoryBase, VarPtr(lngDataSegment(1)), lngDataCount * 4, 0)
-End Function
-
 Public Function System_GetTempFolderPath() As String
-    System_GetTempFolderPath = Space(MAXPATH)
-    System_GetTempFolderPath = Left(System_GetTempFolderPath, GetTempPath(MAXPATH, System_GetTempFolderPath))
+    System_GetTempFolderPath = Space(FILE_MAXPATH)
+    System_GetTempFolderPath = Left(System_GetTempFolderPath, GetTempPath(FILE_MAXPATH, System_GetTempFolderPath))
 End Function
