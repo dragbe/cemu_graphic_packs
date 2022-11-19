@@ -353,3 +353,12 @@ Dim intFile As Integer
     Put intFile, , btContent
     Close intFile
 End Sub
+Public Function File_GetFolder(ByRef strFilename As String) As String
+Dim lngLastSlash As Long
+Dim lngSlash As Long
+    lngLastSlash = InStrRev(strFilename, "\")
+    If lngLastSlash <> 0 Then
+        lngSlash = InStrRev(strFilename, "\", lngLastSlash - 1) + 1
+        File_GetFolder = Mid(strFilename, lngSlash, lngLastSlash - lngSlash)
+    End If
+End Function

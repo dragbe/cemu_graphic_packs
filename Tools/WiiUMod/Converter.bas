@@ -128,3 +128,28 @@ Public Function Converter_CNullTerminatedString(ByRef btNullTerminatedString() A
     Converter_CNullTerminatedString = StrConv(btNullTerminatedString, vbUnicode)
     Converter_CNullTerminatedString = Left(Converter_CNullTerminatedString, InStr(Converter_CNullTerminatedString, vbNullChar) - 1)
 End Function
+Public Function Converter_Str2Acronym(ByRef strString As String, Optional ByVal strSeparator As String = "_", Optional ByRef lngAcronymMaxSize As Long = 0) As String
+Dim strItems() As String
+Dim btAsc As Byte
+Dim lngItemsCount As Long
+    If lngAcronymMaxSize = 0 Then
+        For lngItemsCount = Len(strString) To 1 Step -1
+            strSeparator = Mid(strString, lngItemsCount, 1)
+            btAsc = Asc(strSeparator)
+            If btAsc >= 65 And btAsc <= 90 Then Converter_Str2Acronym = strSeparator + Converter_Str2Acronym
+        Next lngItemsCount
+    ElseIf lngAcronymMaxSize < 0 Then
+        strItems = Split(strString, strSeparator, 2)
+        Converter_Str2Acronym = Converter_Str2Acronym(strItems(0), " ", Abs(lngAcronymMaxSize))
+        Erase strItems
+    Else
+        strItems = Split(strString, strSeparator, lngAcronymMaxSize + 1)
+        lngItemsCount = UBound(strItems) + 1
+        If lngAcronymMaxSize < lngItemsCount Then lngItemsCount = lngAcronymMaxSize
+        Do
+            lngItemsCount = lngItemsCount - 1
+            Converter_Str2Acronym = UCase(Left(strItems(lngItemsCount), 1)) + Converter_Str2Acronym
+        Loop Until lngItemsCount = 0
+        Erase strItems
+    End If
+End Function

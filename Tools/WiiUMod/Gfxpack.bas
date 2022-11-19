@@ -251,7 +251,7 @@ Private Function Gfxpack_ParseAsmFile(ByVal strAsmFilename As String) As Long
 Dim intFile As Integer
 Dim strFirstChar As String * 1
     intFile = FreeFile
-    Gfxpack_ParseAsmFile = FileLen(strAsmFilename)
+    Gfxpack_ParseAsmFile = -FileLen(strAsmFilename)
     Open strAsmFilename For Input As intFile
     With stGfxPackStats
     .lngInjectionPointCount = 0
@@ -261,20 +261,22 @@ Dim strFirstChar As String * 1
         Line Input #intFile, strAsmFilename
         If LCase(Left(strAsmFilename, 13)) = "modulematches" Then .lngModuleMatch = CLng("&h" + Mid(strAsmFilename, InStr(15, strAsmFilename, "0") + 2))
     Loop
-    strFirstChar = "#"
-    Do Until EOF(intFile) Or (strFirstChar <> "#" And strFirstChar <> "_")
+    Do Until EOF(intFile) Or Gfxpack_ParseAsmFile > 0
         Line Input #intFile, strAsmFilename
-        If strAsmFilename <> "" Then strFirstChar = Left(strAsmFilename, 1)
-    Loop
-    If (strFirstChar <> "#" And strFirstChar <> "_") Then
-        If Left(strAsmFilename, 7) <> ".origin" Then
-            If strFirstChar = "0" Then
-                .lngInjectionPointCount = .lngInjectionPointCount + 1
-            Else
-                .lngCodeCaveSize = .lngCodeCaveSize + 4
+        If strAsmFilename <> "" Then
+            strFirstChar = Left(strAsmFilename, 1)
+            If (strFirstChar <> "#" And strFirstChar <> "_") Then
+                If Left(strAsmFilename, 7) <> ".origin" Then
+                    If strFirstChar = "0" Then
+                        .lngInjectionPointCount = .lngInjectionPointCount + 1
+                    Else
+                        .lngCodeCaveSize = .lngCodeCaveSize + 4
+                    End If
+                End If
+                Gfxpack_ParseAsmFile = -Gfxpack_ParseAsmFile
             End If
         End If
-    End If
+    Loop
     Do Until EOF(intFile)
         Line Input #intFile, strAsmFilename
         If strAsmFilename <> "" Then
@@ -591,4 +593,76 @@ Dim btFileContent() As Byte
         Erase stCemuLogData
     End If
     End With
+End Function
+Public Function Gfxpack_InjectAsmSnippet(ByVal strAsmFile As String, ByVal strSnippetEntryPoints As String, ByRef strOutputDirectory As String) As Long
+'Usage example with the immediate window: ?Gfxpack_InjectAsmSnippet("D:\WiiU\vanilla\graphicPacks\!BreathOfTheWild_CEMUKingTweaks\patch_strcmp.asm","AsmSnippets.A3:C3","D:\WiiU\vanilla\graphicPacks\!BreathOfTheWild_UKingTweaks\")
+Dim stAsmSub As stDataMap
+Dim strEntryPoints() As String
+Dim intOutFile As Integer
+Dim intInFile As Integer
+Dim i As Long
+    Gfxpack_InjectAsmSnippet = InStr(strSnippetEntryPoints, ".")
+    With Worksheets(Left(strSnippetEntryPoints, Gfxpack_InjectAsmSnippet - 1)).Range(Mid(strSnippetEntryPoints, Gfxpack_InjectAsmSnippet + 1)).Cells
+        strEntryPoints = Split(.Item(1, 3).Text, vbLf)
+        strSnippetEntryPoints = File_GetFolder(strAsmFile)
+        Gfxpack_InjectAsmSnippet = InStr(strSnippetEntryPoints, "_")
+        strSnippetEntryPoints = "_" + Converter_Str2Acronym(Left(strSnippetEntryPoints, Gfxpack_InjectAsmSnippet - 1)) + Mid(strSnippetEntryPoints, Gfxpack_InjectAsmSnippet) + "_" + .Item(1, 1).Text
+    End With
+    With stAsmSub
+    .lngDataSize = UBound(strEntryPoints)
+    ReDim .lngLowerOffsets(0 To .lngDataSize)
+    i = CLng("&h" + strEntryPoints(0))
+    .lngLowerOffsets(0) = i
+    For Gfxpack_InjectAsmSnippet = .lngDataSize To 1 Step -1
+        .lngLowerOffsets(Gfxpack_InjectAsmSnippet) = .lngLowerOffsets(0) + CLng(strEntryPoints(Gfxpack_InjectAsmSnippet))
+    Next Gfxpack_InjectAsmSnippet
+    Gfxpack_InjectAsmSnippet = Len(strSnippetEntryPoints)
+    .lngDataSize = Gfxpack_InjectAsmSnippet + 18
+    intOutFile = FreeFile
+    Open strOutputDirectory + Mid(strAsmFile, InStrRev(strAsmFile, "\") + 1) For Output As intOutFile
+    intInFile = FreeFile
+    Open strAsmFile For Input As intInFile
+    Line Input #intInFile, strAsmFile
+    Do Until EOF(intInFile) Or Left(strAsmFile, 7) = ".origin"
+        Print #intOutFile, strAsmFile
+        Line Input #intInFile, strAsmFile
+    Loop
+    Print #intOutFile, "#";
+    Print #intOutFile, strAsmFile
+    Do Until EOF(intInFile)
+        Line Input #intInFile, strAsmFile
+        Select Case Left(strAsmFile, 1)
+        Case "_"
+            Print #intOutFile, "#";
+            Print #intOutFile, strAsmFile
+        Case "0"
+            If Mid(strAsmFile, 18, Gfxpack_InjectAsmSnippet) = strSnippetEntryPoints Then
+                Print #intOutFile, Left(strAsmFile, 15);
+                i = 0
+                strEntryPoints(0) = Mid(strAsmFile, .lngDataSize)
+                Do Until Left(strEntryPoints(0), 1) <> "x"
+                    i = i + 1
+                    strEntryPoints(0) = Mid(strAsmFile, .lngDataSize + i)
+                Loop
+                i = .lngLowerOffsets(i) - CLng("&h" + Mid(strAsmFile, 3, 8))
+                Print #intOutFile, IIf(i < 0, " .-0x" + Hex(Abs(i)), " .+0x" + Hex(i));
+                Print #intOutFile, strEntryPoints(0)
+            Else
+                Print #intOutFile, strAsmFile
+            End If
+        Case "#", ""
+            Print #intOutFile, strAsmFile
+        Case Else
+            Print #intOutFile, "0x0";
+            Print #intOutFile, Hex(i);
+            Print #intOutFile, " = ";
+            Print #intOutFile, strAsmFile
+            i = i + 4
+        End Select
+    Loop
+    Erase .lngLowerOffsets
+    End With
+    Erase strEntryPoints
+    Close intInFile
+    Close intOutFile
 End Function
