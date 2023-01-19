@@ -1,1 +1,18 @@
-
+Header text
+#Text line(s) added after this line
+Basic mode 1
+add after
+Basic mode 0
+full line replace
+Basic mode -1 (add before)
+#Text line(s) added before this line
+#Part(s) Basic mode -2147483648 this replace parts of a line replaced
+#Text line(s) added after the next line
+#The line mentioned just below
+Basic mode 2+ (skip lines and add)
+#Text block line #1 unchanged
+Advanced mode #1
+full line replace
+#Part(s) of this Advanced mode #2 (replace parts of a line) block line #3 replaced
+#Text line(s) appended at the end of the file after this line
+trick to append text at the end of file
