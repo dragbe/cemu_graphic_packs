@@ -1,0 +1,11 @@
+Header text
+#Text line(s) added after this line
+#Text line(s) replace this line
+#Text line(s) added before this line
+#Part(s) of this line replaced
+#Text line(s) added after the next line
+#The line mentioned just below
+#Text block line #1 unchanged
+#Text line(s) replace this text block line #2
+#Part(s) of this text block line #3 replaced
+#Text line(s) appended at the end of the file after this line
