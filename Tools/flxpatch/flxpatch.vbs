@@ -12,7 +12,7 @@ If Wscript.Arguments.count=2 Then
 	Set fsoTextFile=fso.GetFile(WScript.Arguments(0)).OpenAsTextStream(1,0)
 	Do Until fsoPatchFile.AtEndOfStream Or fsoTextFile.AtEndOfStream
 		objRegExp.Pattern=fsoPatchFile.ReadLine
-		Do Until fsoTextFile.AtEndOfStream
+		Do
 			strTextLine=fsoTextFile.ReadLine
 			If objRegExp.test(strTextLine) Then
 				intExitCode=intExitCode+1
@@ -100,9 +100,6 @@ If Wscript.Arguments.count=2 Then
 								strPatchLines(i,2)=Mid(strTextLine,lngChar41Offset+1)
 								objRegExp.Pattern=strPatchLines(i,1)
 								If Not objRegExp.test(strPatchLines(i,0)) Then
-									For j=0 To i
-										fsoOutFile.WriteLine(strPatchLines(j,0))
-									Next
 									For j=0 To i
 										fsoOutFile.WriteLine(strPatchLines(j,0))
 									Next
@@ -213,7 +210,7 @@ If Wscript.Arguments.count=2 Then
 			Else
 				fsoOutFile.WriteLine(strTextLine)
 			End If
-		Loop
+		Loop Until fsoTextFile.AtEndOfStream
 	Loop
 	Do Until fsoTextFile.AtEndOfStream
 		fsoOutFile.WriteLine(fsoTextFile.ReadLine)
