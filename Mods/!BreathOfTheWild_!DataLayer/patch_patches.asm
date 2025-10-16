@@ -1420,14 +1420,14 @@ cmpwi r22, 0
 bgelr
 sub r23, r10, r16
 sub r22, r31, r22
-stwxu r23, r22, r3
+stwux r23, r22, r3
 stw r31, 0x4(r22)
 addi r20, r20, 4
 b .+0x90 # GOTO cmpw r21, r5
 cmpwi r22, 0
-bge .+0x8 # if (is vanilla gamedata) GOTO stwxu r23, r22, r3
+bge .+0x8 # if (is vanilla gamedata) GOTO stwux r23, r22, r3
 sub r22, r31, r22
-stwxu r23, r22, r3
+stwux r23, r22, r3
 lwz r7, 0x4(r22)
 cmpwi r7, 0
 beq .+0x74 # if (savedata pointer init value r7==0) GOTO cmpw r21, r5
@@ -1446,7 +1446,7 @@ rlwinm r17, r7, 29, 31, 31
 slwi r17, r17, 2
 srwi r7, r7, 1
 add r7, r7, r17
-lwzxu r17, r7, r6
+lwzux r17, r7, r6
 cmplw r18, r17
 beq .+0x18 # if (gamedata hash==save data hash) GOTO lwzu r17, -0x8(r7)
 blt .+0xC # if (gamedata hash<save data hash) GOTO mr r23, r7
@@ -1493,7 +1493,7 @@ rlwinm r17, r6, 0, 16, 31
 srwi r6, r6, 16
 add r6, r6, r3
 sth r22, 0x0(r6) # use STHX instruction in the future
-stwxu r23, r17, r3
+stwux r23, r17, r3
 lwz r7, 0x4(r17)
 cmpwi r7, 0
 beq .+0x74 # if (savedata pointer init value r7==0) GOTO addi r5, r5, 8
@@ -1512,7 +1512,7 @@ rlwinm r22, r7, 29, 31, 31
 slwi r22, r22, 2
 srwi r7, r7, 1
 add r7, r7, r22
-lwzxu r22, r7, r6
+lwzux r22, r7, r6
 cmplw r18, r22
 beq .+0x18 # if (gamedata hash==save data hash) GOTO lwzu r22, -0x8(r7)
 blt .+0xC # if (gamedata hash<save data hash) GOTO mr r23, r7
@@ -1656,12 +1656,12 @@ li r4, -1
 stw r4, 0x0(r18)
 blr
 
-0x0322CCC8 = bla _BOTW_DataLayer_BuildDataLayer # Data structure initialization area when a game is (re)started [li r31, 0]
-0x02eaf6f0 = bla _BOTW_DataLayer_FocusItem # Current focused item (material|food|arrow already present in the inventory) [lwz r3, +0x10(r27)]
-0x02eafea8 = bla _BOTW_DataLayer_LookItem # Is focused item (material|food|arrow already present in the inventory) lootable [add r0, r28, r31]
+0x0322CCC8 = bla _BOTW_DataLayer_BuildDataLayer # Data structure initialization area when (re)start|(re)load a game [li r31, 0]
+0x02eaf6f0 = bla _BOTW_DataLayer_FocusItem # Current focused item (material|food|arrow already present in the inventory) area [lwz r3, +0x10(r27)]
+0x02eafea8 = bla _BOTW_DataLayer_LookItem # Is focused item (material|food|arrow already present in the inventory) lootable area [add r0, r28, r31]
 0x02eafeac = cmpw r0, r24 # [cmpwi r0, 0x3E7]
-0x02eb0d9c = bla _BOTW_DataLayer_LootItem # Loot item (material|food|arrow already present in the inventory) [cmpwi r0, 0x3e7]
+0x02eb0d9c = bla _BOTW_DataLayer_LootItem # Loot item (material|food|arrow already present in the inventory) area [cmpwi r0, 0x3e7]
 0x02eb0da4 = mr r0, r4 # [li r0, 0x3e7]
 0x02eb0da8 = bla _BOTW_DataLayer_AddLootItem # [stw r0, +0x10(r10)]
-0x02eafdd4 = bla _BOTW_DataLayer_LookNewFood # Is focused food (not present in the inventory) lootable [cmpwi r3, 0x3C]
-0x02eafe20 = bla _BOTW_DataLayer_LookNewMat # Is focused material (not present in the inventory) lootable [cmpwi r3, 0xa0]
+0x02eafdd4 = bla _BOTW_DataLayer_LookNewFood # Is focused food (not present in the inventory) lootable area [cmpwi r3, 0x3C]
+0x02eafe20 = bla _BOTW_DataLayer_LookNewMat # Is focused material (not present in the inventory) lootable area [cmpwi r3, 0xa0]
