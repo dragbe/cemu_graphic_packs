@@ -1931,6 +1931,8 @@ Dim varDictKey As Variant
 Dim objRegExp As Object
 Dim objMatchCollection As Object
 Dim strGamePath As String
+Dim strSrcRootPath As String
+Dim strDestRootPath As String
 Dim strBoolDataPath As String
 Dim strDlcFolderPath As String
 Dim lnglngHash As LongLong
@@ -1947,6 +1949,7 @@ Dim objDropTableDict As Object
     FILE_DoShellOperation SHELL_DELETE_OPERATION, Botw_Material2Rupee
     MakeSureDirectoryPathExists Botw_Material2Rupee + "logs\"
     strGamePath = Botw_GetGamePath(strCemuFolderPath)
+    strGamePath = Left(strGamePath, Len(strGamePath) - 15)
     strTmp = Cemu_GetTitleId(strCemuFolderPath)
     strCemuFolderPath = Cemu_GetMlc01Path(strCemuFolderPath) + "\usr\title\" + Left(strTmp, 8) + "\" + Mid(strTmp, 10) + "\"
     'Build the Fake Rupee directory structure from the PutRupee sbactorpack
@@ -1956,11 +1959,8 @@ Dim objDropTableDict As Object
     strTempPath = strCachePath + "content\Actor\Pack\"
     strBoolDataPath = strTempPath + .Worksheet.name
     If FILE_DoShellOperation(SHELL_COPY_OPERATION, strBoolDataPath, strMaterialActorLinkFilePath) <> 0 Then
-        strFilePath = strMaterialActorLinkFilePath + ".sbactorpack"
-        FILE_DoShellOperation SHELL_COPY_OPERATION, strTmp + "PutRupee.sbactorpack", strFilePath
-        System_ShellAndWait 0, 1, "SARC extract """ + strFilePath + """"
-        Call File_DeleteFiles(strFilePath, strMaterialActorLinkFilePath + "\Actor\ModelList\Item_Put_Rupee_Green.bmodellist", strMaterialActorLinkFilePath + "\Actor\Physics\Rupee.bphysics")
-        Call File_DeleteFolders(strMaterialActorLinkFilePath + "\Actor\AS", strMaterialActorLinkFilePath + "\Actor\ASList")
+        System_ShellAndWait 0, 1, "SARC extract """ + strTmp + "PutRupee.sbactorpack"" -C """ + strMaterialActorLinkFilePath + """"
+        Call File_DeleteFileSystemObjects(strMaterialActorLinkFilePath + "\Actor\AS", strMaterialActorLinkFilePath + "\Actor\ASList", strMaterialActorLinkFilePath + "\Actor\ModelList\Item_Put_Rupee_Green.bmodellist", strMaterialActorLinkFilePath + "\Actor\Physics\Rupee.bphysics")
         FILE_DoShellOperation SHELL_COPY_OPERATION, strMaterialActorLinkFilePath, strBoolDataPath
     End If
     'Extract some required data files from the Fake Rupee material sbactorpack
@@ -1969,12 +1969,10 @@ Dim objDropTableDict As Object
     strSrcPath = strTemp + "\Actor\ActorLink\" + .Item(1, 4).Text + ".bxml"
     strMaterialActorLinkFilePath = strSrcPath + ".xml"
     If FILE_DoShellOperation(SHELL_COPY_OPERATION, strBoolDataPath, strTemp) <> 0 Then
-        strFilePath = strTemp + ".sbactorpack"
-        FILE_DoShellOperation SHELL_COPY_OPERATION, strTmp + .Item(1, 4).Text + ".sbactorpack", strFilePath
-        System_ShellAndWait 0, 1, "AAMP_TO_YML """ + strSrcPath + """ """ + strMaterialActorLinkFilePath + """", "SARC extract """ + strFilePath + """"
-        Call File_DeleteFiles(strFilePath, strSrcPath)
+        System_ShellAndWait 0, 1, "AAMP_TO_YML """ + strSrcPath + """ """ + strMaterialActorLinkFilePath + """", "SARC extract """ + strTmp + .Item(1, 4).Text + ".sbactorpack"" -C """ + strTemp + """"
+        Kill strSrcPath
         strSrcPath = strTemp + "\Actor\"
-        Call File_DeleteFolders(strSrcPath + "AIProgram", strSrcPath + "AS", strSrcPath + "ASList", strSrcPath + "AttClient", strSrcPath + "AttClientList", strSrcPath + "Chemical")
+        Call File_DeleteFileSystemObjects(strSrcPath + "AIProgram", strSrcPath + "AS", strSrcPath + "ASList", strSrcPath + "AttClient", strSrcPath + "AttClientList", strSrcPath + "Chemical")
         FILE_DoShellOperation SHELL_COPY_OPERATION, strTemp, strBoolDataPath
     End If
     'Prepare the drop tables data
@@ -1984,10 +1982,7 @@ Dim objDropTableDict As Object
         strFilePath = strActorPackPath + strDropTables(i)
         strTemp = strFilePath + "\Actor\DropTable\"
         If FILE_DoShellOperation(SHELL_COPY_OPERATION, strBoolDataPath, strTemp) <> 0 Then
-            strSrcPath = strFilePath + ".sbactorpack"
-            FILE_DoShellOperation SHELL_COPY_OPERATION, strTmp + strDropTables(i) + ".sbactorpack", strSrcPath
-            System_ShellAndWait 0, 1, "SARC extract """ + strSrcPath + """"
-            Kill strSrcPath
+            System_ShellAndWait 0, 1, "SARC extract """ + strTmp + strDropTables(i) + ".sbactorpack"" -C """ + strFilePath + """"
             strDropTables(i) = Dir(strTemp + "*.bdrop")
             strSrcPath = strTemp + strDropTables(i)
             strFilePath = strSrcPath + ".xml"
@@ -1997,18 +1992,36 @@ Dim objDropTableDict As Object
         End If
     Next i
     Erase strDropTables
-    'Extract bool_data_0.bgdata from Bootup.pack and gamedata.ssarc files
+    'Extract bool_data_X.bgdata revival_bool_data_X.bgdata from Bootup.pack and gamedata.ssarc files
     strTmp = Botw_Material2Rupee + "content\Pack\"
-    strBoolDataPath = strTmp + "Bootup\GameData\gamedata\bool_data_0.bgdata"
+    strDestRootPath = strTmp + "Bootup\GameData\gamedata\"
+    strBoolDataPath = strDestRootPath + "bool_data_0.bgdata"
     strSrcPath = strBoolDataPath + ".yml"
-    strTempPath = strCachePath + "content\Pack\Bootup\GameData\gamedata\bool_data_0.bgdata.yml"
-    If FILE_DoShellOperation(SHELL_COPY_OPERATION, strTempPath, strSrcPath) <> 0 Then
-        strFilePath = strTmp + "Bootup.pack"
-        FILE_DoShellOperation SHELL_COPY_OPERATION, strCemuFolderPath + "content\Pack\Bootup.pack", strFilePath
-        strTemp = strTmp + "Bootup\GameData\gamedata.ssarc"
-        System_ShellAndWait 0, 1, "BYML_TO_YML """ + strBoolDataPath + """ """ + strSrcPath + """", "SARC extract """ + strTemp + """", "SARC extract """ + strFilePath + """"
-        Call File_DeleteFiles(strFilePath, strTemp, strBoolDataPath)
+    strSrcRootPath = strCachePath + "content\Pack\Bootup\GameData\gamedata\"
+    strTempPath = strSrcRootPath + "bool_data_0.bgdata.yml"
+    If FILE_DoShellOperation(SHELL_COPY_OPERATION, strTempPath, strSrcPath) = 0 Then
+        For i = 1 To 2
+            strTemp = CStr(i)
+            System_ShellAndWait 0, 1, "YML_TO_BYML """ + strSrcRootPath + "bool_data_" + strTemp + ".bgdata.yml"" """ + strDestRootPath + "bool_data_" + strTemp + ".bgdata"""
+        Next i
+        For i = 0 To 7
+            strTemp = CStr(i)
+            System_ShellAndWait 0, 1, "YML_TO_BYML """ + strSrcRootPath + "revival_bool_data_" + strTemp + ".bgdata.yml"" """ + strDestRootPath + "revival_bool_data_" + strTemp + ".bgdata"""
+        Next i
+    Else
+        strFilePath = strTmp + "Bootup"
+        strTemp = strFilePath + "\GameData\gamedata.ssarc"
+        System_ShellAndWait 0, 1, "BYML_TO_YML """ + strBoolDataPath + """ """ + strSrcPath + """", "SARC extract """ + strTemp + """", "SARC extract """ + strCemuFolderPath + "content\Pack\Bootup.pack"" -C """ + strFilePath + """"
+        Call File_DeleteFileSystemObjects(strTemp, strBoolDataPath)
         FILE_DoShellOperation SHELL_COPY_OPERATION, strSrcPath, strTempPath
+        For i = 1 To 2
+            strTemp = CStr(i)
+            System_ShellAndWait 0, 1, "BYML_TO_YML """ + strDestRootPath + "bool_data_" + strTemp + ".bgdata"" """ + strSrcRootPath + "bool_data_" + strTemp + ".bgdata.yml"""
+        Next i
+        For i = 0 To 7
+            strTemp = CStr(i)
+            System_ShellAndWait 0, 1, "BYML_TO_YML """ + strDestRootPath + "revival_bool_data_" + strTemp + ".bgdata"" """ + strSrcRootPath + "revival_bool_data_" + strTemp + ".bgdata.yml"""
+        Next i
     End If
     'Prepare the Fake Rupee icon from its material sbitemico file
     FILE_DoShellOperation SHELL_COPY_OPERATION, strCemuFolderPath + "content\UI\StockItem\" + .Item(1, 4).Text + ".sbitemico", Botw_Material2Rupee + "content\UI\StockItem\" + .Item(1, 1).Text + ".sbitemico"
@@ -2021,15 +2034,18 @@ Dim objDropTableDict As Object
     If strTokens(2) = "bfres @1@" Then
         'Prepare the Fake Rupee model from their material model files
         strTempPath = "content\Model\" + .Item(1, 4).Text
-        strGamePath = Left(strGamePath, Len(strGamePath) - 15) + strTempPath
+        strDestRootPath = strGamePath + strTempPath
         strTempPath = strCemuFolderPath + strTempPath
         strTmp = Botw_Material2Rupee + "content\Model\"
         strTemp = strTmp + .Item(1, 1).Text
         MakeSureDirectoryPathExists strTmp
-        If CopyFile(strTempPath + ".sbfres", strTemp + ".sbfres", 0) = 0 Then CopyFile strGamePath + ".sbfres", strTemp + ".sbfres", 0
-        If CopyFile(strTempPath + ".Tex1.sbfres", strTemp + ".Tex1.sbfres", 0) = 0 Then CopyFile strGamePath + ".Tex1.sbfres", strTemp + ".Tex1.sbfres", 0
-        If CopyFile(strTempPath + ".Tex2.sbfres", strTemp + ".Tex2.sbfres", 0) = 0 Then CopyFile strGamePath + ".Tex2.sbfres", strTemp + ".Tex2.sbfres", 0
+        If CopyFile(strTempPath + ".sbfres", strTemp + ".sbfres", 0) = 0 Then CopyFile strDestRootPath + ".sbfres", strTemp + ".sbfres", 0
+        If CopyFile(strTempPath + ".Tex1.sbfres", strTemp + ".Tex1.sbfres", 0) = 0 Then CopyFile strDestRootPath + ".Tex1.sbfres", strTemp + ".Tex1.sbfres", 0
+        If CopyFile(strTempPath + ".Tex2.sbfres", strTemp + ".Tex2.sbfres", 0) = 0 Then CopyFile strDestRootPath + ".Tex2.sbfres", strTemp + ".Tex2.sbfres", 0
     End If
+    strSrcRootPath = strCachePath + .Item(1, 1).Text + "\"
+    FILE_DoShellOperation SHELL_COPY_OPERATION, strSrcRootPath + "content", Botw_Material2Rupee
+    FILE_DoShellOperation SHELL_COPY_OPERATION, strSrcRootPath + "rules.txt", Botw_Material2Rupee + "rules.txt"
     'Rebuild ActorInfo.product.sbyml
     strDropTables = Botw_GetDataBlockTextContents(strSrcPath, Botw_BuildActorInfoMetaData(strSrcPath), 1, "PutRupee", .Item(1, 4).Text)
     Set objDict = CreateObject("Scripting.Dictionary")
@@ -2038,19 +2054,19 @@ Dim objDropTableDict As Object
     j = UBound(strTokens)
     For i = 0 To j
         strTmp = Left(strTokens(i), InStr(strTokens(i), " ") - 1)
-        strGamePath = Right(strTokens(i), 3)
-        If strGamePath = "@0@" Then
+        strDestRootPath = Right(strTokens(i), 3)
+        If strDestRootPath = "@0@" Then
             Do Until EOF(intFreefile)
-                Line Input #intFreefile, strGamePath
-                strGamePath = Mid(strGamePath, 3)
-                k = InStr(strGamePath, ":")
-                If Left(strGamePath, k - 1) = strTmp Then
-                    objDict(strTmp) = Mid(strGamePath, k)
+                Line Input #intFreefile, strDestRootPath
+                strDestRootPath = Mid(strDestRootPath, 3)
+                k = InStr(strDestRootPath, ":")
+                If Left(strDestRootPath, k - 1) = strTmp Then
+                    objDict(strTmp) = Mid(strDestRootPath, k)
                     Exit Do
                 End If
             Loop
         Else
-            objDict(strTmp) = ": " + .Item(1, CLng(Mid(strGamePath, 2, 1))).Text
+            objDict(strTmp) = ": " + .Item(1, CLng(Mid(strDestRootPath, 2, 1))).Text
         End If
     Next i
     Close intFreefile
@@ -2059,12 +2075,12 @@ Dim objDropTableDict As Object
     intFreefile = FreeFile
     Open strDropTables(0) For Input As intFreefile
     Do Until EOF(intFreefile)
-        Line Input #intFreefile, strGamePath
-        strTemp = Mid(Left(strGamePath, InStr(strGamePath, ":") - 1), 3)
+        Line Input #intFreefile, strDestRootPath
+        strTemp = Mid(Left(strDestRootPath, InStr(strDestRootPath, ":") - 1), 3)
         If objDict.Exists(strTemp) Then
-            Print #intOutFile, Left(strGamePath, 2) + strTemp + objDict(strTemp)
+            Print #intOutFile, Left(strDestRootPath, 2) + strTemp + objDict(strTemp)
         Else
-            Print #intOutFile, strGamePath
+            Print #intOutFile, strDestRootPath
         End If
     Loop
     Close intFreefile
@@ -2084,14 +2100,13 @@ Dim objDropTableDict As Object
         lngCompareData(0) = lngStartOffset
     Else
         lngCompareData = Vector_SortStringItems(strTokens, STRINGITEMS_UHASH_COMPARE, True)
-        strGamePath = strCachePath + .Item(1, 1).Text + "\"
         For i = m To 0 Step -1
             strTempPath = strActorPackPath + strTokens(i)
             strTmp = strTempPath + "\Actor\DropTable\"
             strTokens(i) = Dir(strTmp + "*.bdrop.xml")
             strTemp = strTmp + Left(strTokens(i), Len(strTokens(i)) - 4)
             strTmp = strTmp + strTokens(i)
-            Set objDropTableDict = Botw_WriteDropTableFile(strTmp, strGamePath + strTokens(i))
+            Set objDropTableDict = Botw_WriteDropTableFile(strTmp, strSrcRootPath + strTokens(i))
             System_ShellAndWait 0, 0, "YML_TO_AAMP """ + strTmp + """ """ + strTemp + """"
             Kill strTmp
             System_ShellAndWait 0, 1, "SARC create """ + strTempPath + """ """ + strTempPath + ".sbactorpack"" -b"
@@ -2240,7 +2255,7 @@ Dim objDropTableDict As Object
     End With
     System_ShellAndWait 0, 1, "SARC create """ + strTempPath + """ """ + strTempPath + ".sbactorpack"" -b"
     With xlsFakeRupeeSettings
-    Call File_DeleteFolders(strTempPath, strActorPackPath + .Item(1, 4).Text)
+    Call File_DeleteFileSystemObjects(strTempPath, strActorPackPath + .Item(1, 4).Text)
     'Add IsGet_<FAKE RUPEE ACTOR NAME> game data into bool_data_0.bgdata and rebuild Bootup.pack
     strTmp = File_GetTempFilePath()
     strSrcPath = "IsGet_" + .Item(1, 1).Text
@@ -2254,7 +2269,7 @@ Dim objDropTableDict As Object
     Name strFilePath As strBoolDataPath
     File_PatchText strBoolDataPath, strFilePath, strTmp
     System_ShellAndWait 0, 1, "YML_TO_BYML """ + strFilePath + """ """ + strBoolDataPath + """"
-    Call File_DeleteFiles(strTmp, strFilePath)
+    Call File_DeleteFileSystemObjects(strTmp, strFilePath)
     System_ShellAndWait 0, 1, "SARC create """ + strSrcPath + """ """ + strSrcPath + "\..\gamedata.ssarc"" -b"
     FILE_DoShellOperation SHELL_DELETE_OPERATION, strSrcPath
     System_ShellAndWait 0, 1, "SARC create """ + strMaterialActorLinkFilePath + """ """ + strMaterialActorLinkFilePath + "\..\Bootup.pack"" -b"
@@ -2262,7 +2277,7 @@ Dim objDropTableDict As Object
     'build texts.json
     strTmp = """: {" + vbCrLf + "    ""ActorType/Item.msyt"": {"
     strTemp = "      """ + .Item(1, 1).Text + "_"
-    strGamePath = """: {" + vbCrLf + "        ""contents"": [" + vbCrLf + "          {" + vbCrLf + "            ""text"": """
+    strDestRootPath = """: {" + vbCrLf + "        ""contents"": [" + vbCrLf + "          {" + vbCrLf + "            ""text"": """
     strFilePath = """" + vbCrLf + "          }" + vbCrLf + "        ]" + vbCrLf + "      }"
     strSrcPath = "    }" + vbCrLf + "  }"
     strTokens = Split(.Item(1, 2).Text, vbLf)
@@ -2279,37 +2294,56 @@ Dim objDropTableDict As Object
     Close #intFreefile
     Erase strTokens
     'drop actor patch for map tbox objects
-    strGamePath = Botw_Material2Rupee + "content\Map\"
+    strCemuFolderPath = Botw_Material2Rupee + "content\Pack\"
+    strGamePath = strGamePath + "content\Pack\"
+    strDestRootPath = Botw_Material2Rupee + "content\Map\"
     strTempPath = strCachePath + "content\Map\"
+    strSrcRootPath = strCachePath + "content\Pack\"
     strTokens = Split(.Item(1, 6).Text, vbLf)
     For i = UBound(strTokens) To 0 Step -1
+        strBoolDataPath = ""
         strDropTables = Split(strTokens(i), " ")
         strTemp = strDropTables(0) + ".smubin"
-        strFilePath = strGamePath + strTemp
-        strSrcPath = strFilePath + ".yml"
-        strMaterialActorLinkFilePath = strTempPath + strTemp + ".yml"
-        If FILE_DoShellOperation(SHELL_COPY_OPERATION, strMaterialActorLinkFilePath, strSrcPath) <> 0 Then
-            MakeSureDirectoryPathExists Left(strFilePath, InStrRev(strFilePath, "\"))
-            System_ShellAndWait 0, 0, "BYML_TO_YML """ + strDlcFolderPath + "\content\0010\Map\" + strTemp + """ """ + strSrcPath + """"
-            FILE_DoShellOperation SHELL_COPY_OPERATION, strSrcPath, strMaterialActorLinkFilePath
-        End If
+        strTmp = Left(strTemp, InStr(strTemp, "\") - 1)
+        Select Case strTmp
+        Case "MainField"
+            strFilePath = strDestRootPath + strTemp
+            strSrcPath = strFilePath + ".yml"
+            strMaterialActorLinkFilePath = strTempPath + strTemp + ".yml"
+            If Dir(strMaterialActorLinkFilePath) = "" Then
+                MakeSureDirectoryPathExists Left(strMaterialActorLinkFilePath, InStrRev(strMaterialActorLinkFilePath, "\"))
+                System_ShellAndWait 0, 1, "BYML_TO_YML """ + strDlcFolderPath + "\content\0010\Map\" + strTemp + """ """ + strMaterialActorLinkFilePath + """"
+            End If
+        Case Else
+            strFilePath = strCemuFolderPath + strTemp
+            strSrcPath = strFilePath + ".yml"
+            strMaterialActorLinkFilePath = strSrcRootPath + strTemp + ".yml"
+            strBoolDataPath = strCemuFolderPath + strTmp
+            If Dir(strMaterialActorLinkFilePath) = "" Then
+                MakeSureDirectoryPathExists Left(strMaterialActorLinkFilePath, InStrRev(strMaterialActorLinkFilePath, "\"))
+                System_ShellAndWait 0, 1, "BYML_TO_YML """ + strFilePath + """ """ + strMaterialActorLinkFilePath + """", "SARC extract """ + strGamePath + strTmp + ".pack"" -C """ + strBoolDataPath + """"
+            End If
+        End Select
+        MakeSureDirectoryPathExists Left(strFilePath, InStrRev(strFilePath, "\"))
         strTmp = Left(strMaterialActorLinkFilePath, Len(strMaterialActorLinkFilePath) - 4) + "\"
+        'TOFIX
         k = Botw_BuildMapUnitMetadata(strMaterialActorLinkFilePath)
         intFreefile = FreeFile
-        Open strSrcPath For Binary Access Read As intFreefile
+        Open strMaterialActorLinkFilePath For Binary Access Read As intFreefile
         intOutFile = FreeFile
-        Open strFilePath For Binary Access Write As intOutFile
+        Open strSrcPath For Binary Access Write As intOutFile
         m = 0
-        For j = UBound(strDropTables) To 1 Step -1
-            strBoolDataPath = Botw_WriteModdedMapTBoxObjectContent(intFreefile, k, Right(strDropTables(j), 8), .Item(1, 1).Text, strTmp, lngDataBlockIndex)
+        If Left(strDropTables(1), 1) = "@" Then strDropTables(1) = .Item(1, CLng(Mid(strDropTables(1), 2, 1))).Text
+        For j = UBound(strDropTables) To 2 Step -1
+            strMaterialActorLinkFilePath = Botw_WriteModdedMapTBoxObjectContent(intFreefile, k, Right(strDropTables(j), 8), strDropTables(1), strTmp, lngDataBlockIndex)
             If lngDataBlockIndex > m Then
                 Get k, m * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, lngStartOffset
                 Get k, lngDataBlockIndex * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, m
                 Call File_CopyBytes(intOutFile, intFreefile, lngStartOffset, m - lngStartOffset)
             End If
-            Call File_CopyContent(intOutFile, strBoolDataPath)
+            Call File_CopyContent(intOutFile, strMaterialActorLinkFilePath)
             m = lngDataBlockIndex + 1
-            Kill strBoolDataPath
+            Kill strMaterialActorLinkFilePath
         Next j
         Get k, m * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, lngStartOffset
         Call File_CpyBytes(intOutFile, intFreefile, LOF(intFreefile) - lngStartOffset + 1, lngStartOffset)
@@ -2317,10 +2351,12 @@ Dim objDropTableDict As Object
         Close intOutFile
         Close k
         Close intFreefile
-        Kill strSrcPath
-        Name strFilePath As strSrcPath
         System_ShellAndWait 0, 0, "YML_TO_BYML """ + strSrcPath + """ """ + strFilePath + """"
         Kill strSrcPath
+        If strBoolDataPath <> "" Then
+            System_ShellAndWait 0, 1, "SARC create """ + strBoolDataPath + """ """ + strBoolDataPath + ".pack"" -b"
+            FILE_DoShellOperation SHELL_DELETE_OPERATION, strBoolDataPath
+        End If
     Next i
     Erase strTokens
     End With
@@ -2332,13 +2368,13 @@ Botw_Material2RupeeSub0:
     Print #intFreefile, strTmp
     Print #intFreefile, strTemp;
     Print #intFreefile, "Desc";
-    Print #intFreefile, strGamePath;
+    Print #intFreefile, strDestRootPath;
     Print #intFreefile, strDropTables(1);
     Print #intFreefile, strFilePath;
     Print #intFreefile, ","
     Print #intFreefile, strTemp;
     Print #intFreefile, "Name";
-    Print #intFreefile, strGamePath;
+    Print #intFreefile, strDestRootPath;
     Print #intFreefile, strDropTables(2);
     Print #intFreefile, strFilePath
     Print #intFreefile, strSrcPath;

@@ -67,16 +67,10 @@ Dim stShFileOperation As FILE_SHFILEOPSTRUCT
     End With
     FILE_DoShellOperation = SHFileOperation(stShFileOperation)
 End Function
-Public Sub File_DeleteFolders(ParamArray varFolderPaths() As Variant)
+Public Sub File_DeleteFileSystemObjects(ParamArray varFileSystemObjectPaths() As Variant)
 Dim i As Long
-    For i = UBound(varFolderPaths) To 0 Step -1
-        FILE_DoShellOperation SHELL_DELETE_OPERATION, varFolderPaths(i)
-    Next i
-End Sub
-Public Sub File_DeleteFiles(ParamArray varFilePaths() As Variant)
-Dim i As Long
-    For i = UBound(varFilePaths) To 0 Step -1
-        Kill varFilePaths(i)
+    For i = UBound(varFileSystemObjectPaths) To 0 Step -1
+        FILE_DoShellOperation SHELL_DELETE_OPERATION, varFileSystemObjectPaths(i)
     Next i
 End Sub
 Public Function File_GetTimestamp(ByRef strFilename As String, Optional ByRef FILE_TIMESTAMP_TYPE As FILE_TIMESTAMPS = FILE_TIMESTAMP_WRITE) As LongLong
