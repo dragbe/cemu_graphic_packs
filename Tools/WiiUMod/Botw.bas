@@ -2002,11 +2002,11 @@ Dim objDropTableDict As Object
     If FILE_DoShellOperation(SHELL_COPY_OPERATION, strTempPath, strSrcPath) = 0 Then
         For i = 1 To 2
             strTemp = CStr(i)
-            System_ShellAndWait 0, 1, "YML_TO_BYML """ + strSrcRootPath + "bool_data_" + strTemp + ".bgdata.yml"" """ + strDestRootPath + "bool_data_" + strTemp + ".bgdata"""
+            System_ShellAndWait 0, 1, "YML_TO_BYML """ + strSrcRootPath + "bool_data_" + strTemp + ".bgdata.yml"" """ + strDestRootPath + "bool_data_" + strTemp + ".bgdata"" -b"
         Next i
         For i = 0 To 7
             strTemp = CStr(i)
-            System_ShellAndWait 0, 1, "YML_TO_BYML """ + strSrcRootPath + "revival_bool_data_" + strTemp + ".bgdata.yml"" """ + strDestRootPath + "revival_bool_data_" + strTemp + ".bgdata"""
+            System_ShellAndWait 0, 1, "YML_TO_BYML """ + strSrcRootPath + "revival_bool_data_" + strTemp + ".bgdata.yml"" """ + strDestRootPath + "revival_bool_data_" + strTemp + ".bgdata"" -b"
         Next i
     Else
         strFilePath = strTmp + "Bootup"
@@ -2194,7 +2194,7 @@ Dim objDropTableDict As Object
     Close j
     Close k
     Erase lngCompareData
-    System_ShellAndWait 0, 1, "YML_TO_BYML """ + strDropTables(0) + """ """ + strFilePath + """"
+    System_ShellAndWait 0, 1, "YML_TO_BYML """ + strDropTables(0) + """ """ + strFilePath + """ -b"
     Kill strDropTables(0)
     Erase strDropTables
     strTempPath = strActorPackPath + .Item(1, 1).Text
@@ -2268,7 +2268,7 @@ Dim objDropTableDict As Object
     strFilePath = strBoolDataPath + ".yml"
     Name strFilePath As strBoolDataPath
     File_PatchText strBoolDataPath, strFilePath, strTmp
-    System_ShellAndWait 0, 1, "YML_TO_BYML """ + strFilePath + """ """ + strBoolDataPath + """"
+    System_ShellAndWait 0, 1, "YML_TO_BYML """ + strFilePath + """ """ + strBoolDataPath + """ -b"
     Call File_DeleteFileSystemObjects(strTmp, strFilePath)
     System_ShellAndWait 0, 1, "SARC create """ + strSrcPath + """ """ + strSrcPath + "\..\gamedata.ssarc"" -b"
     FILE_DoShellOperation SHELL_DELETE_OPERATION, strSrcPath
@@ -2301,61 +2301,62 @@ Dim objDropTableDict As Object
     strSrcRootPath = strCachePath + "content\Pack\"
     strTokens = Split(.Item(1, 6).Text, vbLf)
     For i = UBound(strTokens) To 0 Step -1
-        strBoolDataPath = ""
-        strDropTables = Split(strTokens(i), " ")
-        strTemp = strDropTables(0) + ".smubin"
-        strTmp = Left(strTemp, InStr(strTemp, "\") - 1)
-        Select Case strTmp
-        Case "MainField"
-            strFilePath = strDestRootPath + strTemp
-            strSrcPath = strFilePath + ".yml"
-            strMaterialActorLinkFilePath = strTempPath + strTemp + ".yml"
-            If Dir(strMaterialActorLinkFilePath) = "" Then
-                MakeSureDirectoryPathExists Left(strMaterialActorLinkFilePath, InStrRev(strMaterialActorLinkFilePath, "\"))
-                System_ShellAndWait 0, 1, "BYML_TO_YML """ + strDlcFolderPath + "\content\0010\Map\" + strTemp + """ """ + strMaterialActorLinkFilePath + """"
+        If Left(strTokens(i), 1) <> "#" Then
+            strBoolDataPath = ""
+            strDropTables = Split(strTokens(i), " ")
+            strTemp = strDropTables(0) + ".smubin"
+            strTmp = Left(strTemp, InStr(strTemp, "\") - 1)
+            Select Case strTmp
+            Case "MainField"
+                strFilePath = strDestRootPath + strTemp
+                strSrcPath = strFilePath + ".yml"
+                strMaterialActorLinkFilePath = strTempPath + strTemp + ".yml"
+                If Dir(strMaterialActorLinkFilePath) = "" Then
+                    MakeSureDirectoryPathExists Left(strMaterialActorLinkFilePath, InStrRev(strMaterialActorLinkFilePath, "\"))
+                    System_ShellAndWait 0, 1, "BYML_TO_YML """ + strDlcFolderPath + "\content\0010\Map\" + strTemp + """ """ + strMaterialActorLinkFilePath + """"
+                End If
+            Case Else
+                strFilePath = strCemuFolderPath + strTemp
+                strSrcPath = strFilePath + ".yml"
+                strMaterialActorLinkFilePath = strSrcRootPath + strTemp + ".yml"
+                strBoolDataPath = strCemuFolderPath + strTmp
+                If Dir(strMaterialActorLinkFilePath) = "" Then
+                    MakeSureDirectoryPathExists Left(strMaterialActorLinkFilePath, InStrRev(strMaterialActorLinkFilePath, "\"))
+                    System_ShellAndWait 0, 1, "BYML_TO_YML """ + strFilePath + """ """ + strMaterialActorLinkFilePath + """", "SARC extract """ + strGamePath + strTmp + ".pack"" -C """ + strBoolDataPath + """"
+                End If
+            End Select
+            MakeSureDirectoryPathExists Left(strFilePath, InStrRev(strFilePath, "\"))
+            strTmp = Left(strMaterialActorLinkFilePath, Len(strMaterialActorLinkFilePath) - 4) + "\"
+            k = Botw_BuildMapUnitMetadata(strMaterialActorLinkFilePath)
+            intFreefile = FreeFile
+            Open strMaterialActorLinkFilePath For Binary Access Read As intFreefile
+            intOutFile = FreeFile
+            Open strSrcPath For Binary Access Write As intOutFile
+            m = 0
+            If Left(strDropTables(1), 1) = "@" Then strDropTables(1) = .Item(1, CLng(Mid(strDropTables(1), 2, 1))).Text
+            For j = UBound(strDropTables) To 2 Step -1
+                strMaterialActorLinkFilePath = Botw_WriteModdedMapTBoxObjectContent(intFreefile, k, Right(strDropTables(j), 8), strDropTables(1), strTmp, lngDataBlockIndex)
+                If lngDataBlockIndex > m Then
+                    Get k, m * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, lngStartOffset
+                    Get k, lngDataBlockIndex * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, m
+                    Call File_CopyBytes(intOutFile, intFreefile, lngStartOffset, m - lngStartOffset)
+                End If
+                Call File_CopyContent(intOutFile, strMaterialActorLinkFilePath)
+                m = lngDataBlockIndex + 1
+                Kill strMaterialActorLinkFilePath
+            Next j
+            Get k, m * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, lngStartOffset
+            Call File_CpyBytes(intOutFile, intFreefile, LOF(intFreefile) - lngStartOffset + 1, lngStartOffset)
+            Erase strDropTables
+            Close intOutFile
+            Close k
+            Close intFreefile
+            System_ShellAndWait 0, 0, "YML_TO_BYML """ + strSrcPath + """ """ + strFilePath + """ -b"
+            Kill strSrcPath
+            If strBoolDataPath <> "" Then
+                System_ShellAndWait 0, 1, "SARC create """ + strBoolDataPath + """ """ + strBoolDataPath + ".pack"" -b"
+                FILE_DoShellOperation SHELL_DELETE_OPERATION, strBoolDataPath
             End If
-        Case Else
-            strFilePath = strCemuFolderPath + strTemp
-            strSrcPath = strFilePath + ".yml"
-            strMaterialActorLinkFilePath = strSrcRootPath + strTemp + ".yml"
-            strBoolDataPath = strCemuFolderPath + strTmp
-            If Dir(strMaterialActorLinkFilePath) = "" Then
-                MakeSureDirectoryPathExists Left(strMaterialActorLinkFilePath, InStrRev(strMaterialActorLinkFilePath, "\"))
-                System_ShellAndWait 0, 1, "BYML_TO_YML """ + strFilePath + """ """ + strMaterialActorLinkFilePath + """", "SARC extract """ + strGamePath + strTmp + ".pack"" -C """ + strBoolDataPath + """"
-            End If
-        End Select
-        MakeSureDirectoryPathExists Left(strFilePath, InStrRev(strFilePath, "\"))
-        strTmp = Left(strMaterialActorLinkFilePath, Len(strMaterialActorLinkFilePath) - 4) + "\"
-        'TOFIX
-        k = Botw_BuildMapUnitMetadata(strMaterialActorLinkFilePath)
-        intFreefile = FreeFile
-        Open strMaterialActorLinkFilePath For Binary Access Read As intFreefile
-        intOutFile = FreeFile
-        Open strSrcPath For Binary Access Write As intOutFile
-        m = 0
-        If Left(strDropTables(1), 1) = "@" Then strDropTables(1) = .Item(1, CLng(Mid(strDropTables(1), 2, 1))).Text
-        For j = UBound(strDropTables) To 2 Step -1
-            strMaterialActorLinkFilePath = Botw_WriteModdedMapTBoxObjectContent(intFreefile, k, Right(strDropTables(j), 8), strDropTables(1), strTmp, lngDataBlockIndex)
-            If lngDataBlockIndex > m Then
-                Get k, m * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, lngStartOffset
-                Get k, lngDataBlockIndex * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, m
-                Call File_CopyBytes(intOutFile, intFreefile, lngStartOffset, m - lngStartOffset)
-            End If
-            Call File_CopyContent(intOutFile, strMaterialActorLinkFilePath)
-            m = lngDataBlockIndex + 1
-            Kill strMaterialActorLinkFilePath
-        Next j
-        Get k, m * BOTW_DATABLOCKMETADATASIZE + BOTW_DATABLOCK_OFFSET_OFFSET + 1, lngStartOffset
-        Call File_CpyBytes(intOutFile, intFreefile, LOF(intFreefile) - lngStartOffset + 1, lngStartOffset)
-        Erase strDropTables
-        Close intOutFile
-        Close k
-        Close intFreefile
-        System_ShellAndWait 0, 0, "YML_TO_BYML """ + strSrcPath + """ """ + strFilePath + """"
-        Kill strSrcPath
-        If strBoolDataPath <> "" Then
-            System_ShellAndWait 0, 1, "SARC create """ + strBoolDataPath + """ """ + strBoolDataPath + ".pack"" -b"
-            FILE_DoShellOperation SHELL_DELETE_OPERATION, strBoolDataPath
         End If
     Next i
     Erase strTokens

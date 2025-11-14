@@ -869,3 +869,33 @@ Dim intTmpFile As Integer
     Close intTmpFile
     Kill strTmpFilePath
 End Sub
+Public Sub File_Multi2SingleLine(ByRef strFilePath As String, ByRef strBreak As String, Optional ByRef strJoin As String = "")
+Dim strTmpFilePath As String
+Dim intInput As Integer
+Dim intOutput As Integer
+Dim strLine As String
+Dim lngBreakLength As Long
+    lngBreakLength = Len(strBreak)
+    strTmpFilePath = File_GetTempFilePath
+    intOutput = FreeFile
+    Open strTmpFilePath For Output As intOutput
+    intInput = FreeFile
+    Open strFilePath For Input As intInput
+    Do Until EOF(intInput)
+        Line Input #intInput, strLine
+        If Right(strLine, lngBreakLength) = strBreak Then
+            Print #intOutput, strLine;
+            Do
+                Line Input #intInput, strLine
+                Print #intOutput, strJoin + LTrim(strLine);
+            Loop Until Right(strLine, lngBreakLength) <> strBreak
+            Print #intOutput, vbCrLf;
+        Else
+            Print #intOutput, strLine
+        End If
+    Loop
+    Close intInput
+    Close intOutput
+    Kill strFilePath
+    Name strTmpFilePath As strFilePath
+End Sub
