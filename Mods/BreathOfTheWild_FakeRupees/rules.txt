@@ -8,5 +8,12 @@ version = 5
 [Default]
 $DataLayerMemoryBase:int = 0x180
 $VanillaMaxRupeeValue:int = 300
-$AncientCrystalId:int = 16750 # {'A','n'} = *((int16 *) (pFakeRupeeActorName+3))
-$BombsNumGameDataPointerOffset:int = 0xB08
+$AncientCrystalId:int = 16750 # {'A','n'}
+$RedPotionId:int = 21093 # {'R','e'}
+$MasterKeyId:int = 19809 # {'M','a'}
+$RedPotionRupeeValue:int = 12 # PutRedPotion.bgparamlist["Rupee.RupeeValue"] = Red Potion Heart Pieces
+$AncientCrystalRupeeValue:int = 0xB08 # PutAncientCrystal.bgparamlist["Rupee.RupeeValue"] = BombsNum GameData Pointer Offset in DataLayer
+$MasterKeyRupeeValue:int = 0xB10 # PutMasterKey.bgparamlist["Rupee.RupeeValue"] = SmallKey GameData Pointer Offset in DataLayer
+
+# Fake Rupee Id = *((int16 *) (pFakeRupeeActorName+3))
+# Don't use 1, 5, 20, 50, 100, 300 for <FakeRupee>.bgparamlist["Rupee.RupeeValue"]
