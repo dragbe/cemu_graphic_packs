@@ -1,0 +1,10 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Key Ring
+path = "The Legend of Zelda: Breath of the Wild/Mods/Key Ring"
+description = The small keys can be used in any dungeon
+version = 5
+
+[Default]
+$DataLayerMemoryBase:int = 0x180
+$SmallKeyNumGameDataPointerOffset:int = 0xB10
