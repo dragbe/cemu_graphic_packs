@@ -1,0 +1,21 @@
+[Definition]
+titleIds = 00050000101C9300,00050000101C9400,00050000101C9500
+name = Bomb Bag
+path = "The Legend of Zelda: Breath of the Wild/Mods/Bomb Bag"
+description = Remote bomb rune as bomb bag
+version = 5
+
+[Default]
+$DataLayerMemoryBase:int = 0x180
+$BombsNumGameDataPointerOffset:int = 0xB08
+$WindBombSetting:int = 0
+
+[Preset]
+name = Enabled
+category = Wind Bomb (EXPERIMENTAL)
+$WindBombSetting:int = 0
+
+[Preset]
+name = Disabled
+category = Wind Bomb (EXPERIMENTAL)
+$WindBombSetting:int = 32
