@@ -75,7 +75,7 @@ _BOTW_DataLayer_SharedData:
 .int 0 # PlayerSavePos gamedata pointer [0x8C] -> *((f32 *) ((void *) pointer + 0x2C)) = PlayerSavePosX, *((f32 *) ((void *) pointer + 0x30)) = PlayerSavePosY, *((f32 *) ((void *) pointer + 0x34)) = PlayerSavePosZ
 .int 0 # PlayerSavePos savedata pointer [0x90]
 .int 0 # PorchItem_EquipFlag|PorchItem_Value1|PorchItem array length [0x94], CookMaterialName(0-4) array length [0x96]
-.int 0 # CookEffect(0-1)|StaminaRecover array length [0x98], not used yet [0x9A]
+.int 0 # CookEffect(0-1)|StaminaRecover array length [0x98], SmallKey array length [0x9A]
 .int -1 # Conditional loot #1 (0 < user defined uint hashId #1 <= user defined uint hashId #2) [0x9C]
 .int -1 # Conditional loot #2 [0xA0]
 _BOTW_DataLayer_MatCount:
@@ -747,6 +747,8 @@ _BOTW_DataLayer_FoodCount:
 .int 0 # Clear_Dungeon255 savedata pointer [0xB04]
 .int 0 # BombsNum gamedata pointer [0xB08]
 .int -1 # BombsNum savedata pointer [0xB0C]
+.int 0 # SmallKey gamedata pointer [0xB10] -> *((s32 *) ((void *) pointer + 32 * Item zero-based index + 0x14)) = SmallKey[Item zero-based index]
+.int -1 # SmallKey savedata pointer [0xB14]
 
 _BOTW_DataLayer_GameData:
 .int 8 # Data types count
@@ -1323,8 +1325,10 @@ _BOTW_DataLayer_GameData:
 .int 0x009402FC # Data (array length, array pointer) offsets in the '_BOTW_DataLayer_SharedData array'
 .int -2109173058 # PorchItem_EquipFlag (824892BE)
 # S32 array game data to collect
-.int -0x00010018 # Data count(1), HashValue offset(24)
-.int 0x009402F4 # Data (array length, array pointer) offsets in the '_BOTW_DataLayer_SharedData array'
+.int -0x00020018 # Data count(2), HashValue offset(24)
+.int 0x009A0B10 # Data (array length, array pointer) offsets in the '_BOTW_DataLayer_SharedData array'
+.int -135513030 # SmallKey (F7EC3C3A)
+.int 0x009402F4
 .int 1779039321 # PorchItem_Value1 (6A09FC59)
 # F32 array game data to collect
 .int 0
