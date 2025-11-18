@@ -2300,6 +2300,9 @@ Dim objDropTableDict As Object
     strTempPath = strCachePath + "content\Map\"
     strSrcRootPath = strCachePath + "content\Pack\"
     strTokens = Split(.Item(1, 6).Text, vbLf)
+    lngPreviousStartOffset = FreeFile
+    Open Botw_Material2Rupee + "logs\packs.json" For Output As lngPreviousStartOffset
+    Print #lngPreviousStartOffset, "{" + vbCrLf + "  ""Actor/Pack/" + .Item(1, 1).Text + ".bactorpack"": ""content\\Actor\\Pack\\" + .Item(1, 1).Text + ".sbactorpack"""
     For i = UBound(strTokens) To 0 Step -1
         If Left(strTokens(i), 1) <> "#" Then
             strBoolDataPath = ""
@@ -2316,6 +2319,7 @@ Dim objDropTableDict As Object
                     System_ShellAndWait 0, 1, "BYML_TO_YML """ + strDlcFolderPath + "\content\0010\Map\" + strTemp + """ """ + strMaterialActorLinkFilePath + """"
                 End If
             Case Else
+                Print #lngPreviousStartOffset, "  ""Pack/" + strTmp + ".pack"": ""content\\Pack\\" + strTmp + ".pack"""
                 strFilePath = strCemuFolderPath + strTemp
                 strSrcPath = strFilePath + ".yml"
                 strMaterialActorLinkFilePath = strSrcRootPath + strTemp + ".yml"
@@ -2359,7 +2363,14 @@ Dim objDropTableDict As Object
             End If
         End If
     Next i
+    Print #lngPreviousStartOffset, "}"
+    Close lngPreviousStartOffset
     Erase strTokens
+    strTmp = Left(Botw_Material2Rupee, Len(Botw_Material2Rupee) - 1)
+    strTemp = " """ + strTmp + ".bnp"" "
+    Set objDict = File_IniReadSectionSettings(Botw_Material2Rupee + "rules.txt", "Definition")
+    System_ShellAndWait 0, 1, "7Z a" + strTemp + """logs\packs.json""", "CD /D """ + Botw_Material2Rupee + """", "BNPTOOL create --output" + strTemp + "--name """ + objDict("name") + """ --version ""1.0.0"" --description """ + objDict("description") + """ """ + strTmp + """"
+    Set objDict = Nothing
     End With
     Exit Function
 Botw_Material2RupeeSub0:

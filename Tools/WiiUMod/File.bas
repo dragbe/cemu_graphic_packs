@@ -5,6 +5,7 @@ Private Declare PtrSafe Function GetTempFileName Lib "kernel32" Alias "GetTempFi
 Private Declare PtrSafe Function CreateFile Lib "kernel32.dll" Alias "CreateFileA" (ByVal lpFileName As String, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByVal lpSecurityAttributes As LongPtr, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
 Private Declare PtrSafe Function GetFileTime Lib "kernel32.dll" (ByVal hFile As Long, ByVal lpCreationTime As LongPtr, ByVal lpLastAccessTime As LongPtr, ByVal lpLastWriteTime As LongPtr) As Long
 Public Declare PtrSafe Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
+Public Declare PtrSafe Function GetPrivateProfileSection Lib "kernel32.dll" Alias "GetPrivateProfileSectionA" (ByVal lpApplicationName As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
 Public Declare PtrSafe Function CopyFile Lib "kernel32.dll" Alias "CopyFileA" (ByVal lpExistingFileName As String, ByVal lpNewFileName As String, ByVal bFailIfExists As Long) As Long
 Public Const FILE_ACCESS_GENERIC_READ As Long = &H80000000
 Public Const FILE_SHARE_READ As Long = &H1
@@ -380,6 +381,26 @@ End Function
 Public Function File_IniReadSetting(ByRef strIniFilename As String, ByRef strAppName As String, ByRef strKeyName As String, Optional ByRef strDefault As String = "") As String
     File_IniReadSetting = String(256, 0)
     File_IniReadSetting = Left(File_IniReadSetting, GetPrivateProfileString(strAppName, strKeyName, strDefault, File_IniReadSetting, 256, strIniFilename))
+End Function
+Public Function File_IniReadSectionSettings(ByRef strIniFilename As String, ByVal strAppName As String) As Object
+Dim strReturnedBuffer As String
+Dim lngBufferSize As Long
+Dim varout As Object
+Dim lngStartOffset As Long
+    Set varout = CreateObject("Scripting.Dictionary")
+    lngBufferSize = FileLen(strIniFilename)
+    strReturnedBuffer = String(lngBufferSize, 0)
+    strReturnedBuffer = Left(strReturnedBuffer, GetPrivateProfileSection(strAppName, strReturnedBuffer, lngBufferSize, strIniFilename))
+    lngBufferSize = InStr(strReturnedBuffer, vbNullChar)
+    lngStartOffset = 1
+    Do Until lngBufferSize = 0
+        strAppName = Mid(strReturnedBuffer, lngStartOffset, lngBufferSize - lngStartOffset)
+        lngStartOffset = InStr(strAppName, "=")
+        varout(Left(strAppName, lngStartOffset - 1)) = Mid(strAppName, lngStartOffset + 1)
+        lngStartOffset = lngBufferSize + 1
+        lngBufferSize = InStr(lngStartOffset, strReturnedBuffer, vbNullChar)
+    Loop
+    Set File_IniReadSectionSettings = varout
 End Function
 Public Sub File_ReadContent(ByRef strFilename As String, ByRef btContent() As Byte)
 Dim intFile As Integer
