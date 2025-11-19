@@ -37,11 +37,6 @@ Public Type stHashTableItem
     strValue As String
     lngHash As Long
 End Type
-Public Type stHashTable
-    stItems() As stHashTableItem
-    lngItemsCount As Long
-    lngHashesMap(1 To 50) As Long
-End Type
 Public Function Arrays_GetDimsCount(ByRef varArray As Variant) As Integer
 'MAX DIMENSIONS COUNT: 60
 Dim lngLbound As Long

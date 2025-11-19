@@ -422,3 +422,12 @@ Public Function Memory_GetInteger(ByRef lngProcess As Long, ByRef lngLngDataAddr
         If btDataSize < 8 Then Memory_GetInteger = Memory_GetInteger And (256^ ^ btDataSize - 1)
     End If
 End Function
+Public Function Memory_ItemCmp(ByRef lngptrMemItem1 As LongPtr, ByRef lngptrMemItem2 As LongPtr, ByVal lngItemSize As Long) As Integer
+Dim strMemData1 As String
+Dim strMemData2 As String
+    strMemData1 = Space(lngItemSize)
+    strMemData2 = strMemData1
+    Call CopyMemory(StrPtr(strMemData1), lngptrMemItem1, lngItemSize)
+    Call CopyMemory(StrPtr(strMemData2), lngptrMemItem2, lngItemSize)
+    Memory_ItemCmp = StrComp(strMemData1, strMemData2, vbBinaryCompare)
+End Function

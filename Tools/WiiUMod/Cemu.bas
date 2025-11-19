@@ -129,8 +129,10 @@ Public Sub Cemu_AddMemorySearcherDataMap(ByRef strDataName As String, ByVal btDa
         End With
     End If
 End Sub
-Public Function Cemu_LoadMemorySearcherDataMap(ByRef strDataSource As String, Optional ByRef strSeparator As String = "") As Long
+Public Function Cemu_LoadMemorySearcherDataMap(ByVal strDataSource As String, Optional ByRef strSeparator As String = "") As Long
 Dim xlsWorksheet As Worksheet
+Dim intFile As Integer
+Dim strSplitItems() As String
     If strSeparator = "" Then
         Set xlsWorksheet = ThisWorkbook.Worksheets(strDataSource)
         Cemu_LoadMemorySearcherDataMap = xlsWorksheet.Range("F1").Value - 1
@@ -147,7 +149,16 @@ Dim xlsWorksheet As Worksheet
         End If
         Set xlsWorksheet = Nothing
     Else
-        'TODO
+        intFile = FreeFile
+        Open strDataSource For Input As intFile
+        Do Until EOF(intFile)
+            Line Input #intFile, strDataSource
+            strSplitItems = Split(strDataSource, strSeparator, 4)
+            Call Cemu_AddMemorySearcherDataMap(strSplitItems(0), Cemu_GetMemorySearcherDataIndex(strSplitItems(1)), CLng(strSplitItems(2)), CLng(strSplitItems(3)))
+            Erase strSplitItems
+            Cemu_LoadMemorySearcherDataMap = Cemu_LoadMemorySearcherDataMap + 1
+        Loop
+        Close intFile
     End If
 End Function
 Public Function Cemu_GetRootFolderPath(Optional ByRef strUserDefinedPath As String = "")

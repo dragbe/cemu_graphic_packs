@@ -561,26 +561,68 @@ Dim stMemorySearcherEntries(0 To BOTW_INVENTORYITEM_PROPERTIESCOUNT - 1) As stGa
         Erase stMemoryDataMap.btData
     End If
 End Function
-Public Function Botw_InitHashesTable(ByRef strDataSource As String, ByRef stHashesTable() As stGameData, Optional ByRef strSeparator As String = "") As Long
+Public Function Botw_InitHashesTable(ByRef strDataSource As String, ByRef stHashesTable() As stGameData, Optional ByRef strDelimiter As String = "") As Long
 Dim xlsWorksheet As Worksheet
-    If strSeparator = "" Then
-        Set xlsWorksheet = Worksheets(strDataSource)
-        Botw_InitHashesTable = xlsWorksheet.Range("B1").Value
-        If Botw_InitHashesTable > 0 Then
-            ReDim stHashesTable(1 To Botw_InitHashesTable)
-            With xlsWorksheet.Range("A1:A" + xlsWorksheet.Range("B1").Text).Cells
-            Do
-                stHashesTable(Botw_InitHashesTable).strDataName = .Item(Botw_InitHashesTable, 1).Text
-                stHashesTable(Botw_InitHashesTable).lngHash = Hash_CRC32(stHashesTable(Botw_InitHashesTable).strDataName)
-                'stHashesTable(Botw_InitHashesTable).strHash = Right("0000000" + Hex(stHashesTable(Botw_InitHashesTable).lngHash), 8)
-                Botw_InitHashesTable = Botw_InitHashesTable - 1
-            Loop Until Botw_InitHashesTable = 0
-            Botw_InitHashesTable = .Rows.Count
-            End With
+Dim lngOffset As Long
+Dim lngPreviousOffset As Long
+Dim lngDelimiterLength As Long
+Dim strClipBoardText As String
+    If strDelimiter = "" Then
+        If strDataSource = "" Then
+            strClipBoardText = System_Clipboard
+            If strClipBoardText <> "" Then Botw_InitHashesTable = Botw_InitHashesTable(strClipBoardText, stHashesTable, vbCrLf)
+        Else
+            If InStr(strDataSource, "\") = 0 Then
+                Set xlsWorksheet = Worksheets(strDataSource)
+                Botw_InitHashesTable = xlsWorksheet.Range("B1").Value
+                If Botw_InitHashesTable > 0 Then
+                    ReDim stHashesTable(1 To Botw_InitHashesTable)
+                    With xlsWorksheet.Range("A1:A" + xlsWorksheet.Range("B1").Text).Cells
+                    Do
+                        stHashesTable(Botw_InitHashesTable).strDataName = .Item(Botw_InitHashesTable, 1).Text
+                        stHashesTable(Botw_InitHashesTable).lngHash = Hash_CRC32(stHashesTable(Botw_InitHashesTable).strDataName)
+                        'stHashesTable(Botw_InitHashesTable).strHash = Right("0000000" + Hex(stHashesTable(Botw_InitHashesTable).lngHash), 8)
+                        Botw_InitHashesTable = Botw_InitHashesTable - 1
+                    Loop Until Botw_InitHashesTable = 0
+                    Botw_InitHashesTable = .Rows.Count
+                    End With
+                End If
+                Set xlsWorksheet = Nothing
+            Else
+                lngOffset = FreeFile
+                Open strDataSource For Input As lngOffset
+                Do Until EOF(lngOffset)
+                    Botw_InitHashesTable = Botw_InitHashesTable + 1
+                    ReDim Preserve stHashesTable(1 To Botw_InitHashesTable)
+                    With stHashesTable(Botw_InitHashesTable)
+                        Line Input #lngOffset, .strDataName
+                        .lngHash = Hash_CRC32(.strDataName)
+                        '.strHash = Right("0000000" + Hex(.lngHash), 8)
+                    End With
+                Loop
+                Close lngOffset
+            End If
         End If
-        Set xlsWorksheet = Nothing
     Else
-        'TODO
+        If strDataSource = "" Then
+            strClipBoardText = System_Clipboard
+            If strClipBoardText <> "" Then Botw_InitHashesTable = Botw_InitHashesTable(strClipBoardText, stHashesTable, strDelimiter)
+        Else
+            lngDelimiterLength = Len(strDelimiter)
+            lngPreviousOffset = 1
+            lngOffset = InStr(strDataSource, strDelimiter)
+            Do Until lngOffset = 0
+                Botw_InitHashesTable = Botw_InitHashesTable + 1
+                ReDim Preserve stHashesTable(1 To Botw_InitHashesTable)
+                With stHashesTable(Botw_InitHashesTable)
+                    .strDataName = Mid(strDataSource, lngPreviousOffset, lngOffset - lngPreviousOffset)
+                    .lngHash = Hash_CRC32(.strDataName)
+                    '.strHash = Right("0000000" + Hex(.lngHash), 8)
+                End With
+                lngPreviousOffset = lngOffset + lngDelimiterLength
+                lngOffset = InStr(lngPreviousOffset, strDataSource, strDelimiter)
+            Loop
+        End If
     End If
 End Function
 Public Function Botw_GetGameSavePath(Optional ByRef strCemuFolderPath As String = "", Optional ByRef lngLngMinFileTimestamp As LongLong = 0) As String
